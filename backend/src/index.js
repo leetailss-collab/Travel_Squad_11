@@ -137,7 +137,9 @@ const FAM_USERS = [
   { name: "양슬기", pin: "871214", role: "user" },
   { name: "이준성", pin: "110324", role: "user" },
   { name: "이은성", pin: "140813", role: "user" },
-  { name: "이해성", pin: "200220", role: "user" }
+  { name: "이해성", pin: "200220", role: "user" },
+  { name: "이하성", pin: "210930", role: "user" },
+  { name: "이주성", pin: "231110", role: "user" }
 ];
 
 // Authentication API
@@ -191,17 +193,23 @@ app.get('/api/plans/:id', (req, res) => {
 
 // Create new plan
 app.post('/api/plans', (req, res) => {
-  const { title, startDate, endDate, members } = req.body;
+  const { title, startDate, endDate, members, manager, currency, accommodation, transportation, isEvent, description } = req.body;
   if (!title || !startDate || !endDate) {
     return res.status(400).json({ message: "제목, 시작일, 종료일은 필수입니다." });
   }
   const plans = loadPlans();
   const newPlan = {
-    id: plans.length + 1,
+    id: plans.reduce((maxId, plan) => Math.max(maxId, Number(plan.id) || 0), 0) + 1,
     title,
     startDate,
     endDate,
     members: members || [],
+    manager: manager || (members || [])[0] || '',
+    currency: currency || 'KRW',
+    ...(accommodation ? { accommodation } : {}),
+    ...(transportation ? { transportation } : {}),
+    ...(isEvent ? { isEvent: true } : {}),
+    ...(description ? { description } : {}),
     itinerary: [],
     expenses: [],
     checklists: []
@@ -209,6 +217,19 @@ app.post('/api/plans', (req, res) => {
   plans.push(newPlan);
   savePlans(plans);
   res.status(201).json(newPlan);
+});
+
+// Delete plan or event API
+app.delete('/api/plans/:id', (req, res) => {
+  const planId = parseInt(req.params.id);
+  let plans = loadPlans();
+  const exists = plans.some(p => p.id === planId);
+  if (!exists) {
+    return res.status(404).json({ message: "삭제할 일정을 찾을 수 없습니다." });
+  }
+  plans = plans.filter(p => p.id !== planId);
+  savePlans(plans);
+  res.json({ message: "일정이 성공적으로 삭제되었습니다." });
 });
 
 // Add Place Comment API
@@ -267,6 +288,12 @@ app.post('/api/plans/:id/itinerary', (req, res) => {
     time: p.time,
     name: p.name,
     description: p.description || '',
+    category: p.category || '관광',
+    estimatedCost: Number(p.estimatedCost ?? p.cost) || 0,
+    currency: p.currency || plans[planIndex].currency || 'KRW',
+    needsReservation: Boolean(p.needsReservation),
+    tip: p.tip || '',
+    payer: p.payer || '',
     comments: p.comments || []
   }));
 

@@ -214,6 +214,149 @@ body {
   color: var(--text-muted);
 }
 
+.trip-summary-panel {
+  margin-bottom: 16px;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--primary-light), var(--bg-card));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.trip-date-summary {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.exchange-rate-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.exchange-rate-line small { margin-left: auto; }
+
+.rate-source {
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--border);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.rate-source.live {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.travel-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.travel-meta-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  font-size: 0.76rem;
+}
+
+.travel-meta-card strong { color: var(--primary); }
+.travel-meta-card small { color: var(--text-muted); }
+
+.day-heading { flex-wrap: wrap; }
+.day-theme { font-size: 0.82rem; color: var(--primary); }
+.day-date { margin-left: auto; font-size: 0.78rem; font-weight: 400; color: var(--text-muted); }
+
+.timeline-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.category-badge {
+  flex: none;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.category-관광 { color: #7e22ce; background: #f3e8ff; }
+.category-식사 { color: #c2410c; background: #ffedd5; }
+.category-쇼핑 { color: #be185d; background: #fce7f3; }
+.category-이동 { color: #1d4ed8; background: #dbeafe; }
+.category-숙소 { color: #047857; background: #d1fae5; }
+.category-기타 { color: var(--text-muted); background: var(--border); }
+
+.timeline-cost {
+  margin-top: 8px;
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.reservation-required {
+  display: inline-block;
+  margin-top: 7px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #b45309;
+  background: #fef3c7;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.timeline-tip {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--warning);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--warning) 9%, var(--bg-card));
+  color: var(--text-muted);
+  font-size: 0.76rem;
+}
+
+.cost-input-row { display: flex; gap: 8px; }
+.cost-input-row .currency-select { width: 112px; flex: none; }
+.cost-preview { margin-top: 6px; color: var(--primary); font-size: 0.78rem; font-weight: 600; }
+
+.reservation-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 16px;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+
+.reservation-check input { width: 18px; height: 18px; accent-color: var(--primary); }
+
+.currency-detection-message {
+  margin-top: 8px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  color: #047857;
+  background: #d1fae5;
+  font-size: 0.77rem;
+  font-weight: 600;
+}
+
+@media (max-width: 390px) {
+  .travel-meta-grid { grid-template-columns: 1fr; }
+  .exchange-rate-line small { width: 100%; margin-left: 0; }
+}
+
 /* Tabs */
 .tabs {
   display: flex;
@@ -857,3 +1000,230 @@ body {
   color: var(--text-muted);
   padding: 16px 0;
 }
+
+/* Calendar Styles */
+.calendar-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 16px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.calendar-header h3 {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.calendar-nav-btn {
+  background: var(--bg-app);
+  border: 1px solid var(--border);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-main);
+  font-weight: bold;
+  transition: var(--transition);
+}
+
+.calendar-nav-btn:hover {
+  background: var(--border);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day-label {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 4px 0;
+}
+
+.calendar-day {
+  background: var(--bg-app);
+  border-radius: 8px;
+  aspect-ratio: 1;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: var(--transition);
+  position: relative;
+}
+
+.calendar-day:hover {
+  background: var(--border);
+}
+
+.calendar-day.inactive {
+  opacity: 0.4;
+}
+
+.calendar-day.today {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+.calendar-day.today .day-number {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.calendar-day.selected {
+  background: var(--primary);
+  color: white;
+}
+.calendar-day.selected .day-number {
+  color: white;
+}
+
+.day-number {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.calendar-events {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.calendar-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.calendar-dot.trip {
+  background: #a855f7; /* Purple */
+}
+
+.calendar-dot.event {
+  background: #10b981; /* Green */
+}
+
+/* Selected Day Panel */
+.selected-day-panel {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.selected-day-panel h4 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.selected-day-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.selected-day-event-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--bg-app);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.selected-day-event-item:hover {
+  background: var(--border);
+}
+
+.event-type-tag {
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: white;
+}
+
+.event-type-tag.trip {
+  background: #a855f7;
+}
+
+.event-type-tag.event {
+  background: #10b981;
+}
+
+.selected-day-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-secondary-sm {
+  flex: 1;
+  background: var(--bg-app);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition);
+}
+
+.btn-secondary-sm:hover {
+  background: var(--border);
+}
+
+/* Checkbox group for member selection */
+.members-checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-app);
+}
+
+.member-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--text-main);
+}
+

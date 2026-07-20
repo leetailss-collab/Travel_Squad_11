@@ -1,5 +1,102 @@
 import React, { useState, useEffect } from 'react';
 
+// Korean Holiday Name Mapping
+const HOLIDAY_NAMES_KO = {
+  "New Year's Day": "신정",
+  "Lunar New Year": "설날",
+  "Independence Movement Day": "삼일절",
+  "Labour Day": "근로자의 날",
+  "Children's Day": "어린이날",
+  "Buddha's Birthday": "석가탄신일",
+  "Local Election Day": "선거일",
+  "Memorial Day": "현충일",
+  "Constitution Day": "제헌절",
+  "Liberation Day": "광복절",
+  "Chuseok": "추석",
+  "National Foundation Day": "개천절",
+  "Hangul Day": "한글날",
+  "Christmas Day": "성탄절"
+};
+
+const CURRENCY_OPTIONS = {
+  KRW: { code: 'KRW', symbol: '₩', name: '원' },
+  JPY: { code: 'JPY', symbol: '¥', name: '엔' },
+  USD: { code: 'USD', symbol: '$', name: '달러' },
+  EUR: { code: 'EUR', symbol: '€', name: '유로' },
+  GBP: { code: 'GBP', symbol: '£', name: '파운드' },
+  CNY: { code: 'CNY', symbol: '¥', name: '위안' },
+  THB: { code: 'THB', symbol: '฿', name: '바트' },
+  VND: { code: 'VND', symbol: '₫', name: '동' },
+  TWD: { code: 'TWD', symbol: 'NT$', name: '대만달러' },
+  AUD: { code: 'AUD', symbol: 'A$', name: '호주달러' },
+  CAD: { code: 'CAD', symbol: 'C$', name: '캐나다달러' },
+  PHP: { code: 'PHP', symbol: '₱', name: '페소' },
+  SGD: { code: 'SGD', symbol: 'S$', name: '싱가포르달러' }
+};
+
+const COUNTRY_CURRENCY_MAP = {
+  일본: CURRENCY_OPTIONS.JPY,
+  도쿄: CURRENCY_OPTIONS.JPY,
+  오사카: CURRENCY_OPTIONS.JPY,
+  미국: CURRENCY_OPTIONS.USD,
+  유럽: CURRENCY_OPTIONS.EUR,
+  영국: CURRENCY_OPTIONS.GBP,
+  중국: CURRENCY_OPTIONS.CNY,
+  태국: CURRENCY_OPTIONS.THB,
+  베트남: CURRENCY_OPTIONS.VND,
+  대만: CURRENCY_OPTIONS.TWD,
+  호주: CURRENCY_OPTIONS.AUD,
+  캐나다: CURRENCY_OPTIONS.CAD,
+  필리핀: CURRENCY_OPTIONS.PHP,
+  싱가포르: CURRENCY_OPTIONS.SGD
+};
+
+const FALLBACK_KRW_RATES = {
+  KRW: 1, JPY: 9.3, USD: 1380, EUR: 1510, GBP: 1790, CNY: 190,
+  THB: 41, VND: 0.054, TWD: 42, AUD: 910, CAD: 1010, PHP: 24, SGD: 1060
+};
+
+const detectTripCurrency = (title = '') => {
+  const match = Object.entries(COUNTRY_CURRENCY_MAP).find(([keyword]) => title.includes(keyword));
+  return match ? { country: match[0], ...match[1] } : { country: '국내', ...CURRENCY_OPTIONS.KRW };
+};
+
+// Pre-registered Family Users
+const FAM_USERS = [
+  { name: "이정우", pin: "570413", role: "user" },
+  { name: "홍영숙", pin: "630124", role: "user" },
+  { name: "이진수", pin: "850119", role: "user" },
+  { name: "이아름", pin: "880803", role: "user" },
+  { name: "이현수", pin: "870707", role: "admin" },
+  { name: "양슬기", pin: "871214", role: "user" },
+  { name: "이준성", pin: "110324", role: "user" },
+  { name: "이은성", pin: "140813", role: "user" },
+  { name: "이해성", pin: "200220", role: "user" },
+  { name: "이하성", pin: "210930", role: "user" },
+  { name: "이주성", pin: "231110", role: "user" }
+];
+
+// Calculate international (man) age based on 6-digit YYMMDD pin
+const calculateManAge = (pin) => {
+  if (!pin || pin.length !== 6) return null;
+  const yy = parseInt(pin.substring(0, 2));
+  const mm = parseInt(pin.substring(2, 4));
+  const dd = parseInt(pin.substring(4, 6));
+  if (isNaN(yy) || isNaN(mm) || isNaN(dd)) return null;
+
+  const birthYear = yy >= 30 ? 1900 + yy : 2000 + yy;
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
+  const currentDay = today.getDate();
+
+  let age = currentYear - birthYear;
+  if (currentMonth < mm || (currentMonth === mm && currentDay < dd)) {
+    age--;
+  }
+  return age;
+};
+
 // Fallback Mock Data
 const DEFAULT_MOCK_PLANS = [
   {
@@ -58,6 +155,8 @@ function App() {
   const [plans, setPlans] = useState([]);
   const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [plan, setPlan] = useState(null); // Detailed state of the active plan
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [tempTitle, setTempTitle] = useState('');
   const [activeTab, setActiveTab] = useState('itinerary'); // 'itinerary' | 'checklist' | 'expense' | 'members'
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false); // Modal inside tabs (Add Itinerary / Expense / Checklist)
@@ -68,12 +167,75 @@ function App() {
   const [commentInputs, setCommentInputs] = useState({}); // { [placeId]: string }
 
   // Form States for adding new trip
-  const [newTrip, setNewTrip] = useState({ title: '', startDate: '', endDate: '', membersInput: '' });
+  const [newTrip, setNewTrip] = useState({ title: '', startDate: '', endDate: '', membersInput: '', currency: '' });
 
   // Form States inside detail tabs
-  const [newPlace, setNewPlace] = useState({ day: 1, time: '', name: '', description: '' });
+  const [newPlace, setNewPlace] = useState({
+    day: 1, time: '', name: '', description: '', category: '관광', estimatedCost: '',
+    currency: '', needsReservation: false, tip: '', payer: ''
+  });
   const [newCheck, setNewCheck] = useState({ title: '', assignee: '' });
   const [newExpense, setNewExpense] = useState({ title: '', amount: '', payer: '', date: '' });
+
+  // Calendar & Event States
+  const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
+  const [showAddEventModal, setShowAddEventModal] = useState(false);
+  const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '', members: [] });
+  const [showEditMembersModal, setShowEditMembersModal] = useState(false);
+  const [tempMembers, setTempMembers] = useState([]);
+
+  const [holidays, setHolidays] = useState([]);
+  const [exchangeRate, setExchangeRate] = useState({ rate: 1, source: '기본값', updatedAt: null, loading: false });
+
+  // Fetch Korean national holidays dynamically when calendar year changes
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      const year = currentCalendarDate.getFullYear();
+      try {
+        const response = await fetch(`https://date.nager.at/api/v4/Holidays/KR/${year}`);
+        if (response.ok) {
+          const data = await response.json();
+          setHolidays(data);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch holidays:", err);
+      }
+    };
+    fetchHolidays();
+  }, [currentCalendarDate.getFullYear()]);
+
+  useEffect(() => {
+    const currencyCode = plan?.currency || 'KRW';
+    if (!plan || currencyCode === 'KRW') {
+      setExchangeRate({ rate: 1, source: '원화', updatedAt: new Date(), loading: false });
+      return;
+    }
+
+    let cancelled = false;
+    const loadExchangeRate = async () => {
+      setExchangeRate(prev => ({ ...prev, loading: true }));
+      try {
+        const response = await fetch(`https://open.er-api.com/v6/latest/${currencyCode}`);
+        if (!response.ok) throw new Error('환율 응답 오류');
+        const data = await response.json();
+        const rate = Number(data?.rates?.KRW);
+        if (!rate) throw new Error('원화 환율 없음');
+        if (!cancelled) setExchangeRate({ rate, source: '실시간', updatedAt: new Date(), loading: false });
+      } catch (error) {
+        if (!cancelled) {
+          setExchangeRate({
+            rate: FALLBACK_KRW_RATES[currencyCode] || 1,
+            source: '기준 환율',
+            updatedAt: new Date(),
+            loading: false
+          });
+        }
+      }
+    };
+    loadExchangeRate();
+    return () => { cancelled = true; };
+  }, [plan?.currency]);
 
   // Load User and Plans on mount
   useEffect(() => {
@@ -152,19 +314,8 @@ function App() {
       }
     } catch (err) {
       console.warn("Offline authentication fallback:");
-      // Simulating login offline using preset list
-      const OFFLINE_USERS = [
-        { name: "이정우", pin: "570413", role: "user" },
-        { name: "홍영숙", pin: "630124", role: "user" },
-        { name: "이진수", pin: "850119", role: "user" },
-        { name: "이아름", pin: "880803", role: "user" },
-        { name: "이현수", pin: "870707", role: "admin" },
-        { name: "양슬기", pin: "871214", role: "user" },
-        { name: "이준성", pin: "110324", role: "user" },
-        { name: "이은성", pin: "140813", role: "user" },
-        { name: "이해성", pin: "200220", role: "user" }
-      ];
-      const matched = OFFLINE_USERS.find(u => u.name === loginForm.username && u.pin === loginForm.password);
+      // Simulating login offline using global FAM_USERS list
+      const matched = FAM_USERS.find(u => u.name === loginForm.username && u.pin === loginForm.password);
       if (matched) {
         const userObj = { name: matched.name, role: matched.role };
         setCurrentUser(userObj);
@@ -198,6 +349,17 @@ function App() {
     }).catch(err => console.log('Offline: sync postponed...'));
   };
 
+  // Save updated travel plan title
+  const handleSaveTitle = () => {
+    if (!tempTitle || !tempTitle.trim()) {
+      setIsEditingTitle(false);
+      return;
+    }
+    const updatedPlan = { ...plan, title: tempTitle.trim() };
+    saveUpdatedPlan(updatedPlan);
+    setIsEditingTitle(false);
+  };
+
   // Add New Travel Plan (Trip) - Accessible to all members
   const handleCreateTrip = async (e) => {
     e.preventDefault();
@@ -216,6 +378,8 @@ function App() {
       startDate: newTrip.startDate,
       endDate: newTrip.endDate,
       members,
+      manager: currentUser.name,
+      currency: newTrip.currency || detectTripCurrency(newTrip.title).code,
       itinerary: [],
       expenses: [],
       checklists: []
@@ -256,8 +420,84 @@ function App() {
     }
 
     // Reset forms
-    setNewTrip({ title: '', startDate: '', endDate: '', membersInput: '' });
+    setNewTrip({ title: '', startDate: '', endDate: '', membersInput: '', currency: '' });
     setShowAddTripModal(false);
+  };
+
+  // Add Custom Family Event
+  const handleCreateEvent = async (e) => {
+    e.preventDefault();
+    if (!newEvent.title || !newEvent.date) return;
+
+    const newEventData = {
+      title: newEvent.title,
+      startDate: newEvent.date,
+      endDate: newEvent.date,
+      isEvent: true,
+      members: newEvent.members.length > 0 ? newEvent.members : [currentUser.name],
+      description: newEvent.description || '',
+      itinerary: [],
+      expenses: [],
+      checklists: []
+    };
+
+    try {
+      const response = await fetch('/api/plans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newEventData)
+      });
+      if (response.ok) {
+        const createdEvent = await response.json();
+        setPlans([...plans, createdEvent]);
+        localStorage.setItem('family_travel_plans', JSON.stringify([...plans, createdEvent]));
+      } else {
+        throw new Error('Server failed to create event');
+      }
+    } catch (err) {
+      console.warn("Offline: creating event locally:", err);
+      const offlineCreatedEvent = {
+        id: Date.now(),
+        ...newEventData
+      };
+      const updatedPlans = [...plans, offlineCreatedEvent];
+      setPlans(updatedPlans);
+      localStorage.setItem('family_travel_plans', JSON.stringify(updatedPlans));
+    }
+
+    // Reset form
+    setNewEvent({ title: '', date: '', description: '', members: [] });
+    setShowAddEventModal(false);
+    setSelectedCalendarDate(null);
+  };
+
+  // Delete Travel Plan or Family Event
+  const handleDeletePlan = async (id) => {
+    const isConfirmed = window.confirm("정말로 이 일정(여행/행사)을 삭제하시겠습니까?");
+    if (!isConfirmed) return;
+
+    // Optimistically update local state
+    const updatedPlans = plans.filter(p => p.id !== id);
+    setPlans(updatedPlans);
+    localStorage.setItem('family_travel_plans', JSON.stringify(updatedPlans));
+    
+    // Clear selection if deleted plan was active
+    if (selectedPlanId === id) {
+      setPlan(null);
+      setSelectedPlanId(null);
+      setView('home');
+    }
+
+    try {
+      const response = await fetch(`/api/plans/${id}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete on server');
+      }
+    } catch (err) {
+      console.warn("Offline: deletion queued or failed on server:", err);
+    }
   };
 
   // Add Itinerary Place
@@ -281,11 +521,22 @@ function App() {
     };
     
     const targetDateStr = getTargetDate(plan.startDate, dayNumber);
+    const placeId = Date.now();
+    const costValue = newPlace.estimatedCost ? Number(newPlace.estimatedCost) : 0;
+    const costCurrency = newPlace.currency || plan.currency || 'KRW';
+    const payerValue = newPlace.payer || currentUser.name;
+
     const newPlaceObj = {
-      id: Date.now(),
+      id: placeId,
       time: newPlace.time,
       name: newPlace.name,
       description: newPlace.description,
+      category: newPlace.category,
+      estimatedCost: costValue,
+      currency: costCurrency,
+      needsReservation: newPlace.needsReservation,
+      tip: newPlace.tip,
+      payer: payerValue,
       comments: []
     };
 
@@ -300,8 +551,26 @@ function App() {
       updatedPlan.itinerary[dayIndex].places.sort((a, b) => a.time.localeCompare(b.time));
     }
 
+    // Auto-sync to expenses if there is a positive cost
+    if (costValue > 0) {
+      const newExpenseItem = {
+        id: placeId, // Link using same ID (or can use placeId explicitly as custom property)
+        placeId: placeId,
+        title: `[일정] ${newPlace.name}`,
+        amount: Math.round(costCurrency === 'KRW' ? costValue : costValue * (costCurrency === (plan.currency || 'KRW') ? exchangeRate.rate : (FALLBACK_KRW_RATES[costCurrency] || 1))),
+        originalAmount: costValue,
+        currency: costCurrency,
+        payer: payerValue,
+        date: targetDateStr
+      };
+      updatedPlan.expenses.push(newExpenseItem);
+    }
+
     saveUpdatedPlan(updatedPlan);
-    setNewPlace({ day: 1, time: '', name: '', description: '' });
+    setNewPlace({
+      day: 1, time: '', name: '', description: '', category: '관광', estimatedCost: '',
+      currency: plan.currency || 'KRW', needsReservation: false, tip: '', payer: ''
+    });
     setShowModal(false);
   };
 
@@ -411,23 +680,61 @@ function App() {
 
   // Current Date Helper to divide plans
   const today = new Date().toISOString().split('T')[0];
-  const activeTrips = plans.filter(p => p.endDate >= today);
-  const pastTrips = plans.filter(p => p.endDate < today);
+  const activeTrips = plans.filter(p => (currentUser?.role === 'admin' || p.members.includes(currentUser?.name)) && !p.isEvent && p.endDate >= today);
+  const pastTrips = plans.filter(p => (currentUser?.role === 'admin' || p.members.includes(currentUser?.name)) && !p.isEvent && p.endDate < today);
 
   // Calculate total expense
   const totalExpense = plan ? plan.expenses.reduce((sum, item) => sum + item.amount, 0) : 0;
+  const planCurrency = plan?.currency || detectTripCurrency(plan?.title).code;
+  const planCurrencyMeta = CURRENCY_OPTIONS[planCurrency] || CURRENCY_OPTIONS.KRW;
+  const detectedTrip = detectTripCurrency(newTrip.title);
+  const selectedTripCurrency = CURRENCY_OPTIONS[newTrip.currency] || detectedTrip;
+
+  const formatCurrency = (amount, currencyCode = planCurrency) => {
+    const meta = CURRENCY_OPTIONS[currencyCode] || { symbol: currencyCode, name: currencyCode };
+    return `${meta.symbol}${Number(amount || 0).toLocaleString('ko-KR', { maximumFractionDigits: 2 })} ${meta.name}`;
+  };
+
+  const formatCostComparison = (amount, currencyCode = planCurrency) => {
+    const value = Number(amount || 0);
+    if (!value) return '';
+    if (currencyCode === 'KRW') {
+      if (planCurrency === 'KRW') return formatCurrency(value, 'KRW');
+      const foreign = Math.round(value / (exchangeRate.rate || FALLBACK_KRW_RATES[planCurrency] || 1));
+      return `${formatCurrency(value, 'KRW')} (≈ ${formatCurrency(foreign, planCurrency)})`;
+    }
+    const rate = currencyCode === planCurrency
+      ? exchangeRate.rate
+      : (FALLBACK_KRW_RATES[currencyCode] || 1);
+    return `${formatCurrency(value, currencyCode)} (≈ ${formatCurrency(Math.round(value * rate), 'KRW')})`;
+  };
 
   // Render Login Screen if not authenticated
   if (!currentUser) {
     return (
-      <div className="app-container" style={{ justifyContent: 'center', minHeight: '100vh', background: 'radial-gradient(circle at top right, #e0e7ff 0%, var(--bg-app) 70%)' }}>
+      <div 
+        style={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          minHeight: '100vh', 
+          width: '100vw',
+          maxWidth: '100%',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          background: 'radial-gradient(circle at top right, #e0e7ff 0%, var(--bg-app) 70%)',
+          zIndex: 9999
+        }}
+      >
         <div className="login-card">
           <div className="login-header">
-            <span style={{ fontSize: '3rem' }}>✈️</span>
-            <h1>우리 가족 여행</h1>
-            <p>가족 전용 일정 및 경비 소통 공간</p>
+            <span style={{ fontSize: '3.5rem', display: 'block', marginBottom: '8px' }}>📅</span>
+            <h1>Travel Squad11</h1>
+            <p>가족 전용 소통 공간</p>
           </div>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleLogin} style={{ width: '100%' }}>
             <div className="form-group">
               <label>이름</label>
               <input 
@@ -470,8 +777,8 @@ function App() {
       {view === 'home' && (
         <>
           <header className="app-header">
-            <div className="logo">
-              <span>🏡</span> 가족 여행 홈
+            <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>📋</span> 일정 보드
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className="user-welcome">👋 <b>{currentUser.name}</b>님</span>
@@ -480,16 +787,250 @@ function App() {
           </header>
 
           <main className="app-content">
-            <div className="home-hero-card">
-              <h2>가족과 함께하는 다음 여행지는 어디인가요?</h2>
-              <p>일정, 준비물, 경비를 공유해 완벽한 가족 여행을 디자인해 보세요.</p>
-              <button className="btn-primary-rect" onClick={() => setShowAddTripModal(true)}>+ 새 여행 만들기</button>
-            </div>
+            <button 
+              className="submit-btn" 
+              style={{ marginBottom: '24px' }} 
+              onClick={() => setShowAddTripModal(true)}
+            >
+              + 새 여행 만들기
+            </button>
+
+            {/* 1. Monthly Calendar */}
+            {(() => {
+              const calendarCells = [];
+              const year = currentCalendarDate.getFullYear();
+              const month = currentCalendarDate.getMonth();
+              
+              const firstDayIndex = new Date(year, month, 1).getDay();
+              const totalDays = new Date(year, month + 1, 0).getDate();
+              const prevMonthTotalDays = new Date(year, month, 0).getDate();
+
+              // Trailing days from previous month
+              for (let i = firstDayIndex - 1; i >= 0; i--) {
+                const day = prevMonthTotalDays - i;
+                const cellYear = month === 0 ? year - 1 : year;
+                const cellMonth = month === 0 ? 12 : month;
+                calendarCells.push({
+                  dateStr: `${cellYear}-${String(cellMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+                  dayNum: day,
+                  isCurrentMonth: false
+                });
+              }
+
+              // Days of current month
+              for (let i = 1; i <= totalDays; i++) {
+                calendarCells.push({
+                  dateStr: `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`,
+                  dayNum: i,
+                  isCurrentMonth: true
+                });
+              }
+
+              // Leading days of next month
+              const totalGridCells = calendarCells.length > 35 ? 42 : 35;
+              const remainingCells = totalGridCells - calendarCells.length;
+              for (let i = 1; i <= remainingCells; i++) {
+                const cellYear = month === 11 ? year + 1 : year;
+                const cellMonth = month === 11 ? 1 : month + 2;
+                calendarCells.push({
+                  dateStr: `${cellYear}-${String(cellMonth).padStart(2, '0')}-${String(i).padStart(2, '0')}`,
+                  dayNum: i,
+                  isCurrentMonth: false
+                });
+              }
+
+              const getCellEvents = (dateStr) => {
+                return plans.filter(p => {
+                  const hasAccess = currentUser?.role === 'admin' || p.members.includes(currentUser?.name);
+                  if (!hasAccess) return false;
+                  return p.startDate <= dateStr && dateStr <= p.endDate;
+                });
+              };
+
+              const getHoliday = (dateStr) => {
+                return holidays.find(h => h.date === dateStr);
+              };
+
+              const handlePrevMonth = () => {
+                setCurrentCalendarDate(new Date(year, month - 1, 1));
+              };
+
+              const handleNextMonth = () => {
+                setCurrentCalendarDate(new Date(year, month + 1, 1));
+              };
+
+              const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+              const todayStr = new Date().toISOString().split('T')[0];
+              const selectedEvents = selectedCalendarDate ? getCellEvents(selectedCalendarDate) : [];
+
+              return (
+                <div className="calendar-card">
+                  <div className="calendar-header">
+                    <h3>📅 {year}년 {month + 1}월</h3>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button className="calendar-nav-btn" onClick={handlePrevMonth}>&lt;</button>
+                      <button className="calendar-nav-btn" onClick={handleNextMonth}>&gt;</button>
+                    </div>
+                  </div>
+
+                  <div className="calendar-grid">
+                    {weekdays.map((w, idx) => (
+                      <div 
+                        key={w} 
+                        className="calendar-day-label"
+                        style={{ color: idx === 0 ? 'var(--danger)' : idx === 6 ? '#2563eb' : 'var(--text-muted)' }}
+                      >
+                        {w}
+                      </div>
+                    ))}
+                    {calendarCells.map((cell, idx) => {
+                      const isToday = cell.dateStr === todayStr;
+                      const isSelected = cell.dateStr === selectedCalendarDate;
+                      const cellEvents = getCellEvents(cell.dateStr);
+
+                      // Check day of week
+                      const parts = cell.dateStr.split('-');
+                      const cellDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                      const dayOfWeek = cellDate.getDay();
+
+                      // Check holiday
+                      const holiday = getHoliday(cell.dateStr);
+                      const isHoliday = !!holiday;
+
+                      // Style day number
+                      let dayColor = 'var(--text-main)';
+                      if (dayOfWeek === 0 || isHoliday) {
+                        dayColor = 'var(--danger)'; // Red for Sunday or Holiday
+                      } else if (dayOfWeek === 6) {
+                        dayColor = '#2563eb'; // Blue for Saturday
+                      }
+
+                      return (
+                        <div
+                          key={idx}
+                          className={`calendar-day ${cell.isCurrentMonth ? '' : 'inactive'} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}`}
+                          onClick={() => setSelectedCalendarDate(cell.dateStr)}
+                        >
+                          <span className="day-number" style={{ color: isSelected ? 'white' : dayColor }}>
+                            {cell.dayNum}
+                          </span>
+
+                          {/* Holiday label */}
+                          {isHoliday && (
+                            <span 
+                              style={{ 
+                                fontSize: '0.52rem', 
+                                color: isSelected ? 'rgba(255,255,255,0.9)' : 'var(--danger)', 
+                                fontWeight: 'bold',
+                                textAlign: 'center',
+                                display: 'block',
+                                marginTop: '1px',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                width: '100%'
+                              }}
+                              title={HOLIDAY_NAMES_KO[holiday.name] || holiday.name}
+                            >
+                              {HOLIDAY_NAMES_KO[holiday.name] || holiday.name}
+                            </span>
+                          )}
+
+                          <div className="calendar-events">
+                            {cellEvents.map(e => (
+                              <div
+                                key={e.id}
+                                className={`calendar-dot ${e.isEvent ? 'event' : 'trip'}`}
+                                title={e.title}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Selected Date Details & Actions */}
+                  {selectedCalendarDate && (
+                    <div className="selected-day-panel">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <h4 style={{ margin: 0 }}>📌 {selectedCalendarDate} 일정 목록</h4>
+                        <button className="close-btn" style={{ fontSize: '1.25rem', padding: '0 4px', cursor: 'pointer' }} onClick={() => setSelectedCalendarDate(null)}>×</button>
+                      </div>
+                      {selectedEvents.length === 0 ? (
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '12px' }}>등록된 일정이 없습니다.</div>
+                      ) : (
+                        <div className="selected-day-events-list">
+                          {selectedEvents.map(e => (
+                            <div
+                              key={e.id}
+                              className="selected-day-event-item"
+                              onClick={() => {
+                                if (!e.isEvent) {
+                                  fetchSinglePlan(e.id);
+                                }
+                              }}
+                              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                            >
+                              <span>
+                                <span className={`event-type-tag ${e.isEvent ? 'event' : 'trip'}`} style={{ marginRight: '6px' }}>
+                                  {e.isEvent ? '행사' : '여행'}
+                                </span>
+                                {e.title}
+                              </span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                {!e.isEvent && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>자세히 ➔</span>}
+                                <button
+                                  className="logout-btn"
+                                  style={{
+                                    padding: '2px 8px',
+                                    fontSize: '0.7rem',
+                                    margin: 0,
+                                    border: '1px solid var(--danger)',
+                                    borderRadius: '6px',
+                                    color: 'var(--danger)',
+                                    background: 'transparent',
+                                    cursor: 'pointer'
+                                  }}
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleDeletePlan(e.id);
+                                  }}
+                                >
+                                  삭제
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      <div className="selected-day-actions">
+                        <button
+                          className="btn-secondary-sm"
+                          onClick={() => {
+                            setNewEvent({
+                              title: '',
+                              date: selectedCalendarDate,
+                              description: '',
+                              members: [currentUser.name]
+                            });
+                            setShowAddEventModal(true);
+                          }}
+                        >
+                          🔔 가족 행사 등록
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })() }
 
             {/* Active & Upcoming Trips */}
             <div className="section-title">📅 예정된 & 진행 중인 여행</div>
             {activeTrips.length === 0 ? (
-              <div className="empty-state">진행 예정인 여행이 없습니다. 아래 버튼으로 새로 등록해 보세요!</div>
+              <div className="empty-state">진행 예정인 여행이 없습니다.</div>
             ) : (
               activeTrips.map(p => (
                 <div key={p.id} className="trip-card" onClick={() => fetchSinglePlan(p.id)}>
@@ -548,9 +1089,80 @@ function App() {
           {/* Header */}
           <header className="app-header">
             <button className="back-btn" onClick={() => setView('home')}>← 홈</button>
-            <div className="logo" style={{ fontSize: '1.05rem' }}>
-              <span>✈️</span> {plan.title}
-            </div>
+            {isEditingTitle ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: 1, maxWidth: '200px' }}>
+                <input
+                  type="text"
+                  className="form-control"
+                  style={{
+                    fontSize: '0.9rem',
+                    padding: '4px 6px',
+                    margin: 0,
+                    flex: 1,
+                    minWidth: '80px',
+                    maxWidth: '130px',
+                    fontWeight: '700',
+                    height: '32px'
+                  }}
+                  value={tempTitle}
+                  onChange={(e) => setTempTitle(e.target.value)}
+                  onBlur={handleSaveTitle}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveTitle();
+                    if (e.key === 'Escape') setIsEditingTitle(false);
+                  }}
+                  autoFocus
+                />
+                <button 
+                  onMouseDown={(e) => { e.preventDefault(); handleSaveTitle(); }}
+                  onTouchStart={(e) => { e.preventDefault(); handleSaveTitle(); }}
+                  style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    fontSize: '1.2rem', 
+                    cursor: 'pointer', 
+                    padding: '2px 4px', 
+                    color: 'var(--primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  title="저장"
+                >
+                  ✓
+                </button>
+                <button 
+                  onMouseDown={(e) => { e.preventDefault(); setIsEditingTitle(false); }}
+                  onTouchStart={(e) => { e.preventDefault(); setIsEditingTitle(false); }}
+                  style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    fontSize: '1.2rem', 
+                    cursor: 'pointer', 
+                    padding: '2px 4px', 
+                    color: 'var(--danger)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  title="취소"
+                >
+                  ✗
+                </button>
+              </div>
+            ) : (
+              <div 
+                className="logo" 
+                style={{ fontSize: '1.05rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                onClick={() => {
+                  setTempTitle(plan.title);
+                  setIsEditingTitle(true);
+                }}
+                title="클릭하여 제목 수정"
+              >
+                {plan.title} <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>✏️</span>
+              </div>
+            )}
             <div className="avatar-group">
               {plan.members.slice(0, 3).map((m, idx) => (
                 <div key={idx} className="avatar">{m[0]}</div>
@@ -566,15 +1178,44 @@ function App() {
             <div className="tabs">
               <button className={`tab-btn ${activeTab === 'itinerary' ? 'active' : ''}`} onClick={() => setActiveTab('itinerary')}>📅 일정</button>
               <button className={`tab-btn ${activeTab === 'checklist' ? 'active' : ''}`} onClick={() => setActiveTab('checklist')}>🎒 준비물</button>
-              <button className={`tab-btn ${activeTab === 'expense' ? 'active' : ''}`} onClick={() => setActiveTab('expense')}>🪙 경비</button>
+              <button className={`tab-btn ${activeTab === 'expense' ? 'active' : ''}`} onClick={() => setActiveTab('expense')}>💰 경비</button>
               <button className={`tab-btn ${activeTab === 'members' ? 'active' : ''}`} onClick={() => setActiveTab('members')}>👥 가족</button>
             </div>
 
             {/* 1. ITINERARY TAB */}
             {activeTab === 'itinerary' && (
               <div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                  💡 여행 일정: {plan.startDate} ~ {plan.endDate}
+                <div className="trip-summary-panel">
+                  <div className="trip-date-summary">🗓️ {plan.startDate} ~ {plan.endDate}</div>
+                  <div className="exchange-rate-line">
+                    💱 현재 환율: 1{planCurrencyMeta.name} ≈ {exchangeRate.rate.toLocaleString('ko-KR', { maximumFractionDigits: 2 })}원
+                    <span className={`rate-source ${exchangeRate.source === '실시간' ? 'live' : ''}`}>
+                      {exchangeRate.loading ? '조회 중' : exchangeRate.source}
+                    </span>
+                    {exchangeRate.updatedAt && <small>{exchangeRate.updatedAt.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 갱신</small>}
+                  </div>
+                  {(plan.accommodation || plan.transportation?.length > 0) && (
+                    <div className="travel-meta-grid">
+                      {plan.accommodation && (
+                        <div className="travel-meta-card">
+                          <strong>🏨 숙소</strong>
+                          <span>{plan.accommodation.name}</span>
+                          <small>{[plan.accommodation.location, plan.accommodation.highlight].filter(Boolean).join(' · ')}</small>
+                        </div>
+                      )}
+                      {plan.transportation?.length > 0 && (
+                        <div className="travel-meta-card">
+                          <strong>🚇 교통</strong>
+                          {plan.transportation.map((item, index) => (
+                            <span key={`${item.type}-${index}`}>
+                              {item.type}{item.route ? ` · ${item.route}` : ''}
+                              {item.cost ? ` · ${formatCostComparison(item.cost, item.currency)}` : ''}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 {plan.itinerary.length === 0 ? (
                   <div className="empty-state">
@@ -583,7 +1224,11 @@ function App() {
                 ) : (
                   plan.itinerary.map((dayItem) => (
                     <div key={dayItem.day} className="card" style={{ padding: '20px 16px' }}>
-                      <h3 className="card-title">Day {dayItem.day} <span style={{ fontSize: '0.85rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>({dayItem.date})</span></h3>
+                      <h3 className="card-title day-heading">
+                        Day {dayItem.day}
+                        {dayItem.title && <span className="day-theme">{dayItem.title}</span>}
+                        <span className="day-date">({dayItem.date})</span>
+                      </h3>
                       <div className="timeline">
                         {dayItem.places.length === 0 ? (
                           <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>아직 등록된 일정이 없습니다.</div>
@@ -593,8 +1238,19 @@ function App() {
                               <div className="timeline-dot"></div>
                               <div className="timeline-content">
                                 <div className="timeline-time">{place.time}</div>
-                                <div className="timeline-place">{place.name}</div>
+                                <div className="timeline-title-row">
+                                  <div className="timeline-place">{place.name}</div>
+                                  {place.category && <span className={`category-badge category-${place.category}`}>{place.category}</span>}
+                                </div>
                                 {place.description && <div className="timeline-desc">{place.description}</div>}
+                                {(place.estimatedCost > 0 || place.cost > 0) && (
+                                  <div className="timeline-cost">
+                                    💴 {formatCostComparison(place.estimatedCost ?? place.cost, place.currency || (place.estimatedCost ? planCurrency : 'KRW'))}
+                                    {place.payer && <span> · {place.payer} 결제</span>}
+                                  </div>
+                                )}
+                                {place.needsReservation && <div className="reservation-required">🎫 예약 필요</div>}
+                                {place.tip && <div className="timeline-tip">💡 {place.tip}</div>}
                                 
                                 {/* Comments Toggle Button */}
                                 <div className="comments-toggle" onClick={() => toggleCommentsDrawer(place.id)}>
@@ -682,7 +1338,7 @@ function App() {
                 </div>
 
                 <div className="card">
-                  <h3 className="card-title">🪙 경비 상세 내역</h3>
+                  <h3 className="card-title">💰 경비 상세 내역</h3>
                   <div>
                     {plan.expenses.length === 0 ? (
                       <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px 0' }}>등록된 경비 내역이 없습니다.</div>
@@ -706,19 +1362,49 @@ function App() {
             {/* 4. MEMBERS TAB */}
             {activeTab === 'members' && (
               <div className="card">
-                <h3 className="card-title">👥 함께하는 가족</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h3 className="card-title" style={{ margin: 0 }}>👥 함께하는 가족</h3>
+                  {(currentUser.role === 'admin' || plan.members.includes(currentUser.name)) && (
+                    <button 
+                      className="btn-secondary-sm"
+                      style={{ fontSize: '0.85rem', padding: '8px 16px', flex: 'none', width: 'auto' }}
+                      onClick={() => {
+                        setTempMembers([...plan.members]);
+                        setShowEditMembersModal(true);
+                      }}
+                    >
+                      ⚙️ 가족 추가/제외
+                    </button>
+                  )}
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {plan.members.map((m, idx) => (
-                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0' }}>
-                      <div className="avatar" style={{ margin: 0, width: '40px', height: '40px', fontSize: '1.1rem' }}>{m[0]}</div>
-                      <div>
-                        <div style={{ fontWeight: '600' }}>{m}</div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                          {m === '이현수' ? '👑 여행 총괄 관리자' : '참여자'}
+                  {(() => {
+                    const sortedMembers = [...plan.members].sort((a, b) => {
+                      const uA = FAM_USERS.find(u => u.name === a);
+                      const uB = FAM_USERS.find(u => u.name === b);
+                      const ageA = uA ? calculateManAge(uA.pin) : -1;
+                      const ageB = uB ? calculateManAge(uB.pin) : -1;
+                      return ageB - ageA;
+                    });
+                    return sortedMembers.map((m, idx) => {
+                      const isPlanManager = m === (plan.manager || '이현수');
+                      const userObj = FAM_USERS.find(u => u.name === m);
+                      const age = userObj ? calculateManAge(userObj.pin) : null;
+                      return (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0' }}>
+                          <div className="avatar" style={{ margin: 0, width: '40px', height: '40px', fontSize: '1.1rem' }}>{m[0]}</div>
+                          <div>
+                            <div style={{ fontWeight: '600' }}>
+                              {m} {age !== null && <span style={{ fontSize: '0.85rem', fontWeight: 'normal', color: 'var(--text-muted)', marginLeft: '6px' }}>(만 {age}세)</span>}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                              {isPlanManager ? '👑 여행 총괄 관리자' : '참여자'}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             )}
@@ -740,7 +1426,7 @@ function App() {
               <span>준비물</span>
             </div>
             <div className={`nav-item ${activeTab === 'expense' ? 'active' : ''}`} onClick={() => setActiveTab('expense')}>
-              <span className="nav-icon">🪙</span>
+              <span className="nav-icon">💰</span>
               <span>경비</span>
             </div>
             <div className={`nav-item ${activeTab === 'members' ? 'active' : ''}`} onClick={() => setActiveTab('members')}>
@@ -757,7 +1443,7 @@ function App() {
                   <h3>
                     {activeTab === 'itinerary' && '📅 일정 추가'}
                     {activeTab === 'checklist' && '🎒 준비물 추가'}
-                    {activeTab === 'expense' && '🪙 경비 추가'}
+                    {activeTab === 'expense' && '💰 경비 추가'}
                   </h3>
                   <button className="close-btn" onClick={() => setShowModal(false)}>×</button>
                 </div>
@@ -782,8 +1468,41 @@ function App() {
                       <input type="text" required placeholder="예: 함덕 해수욕장" className="form-control" value={newPlace.name} onChange={e => setNewPlace({ ...newPlace, name: e.target.value })} />
                     </div>
                     <div className="form-group">
+                      <label>카테고리</label>
+                      <select className="form-control" value={newPlace.category} onChange={e => setNewPlace({ ...newPlace, category: e.target.value })}>
+                        {['관광', '식사', '쇼핑', '이동', '숙소', '기타'].map(category => <option key={category} value={category}>{category}</option>)}
+                      </select>
+                    </div>
+                    <div className="form-group">
                       <label>메모/설명</label>
                       <textarea placeholder="예: 바다 구경 및 망고주스 마시기" className="form-control" value={newPlace.description} onChange={e => setNewPlace({ ...newPlace, description: e.target.value })}></textarea>
+                    </div>
+                    <div className="form-group">
+                      <label>예상 비용 (선택사항)</label>
+                      <div className="cost-input-row">
+                        <select className="form-control currency-select" value={newPlace.currency || planCurrency} onChange={e => setNewPlace({ ...newPlace, currency: e.target.value })}>
+                          <option value={planCurrency}>{planCurrencyMeta.symbol} {planCurrencyMeta.name}</option>
+                          {planCurrency !== 'KRW' && <option value="KRW">₩ 원</option>}
+                        </select>
+                        <input type="number" min="0" placeholder="금액 입력" className="form-control" value={newPlace.estimatedCost} onChange={e => setNewPlace({ ...newPlace, estimatedCost: e.target.value })} />
+                      </div>
+                      {newPlace.estimatedCost && <div className="cost-preview">{formatCostComparison(newPlace.estimatedCost, newPlace.currency || planCurrency)}</div>}
+                    </div>
+                    <label className="reservation-check">
+                      <input type="checkbox" checked={newPlace.needsReservation} onChange={e => setNewPlace({ ...newPlace, needsReservation: e.target.checked })} />
+                      🎫 사전 예약이 필요한 일정
+                    </label>
+                    <div className="form-group">
+                      <label>팁/메모</label>
+                      <textarea placeholder="예: 해질 무렵 방문, 온라인 예매 권장" className="form-control" value={newPlace.tip} onChange={e => setNewPlace({ ...newPlace, tip: e.target.value })}></textarea>
+                    </div>
+                    <div className="form-group">
+                      <label>결제자</label>
+                      <select className="form-control" value={newPlace.payer || currentUser.name} onChange={e => setNewPlace({ ...newPlace, payer: e.target.value })}>
+                        {plan.members.map((m, idx) => (
+                          <option key={idx} value={m}>{m}</option>
+                        ))}
+                      </select>
                     </div>
                     <button type="submit" className="submit-btn">일정 등록하기</button>
                   </form>
@@ -855,6 +1574,19 @@ function App() {
               <div className="form-group">
                 <label>여행 제목</label>
                 <input type="text" required placeholder="예: 2026 우리가족 추억 만들기" className="form-control" value={newTrip.title} onChange={e => setNewTrip({ ...newTrip, title: e.target.value })} />
+                {newTrip.title && (
+                  <div className="currency-detection-message">
+                    🌏 {detectedTrip.country} 여행으로 인식 → 기본 통화: {detectedTrip.symbol} {detectedTrip.name}({detectedTrip.code})
+                  </div>
+                )}
+              </div>
+              <div className="form-group">
+                <label>기본 통화</label>
+                <select className="form-control" value={selectedTripCurrency.code} onChange={e => setNewTrip({ ...newTrip, currency: e.target.value })}>
+                  {Object.values(CURRENCY_OPTIONS).map(currency => (
+                    <option key={currency.code} value={currency.code}>{currency.symbol} {currency.name} ({currency.code})</option>
+                  ))}
+                </select>
               </div>
               <div className="form-group">
                 <label>시작일</label>
@@ -865,17 +1597,172 @@ function App() {
                 <input type="date" required className="form-control" value={newTrip.endDate} onChange={e => setNewTrip({ ...newTrip, endDate: e.target.value })} />
               </div>
               <div className="form-group">
-                <label>참여 가족 구성원 (쉼표로 구분)</label>
-                <input 
-                  type="text" 
-                  placeholder="예: 이현수, 양슬기, 이정우" 
-                  className="form-control" 
-                  value={newTrip.membersInput} 
-                  onChange={e => setNewTrip({ ...newTrip, membersInput: e.target.value })} 
-                />
+                <label>참여 가족 구성원</label>
+                <div className="members-checkbox-group">
+                  {FAM_USERS.map((user) => {
+                    const name = user.name;
+                    const age = calculateManAge(user.pin);
+                    const currentMembers = newTrip.membersInput 
+                      ? newTrip.membersInput.split(',').map(m => m.trim()).filter(Boolean)
+                      : [];
+                    const isChecked = currentMembers.includes(name);
+                    return (
+                      <label key={name} className="member-checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            let updated = [...currentMembers];
+                            if (e.target.checked) {
+                              if (!updated.includes(name)) updated.push(name);
+                            } else {
+                              updated = updated.filter(m => m !== name);
+                            }
+                            setNewTrip({ ...newTrip, membersInput: updated.join(', ') });
+                          }}
+                        />
+                        {name} {age !== null && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>(만 {age}세)</span>}
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
               <button type="submit" className="submit-btn">여행 추가 및 일정 짜러가기</button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 4. CREATE NEW FAMILY EVENT MODAL (Global) */}
+      {/* ========================================================================= */}
+      {showAddEventModal && (
+        <div className="modal-overlay" onClick={() => { setShowAddEventModal(false); setSelectedCalendarDate(null); }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>🔔 새 가족 행사 등록</h3>
+              <button className="close-btn" onClick={() => { setShowAddEventModal(false); setSelectedCalendarDate(null); }}>×</button>
+            </div>
+            <form onSubmit={handleCreateEvent}>
+              <div className="form-group">
+                <label>행사 제목</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="예: 할머니 칠순 식사, 가족 대청소"
+                  className="form-control"
+                  value={newEvent.title}
+                  onChange={e => setNewEvent({ ...newEvent, title: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>날짜</label>
+                <input
+                  type="date"
+                  required
+                  className="form-control"
+                  value={newEvent.date}
+                  onChange={e => setNewEvent({ ...newEvent, date: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>설명/메모</label>
+                <textarea
+                  placeholder="예: 오후 6시 서라벌 한정식 예약"
+                  className="form-control"
+                  value={newEvent.description}
+                  onChange={e => setNewEvent({ ...newEvent, description: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>참여 가족 구성원</label>
+                <div className="members-checkbox-group">
+                  {FAM_USERS.map((user) => {
+                    const name = user.name;
+                    const age = calculateManAge(user.pin);
+                    const isChecked = newEvent.members.includes(name);
+                    return (
+                      <label key={name} className="member-checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            let updatedMembers = [...newEvent.members];
+                            if (e.target.checked) {
+                              if (!updatedMembers.includes(name)) {
+                                updatedMembers.push(name);
+                              }
+                            } else {
+                              updatedMembers = updatedMembers.filter(m => m !== name);
+                            }
+                            setNewEvent({ ...newEvent, members: updatedMembers });
+                          }}
+                        />
+                        {name} {age !== null && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>(만 {age}세)</span>}
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+              <button type="submit" className="submit-btn">가족 행사 등록하기</button>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Edit Members Modal */}
+      {showEditMembersModal && plan && (
+        <div className="modal-overlay" onClick={() => setShowEditMembersModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>👥 함께하는 가족 편집</h3>
+              <button className="close-btn" onClick={() => setShowEditMembersModal(false)}>×</button>
+            </div>
+            <div style={{ marginBottom: '16px', fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+              이 여행에 참가하거나 제외할 가족 구성원을 선택해 주세요.<br/>
+              (여행 총괄 관리자는 제외할 수 없습니다.)
+            </div>
+            <div className="form-group">
+              <label>참여 가족 구성원</label>
+              <div className="members-checkbox-group">
+                {FAM_USERS.map((user) => {
+                  const name = user.name;
+                  const isChecked = tempMembers.includes(name);
+                  const isPlanManager = name === (plan.manager || '이현수');
+
+                  return (
+                    <label key={name} className="member-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        disabled={isPlanManager}
+                        onChange={(e) => {
+                          let updatedMembers = [...tempMembers];
+                          if (e.target.checked) {
+                            if (!updatedMembers.includes(name)) {
+                              updatedMembers.push(name);
+                            }
+                          } else {
+                            updatedMembers = updatedMembers.filter(m => m !== name);
+                          }
+                          setTempMembers(updatedMembers);
+                        }}
+                      />
+                      {name} {isPlanManager && <span style={{ fontSize: '0.75rem', color: 'var(--primary)' }}>(관리자)</span>}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+            <button 
+              className="submit-btn" 
+              onClick={() => {
+                const updatedPlan = { ...plan, members: tempMembers };
+                saveUpdatedPlan(updatedPlan);
+                setShowEditMembersModal(false);
+              }}
+            >
+              변경사항 저장하기
+            </button>
           </div>
         </div>
       )}
