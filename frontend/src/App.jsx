@@ -429,22 +429,22 @@ function App() {
           </div>
           <form onSubmit={handleLogin}>
             <div className="form-group">
-              <label>이름 (아이디)</label>
+              <label>이름</label>
               <input 
                 type="text" 
                 required 
-                placeholder="예: 이현수, 홍영숙" 
+                placeholder="" 
                 className="form-control" 
                 value={loginForm.username} 
                 onChange={e => setLoginForm({ ...loginForm, username: e.target.value })} 
               />
             </div>
             <div className="form-group" style={{ marginBottom: '24px' }}>
-              <label>비밀번호 (생년월일 6자리)</label>
+              <label>생년월일</label>
               <input 
                 type="password" 
                 required 
-                placeholder="예: 870707" 
+                placeholder="" 
                 className="form-control" 
                 value={loginForm.password} 
                 onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} 
