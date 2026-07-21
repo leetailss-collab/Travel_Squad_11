@@ -163,6 +163,39 @@ app.post('/api/plans/:id/itinerary', async (req, res) => {
   }
 });
 
+// Get all anniversaries
+app.get('/api/anniversaries', async (req, res) => {
+  try {
+    const list = await dbService.getAnniversaries();
+    res.json(list);
+  } catch (err) {
+    console.error("Get anniversaries error:", err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+// Save/update anniversary
+app.post('/api/anniversaries', async (req, res) => {
+  try {
+    const item = await dbService.saveAnniversary(req.body);
+    res.json(item);
+  } catch (err) {
+    console.error("Save anniversary error:", err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+// Delete anniversary
+app.delete('/api/anniversaries/:id', async (req, res) => {
+  try {
+    await dbService.deleteAnniversary(req.params.id);
+    res.json({ message: "기념일이 삭제되었습니다." });
+  } catch (err) {
+    console.error("Delete anniversary error:", err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
 app.get('/health', (req, res) => {
   res.send('Server is healthy');
 });

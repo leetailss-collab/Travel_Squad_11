@@ -221,6 +221,51 @@ const addPlace = async (planId, day, date, places) => {
   }
 };
 
+// 9. Get all anniversaries
+const getAnniversaries = async () => {
+  try {
+    const snapshot = await db.collection('anniversaries').get();
+    const list = [];
+    snapshot.forEach(doc => {
+      list.push(doc.data());
+    });
+    return list;
+  } catch (err) {
+    console.error("Error getting anniversaries from Firestore:", err);
+    return [];
+  }
+};
+
+// 10. Save or update an anniversary
+const saveAnniversary = async (data) => {
+  try {
+    const id = data.id || `ann-${Date.now()}`;
+    const item = {
+      id,
+      name: data.name,
+      month: Number(data.month),
+      day: Number(data.day),
+      isLunar: Boolean(data.isLunar)
+    };
+    await db.collection('anniversaries').doc(id).set(item);
+    return item;
+  } catch (err) {
+    console.error("Error saving anniversary to Firestore:", err);
+    throw err;
+  }
+};
+
+// 11. Delete an anniversary
+const deleteAnniversary = async (id) => {
+  try {
+    await db.collection('anniversaries').doc(String(id)).delete();
+    return true;
+  } catch (err) {
+    console.error(`Error deleting anniversary ${id} from Firestore:`, err);
+    throw err;
+  }
+};
+
 module.exports = {
   authenticateUser,
   getPlans,
@@ -229,5 +274,8 @@ module.exports = {
   deletePlan,
   syncPlan,
   addComment,
-  addPlace
+  addPlace,
+  getAnniversaries,
+  saveAnniversary,
+  deleteAnniversary
 };

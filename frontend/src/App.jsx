@@ -145,22 +145,9 @@ const DEFAULT_MOCK_PLANS = [
   }
 ];
 
-const ANNIVERSARIES = [
-  { name: "이진수 생일", month: 1, day: 19, isLunar: false },
-  { name: "이해성 생일", month: 2, day: 20, isLunar: false },
-  { name: "홍영숙 생신", month: 2, day: 17, isLunar: true },
-  { name: "합동차례", month: 3, day: 10, isLunar: true },
-  { name: "이준성 생일", month: 3, day: 24, isLunar: false },
-  { name: "방예선 생신", month: 3, day: 12, isLunar: true },
-  { name: "이정우 생신", month: 5, day: 10, isLunar: true },
-  { name: "이현수 생일", month: 7, day: 7, isLunar: false },
-  { name: "박경희 기일", month: 7, day: 19, isLunar: true },
-  { name: "할아버지 기일", month: 12, day: 8, isLunar: true },
-  { name: "양슬기 생일", month: 12, day: 14, isLunar: false }
-];
-
-const getAnniversariesForYear = (year) => {
-  return ANNIVERSARIES.map(ann => {
+const getAnniversariesForYear = (year, anniversariesList) => {
+  if (!anniversariesList || anniversariesList.length === 0) return [];
+  return anniversariesList.map(ann => {
     if (ann.isLunar) {
       try {
         const result = solarLunar.lunar2solar(year, ann.month, ann.day);
@@ -168,11 +155,16 @@ const getAnniversariesForYear = (year) => {
           const monthStr = String(result.cMonth).padStart(2, '0');
           const dayStr = String(result.cDay).padStart(2, '0');
           return {
-            id: `ann-${ann.name}-${year}`,
+            id: ann.id || `ann-${ann.name}-${year}`,
             title: `${ann.name} (음력)`,
             dateStr: `${result.cYear}-${monthStr}-${dayStr}`,
             isAnniversary: true,
-            isEvent: false
+            isEvent: false,
+            name: ann.name,
+            month: ann.month,
+            day: ann.day,
+            isLunar: true,
+            rawId: ann.id
           };
         }
       } catch (e) {
@@ -183,11 +175,16 @@ const getAnniversariesForYear = (year) => {
       const monthStr = String(ann.month).padStart(2, '0');
       const dayStr = String(ann.day).padStart(2, '0');
       return {
-        id: `ann-${ann.name}-${year}`,
+        id: ann.id || `ann-${ann.name}-${year}`,
         title: ann.name,
         dateStr: `${year}-${monthStr}-${dayStr}`,
         isAnniversary: true,
-        isEvent: false
+        isEvent: false,
+        name: ann.name,
+        month: ann.month,
+        day: ann.day,
+        isLunar: false,
+        rawId: ann.id
       };
     }
   }).filter(Boolean);
@@ -239,6 +236,12 @@ function App() {
 
   const [holidays, setHolidays] = useState([]);
   const [exchangeRate, setExchangeRate] = useState({ rate: 1, source: '기본값', updatedAt: null, loading: false });
+
+  // Anniversary States
+  const [anniversaries, setAnniversaries] = useState([]);
+  const [editingAnniversary, setEditingAnniversary] = useState(null);
+  const [showAddAnniversaryModal, setShowAddAnniversaryModal] = useState(false);
+  const [newAnniversary, setNewAnniversary] = useState({ name: '', month: 1, day: 1, isLunar: false });
 
   // Fetch Korean national holidays dynamically when calendar year changes
   useEffect(() => {
@@ -296,7 +299,20 @@ function App() {
       setCurrentUser(JSON.parse(savedUser));
     }
     fetchPlans();
+    fetchAnniversaries();
   }, []);
+
+  const fetchAnniversaries = async () => {
+    try {
+      const response = await fetch('/api/anniversaries');
+      if (response.ok) {
+        const data = await response.json();
+        setAnniversaries(data);
+      }
+    } catch (err) {
+      console.warn("Failed to fetch anniversaries:", err);
+    }
+  };
 
   const fetchPlans = async () => {
     try {
@@ -790,6 +806,66 @@ function App() {
     setEditingPlace(null);
   };
 
+  // Anniversary Handlers
+  const handleAddAnniversary = async (e) => {
+    e.preventDefault();
+    if (!newAnniversary.name) return;
+
+    try {
+      const response = await fetch('/api/anniversaries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newAnniversary)
+      });
+      if (response.ok) {
+        await fetchAnniversaries();
+        setShowAddAnniversaryModal(false);
+      }
+    } catch (err) {
+      console.error("Failed to add anniversary:", err);
+    }
+  };
+
+  const handleSaveAnniversaryEdit = async (e) => {
+    e.preventDefault();
+    if (!editingAnniversary || !editingAnniversary.name) return;
+
+    try {
+      const response = await fetch('/api/anniversaries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingAnniversary.rawId,
+          name: editingAnniversary.name,
+          month: editingAnniversary.month,
+          day: editingAnniversary.day,
+          isLunar: editingAnniversary.isLunar
+        })
+      });
+      if (response.ok) {
+        await fetchAnniversaries();
+        setEditingAnniversary(null);
+      }
+    } catch (err) {
+      console.error("Failed to update anniversary:", err);
+    }
+  };
+
+  const handleDeleteAnniversary = async (id) => {
+    if (!window.confirm("정말로 이 기념일을 삭제하시겠습니까?")) return;
+    try {
+      const response = await fetch(`/api/anniversaries/${id}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        await fetchAnniversaries();
+        setEditingAnniversary(null);
+      }
+    } catch (err) {
+      console.error("Failed to delete anniversary:", err);
+    }
+  };
+
   // Add Comment to Place
   const handleAddComment = async (placeId) => {
     const text = commentInputs[placeId];
@@ -1187,11 +1263,22 @@ function App() {
                               key={e.id}
                               className="selected-day-event-item"
                               onClick={() => {
-                                if (!e.isEvent && !e.isAnniversary) {
+                                if (e.isAnniversary) {
+                                  if (currentUser?.role === 'admin') {
+                                    setEditingAnniversary(e);
+                                  }
+                                } else if (!e.isEvent) {
                                   fetchSinglePlan(e.id);
                                 }
                               }}
-                              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: e.isAnniversary ? 'default' : 'pointer' }}
+                              style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center', 
+                                cursor: e.isAnniversary 
+                                  ? (currentUser?.role === 'admin' ? 'pointer' : 'default') 
+                                  : 'pointer' 
+                              }}
                             >
                               <span>
                                 <span className={`event-type-tag ${e.isAnniversary ? 'anniversary' : (e.isEvent ? 'event' : 'trip')}`} style={{ marginRight: '6px' }}>
@@ -1201,6 +1288,7 @@ function App() {
                               </span>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 {!e.isEvent && !e.isAnniversary && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>자세히 ➔</span>}
+                                {e.isAnniversary && currentUser?.role === 'admin' && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>수정 ➔</span>}
                                 {!e.isAnniversary && (
                                   <button
                                     className="logout-btn"
@@ -1243,6 +1331,23 @@ function App() {
                         >
                           🔔 가족 행사 등록
                         </button>
+                        {currentUser?.role === 'admin' && (
+                          <button
+                            className="btn-secondary-sm"
+                            style={{ border: '1px solid var(--primary)', color: 'var(--primary)', background: 'transparent' }}
+                            onClick={() => {
+                              setNewAnniversary({
+                                name: '',
+                                month: 1,
+                                day: 1,
+                                isLunar: false
+                              });
+                              setShowAddAnniversaryModal(true);
+                            }}
+                          >
+                            🎉 기념일 등록
+                          </button>
+                        )}
                       </div>
                     </div>
                   )}
@@ -2098,6 +2203,83 @@ function App() {
             >
               변경사항 저장하기
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add Anniversary Modal */}
+      {showAddAnniversaryModal && (
+        <div className="modal-overlay" onClick={() => setShowAddAnniversaryModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>🎉 신규 가족 기념일 등록</h3>
+              <button className="close-btn" onClick={() => setShowAddAnniversaryModal(false)}>×</button>
+            </div>
+            <form onSubmit={handleAddAnniversary}>
+              <div className="form-group">
+                <label>기념일 이름</label>
+                <input type="text" required placeholder="예: 할머니 생신" className="form-control" value={newAnniversary.name} onChange={e => setNewAnniversary({ ...newAnniversary, name: e.target.value })} />
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>월</label>
+                  <select className="form-control" value={newAnniversary.month} onChange={e => setNewAnniversary({ ...newAnniversary, month: Number(e.target.value) })}>
+                    {Array.from({ length: 12 }).map((_, i) => <option key={i} value={i + 1}>{i + 1}월</option>)}
+                  </select>
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>일</label>
+                  <select className="form-control" value={newAnniversary.day} onChange={e => setNewAnniversary({ ...newAnniversary, day: Number(e.target.value) })}>
+                    {Array.from({ length: 31 }).map((_, i) => <option key={i} value={i + 1}>{i + 1}일</option>)}
+                  </select>
+                </div>
+              </div>
+              <label className="reservation-check" style={{ marginBottom: '16px', display: 'block' }}>
+                <input type="checkbox" checked={newAnniversary.isLunar} onChange={e => setNewAnniversary({ ...newAnniversary, isLunar: e.target.checked })} />
+                🌙 음력 기념일 (매년 변환)
+              </label>
+              <button type="submit" className="submit-btn">등록하기</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Anniversary Modal */}
+      {editingAnniversary && (
+        <div className="modal-overlay" onClick={() => setEditingAnniversary(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>🛠️ 기념일 수정</h3>
+              <button className="close-btn" onClick={() => setEditingAnniversary(null)}>×</button>
+            </div>
+            <form onSubmit={handleSaveAnniversaryEdit}>
+              <div className="form-group">
+                <label>기념일 이름</label>
+                <input type="text" required className="form-control" value={editingAnniversary.name} onChange={e => setEditingAnniversary({ ...editingAnniversary, name: e.target.value })} />
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>월</label>
+                  <select className="form-control" value={editingAnniversary.month} onChange={e => setEditingAnniversary({ ...editingAnniversary, month: Number(e.target.value) })}>
+                    {Array.from({ length: 12 }).map((_, i) => <option key={i} value={i + 1}>{i + 1}월</option>)}
+                  </select>
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>일</label>
+                  <select className="form-control" value={editingAnniversary.day} onChange={e => setEditingAnniversary({ ...editingAnniversary, day: Number(e.target.value) })}>
+                    {Array.from({ length: 31 }).map((_, i) => <option key={i} value={i + 1}>{i + 1}일</option>)}
+                  </select>
+                </div>
+              </div>
+              <label className="reservation-check" style={{ marginBottom: '16px', display: 'block' }}>
+                <input type="checkbox" checked={editingAnniversary.isLunar} onChange={e => setEditingAnniversary({ ...editingAnniversary, isLunar: e.target.checked })} />
+                🌙 음력 기념일 (매년 변환)
+              </label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button type="submit" className="submit-btn" style={{ flex: 1 }}>수정 완료</button>
+                <button type="button" className="delete-btn-danger" onClick={() => handleDeleteAnniversary(editingAnniversary.rawId)} style={{ width: 'auto', marginTop: 0, padding: '10px 16px' }}>삭제</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
