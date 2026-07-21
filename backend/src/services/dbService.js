@@ -18,7 +18,6 @@ const initializeFirebase = () => {
     });
   } else {
     console.log("Local service account key not found. Using Application Default Credentials (GCP)...");
-    // This will automatically pick up credentials on GCP VM or from GOOGLE_APPLICATION_CREDENTIALS env var
     initializeApp();
   }
 };
@@ -42,41 +41,56 @@ const authenticateUser = async (username, pin) => {
   }
 };
 
-// 2. Fetch all plans (sorted by numeric id)
+// 2. Fetch all plans (travels from 'plans' and events from 'events', merged & sorted by numeric id)
 const getPlans = async () => {
   try {
-    const snapshot = await db.collection('plans').get();
-    const plans = [];
-    snapshot.forEach(doc => {
-      plans.push(doc.data());
+    const plansSnapshot = await db.collection('plans').get();
+    const eventsSnapshot = await db.collection('events').get();
+    
+    const items = [];
+    
+    plansSnapshot.forEach(doc => {
+      items.push({ ...doc.data(), isEvent: false });
     });
+    
+    eventsSnapshot.forEach(doc => {
+      items.push({ ...doc.data(), isEvent: true });
+    });
+    
     // Sort plans by id (numeric)
-    plans.sort((a, b) => Number(a.id) - Number(b.id));
-    return plans;
+    items.sort((a, b) => Number(a.id) - Number(b.id));
+    return items;
   } catch (err) {
-    console.error("Error getting plans from Firestore:", err);
+    console.error("Error getting plans and events from Firestore:", err);
     return [];
   }
 };
 
-// 3. Fetch single plan
+// 3. Fetch single plan (checks 'plans' first, then 'events')
 const getPlanById = async (id) => {
   try {
-    const doc = await db.collection('plans').doc(String(id)).get();
-    return doc.exists ? doc.data() : null;
+    const planDoc = await db.collection('plans').doc(String(id)).get();
+    if (planDoc.exists) {
+      return { ...planDoc.data(), isEvent: false };
+    }
+    const eventDoc = await db.collection('events').doc(String(id)).get();
+    if (eventDoc.exists) {
+      return { ...eventDoc.data(), isEvent: true };
+    }
+    return null;
   } catch (err) {
-    console.error(`Error getting plan ${id} from Firestore:`, err);
+    console.error(`Error getting plan/event ${id} from Firestore:`, err);
     return null;
   }
 };
 
-// 4. Create new plan
+// 4. Create new plan (saves to 'events' if isEvent is true, otherwise 'plans')
 const createPlan = async (planData) => {
   try {
-    const plans = await getPlans();
-    const newId = plans.reduce((maxId, plan) => Math.max(maxId, Number(plan.id) || 0), 0) + 1;
+    const allItems = await getPlans();
+    const newId = allItems.reduce((maxId, item) => Math.max(maxId, Number(item.id) || 0), 0) + 1;
     
-    const newPlan = {
+    const newItem = {
       ...planData,
       id: newId,
       itinerary: planData.itinerary || [],
@@ -84,51 +98,61 @@ const createPlan = async (planData) => {
       checklists: planData.checklists || []
     };
     
-    await db.collection('plans').doc(String(newId)).set(newPlan);
-    return newPlan;
+    const targetCollection = planData.isEvent ? 'events' : 'plans';
+    await db.collection(targetCollection).doc(String(newId)).set(newItem);
+    return newItem;
   } catch (err) {
-    console.error("Error creating plan in Firestore:", err);
+    console.error("Error creating plan/event in Firestore:", err);
     throw err;
   }
 };
 
-// 5. Delete plan
+// 5. Delete plan (checks both collections and deletes it from the one it belongs to)
 const deletePlan = async (id) => {
   try {
-    const docRef = db.collection('plans').doc(String(id));
-    const doc = await docRef.get();
-    if (!doc.exists) return false;
-    await docRef.delete();
-    return true;
+    const planRef = db.collection('plans').doc(String(id));
+    const planDoc = await planRef.get();
+    if (planDoc.exists) {
+      await planRef.delete();
+      return true;
+    }
+    
+    const eventRef = db.collection('events').doc(String(id));
+    const eventDoc = await eventRef.get();
+    if (eventDoc.exists) {
+      await eventRef.delete();
+      return true;
+    }
+    
+    return false;
   } catch (err) {
-    console.error(`Error deleting plan ${id} in Firestore:`, err);
+    console.error(`Error deleting plan/event ${id} in Firestore:`, err);
     throw err;
   }
 };
 
-// 6. Sync full plan
+// 6. Sync full plan (updates the correct collection)
 const syncPlan = async (id, planData) => {
   try {
-    const planRef = db.collection('plans').doc(String(id));
-    await planRef.set(planData, { merge: true });
-    const updated = await planRef.get();
+    const targetCollection = planData.isEvent ? 'events' : 'plans';
+    const ref = db.collection(targetCollection).doc(String(id));
+    await ref.set(planData, { merge: true });
+    const updated = await ref.get();
     return updated.data();
   } catch (err) {
-    console.error(`Error syncing plan ${id} in Firestore:`, err);
+    console.error(`Error syncing plan/event ${id} in Firestore:`, err);
     throw err;
   }
 };
 
-// 7. Add Comment to a place in the itinerary
+// 7. Add Comment to a place in the itinerary (checks 'plans' and 'events')
 const addComment = async (planId, placeId, author, text) => {
   try {
-    const planRef = db.collection('plans').doc(String(planId));
-    const doc = await planRef.get();
-    if (!doc.exists) return null;
+    const planData = await getPlanById(planId);
+    if (!planData) return null;
     
-    const plan = doc.data();
     let foundPlace = null;
-    for (const dayItem of plan.itinerary) {
+    for (const dayItem of planData.itinerary) {
       const place = dayItem.places.find(p => p.id === placeId);
       if (place) {
         foundPlace = place;
@@ -150,22 +174,22 @@ const addComment = async (planId, placeId, author, text) => {
     };
     
     foundPlace.comments.push(newComment);
-    await planRef.set(plan);
-    return plan;
+    
+    const targetCollection = planData.isEvent ? 'events' : 'plans';
+    await db.collection(targetCollection).doc(String(planId)).set(planData);
+    return planData;
   } catch (err) {
-    console.error(`Error adding comment to plan ${planId}, place ${placeId}:`, err);
+    console.error(`Error adding comment to plan/event ${planId}, place ${placeId}:`, err);
     throw err;
   }
 };
 
-// 8. Add itinerary place
+// 8. Add itinerary place (checks 'plans' and 'events')
 const addPlace = async (planId, day, date, places) => {
   try {
-    const planRef = db.collection('plans').doc(String(planId));
-    const doc = await planRef.get();
-    if (!doc.exists) return null;
+    const planData = await getPlanById(planId);
+    if (!planData) return null;
     
-    const plan = doc.data();
     const processedPlaces = (places || []).map(p => ({
       id: p.id || Date.now() + Math.random(),
       time: p.time,
@@ -173,25 +197,26 @@ const addPlace = async (planId, day, date, places) => {
       description: p.description || '',
       category: p.category || '관광',
       estimatedCost: Number(p.estimatedCost ?? p.cost) || 0,
-      currency: p.currency || plan.currency || 'KRW',
+      currency: p.currency || planData.currency || 'KRW',
       needsReservation: Boolean(p.needsReservation),
       tip: p.tip || '',
       payer: p.payer || '',
       comments: p.comments || []
     }));
     
-    const dayIndex = plan.itinerary.findIndex(item => item.day === parseInt(day));
+    const dayIndex = planData.itinerary.findIndex(item => item.day === parseInt(day));
     if (dayIndex === -1) {
-      plan.itinerary.push({ day: parseInt(day), date, places: processedPlaces });
+      planData.itinerary.push({ day: parseInt(day), date, places: processedPlaces });
     } else {
-      plan.itinerary[dayIndex].places.push(...processedPlaces);
-      plan.itinerary[dayIndex].places.sort((a, b) => a.time.localeCompare(b.time));
+      planData.itinerary[dayIndex].places.push(...processedPlaces);
+      planData.itinerary[dayIndex].places.sort((a, b) => a.time.localeCompare(b.time));
     }
     
-    await planRef.set(plan);
-    return plan;
+    const targetCollection = planData.isEvent ? 'events' : 'plans';
+    await db.collection(targetCollection).doc(String(planId)).set(planData);
+    return planData;
   } catch (err) {
-    console.error(`Error adding place to plan ${planId}:`, err);
+    console.error(`Error adding place to plan/event ${planId}:`, err);
     throw err;
   }
 };

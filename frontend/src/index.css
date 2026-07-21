@@ -1128,6 +1128,10 @@ body {
   background: #10b981; /* Green */
 }
 
+.calendar-dot.anniversary {
+  background: #f43f5e; /* Rose / Pink */
+}
+
 /* Selected Day Panel */
 .selected-day-panel {
   margin-top: 16px;
@@ -1179,6 +1183,10 @@ body {
 
 .event-type-tag.event {
   background: #10b981;
+}
+
+.event-type-tag.anniversary {
+  background: #f43f5e;
 }
 
 .selected-day-actions {

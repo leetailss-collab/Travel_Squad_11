@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import solarLunar from 'solarlunar';
 
 // Korean Holiday Name Mapping
 const HOLIDAY_NAMES_KO = {
@@ -143,6 +144,54 @@ const DEFAULT_MOCK_PLANS = [
     ]
   }
 ];
+
+const ANNIVERSARIES = [
+  { name: "이진수 생일", month: 1, day: 19, isLunar: false },
+  { name: "이해성 생일", month: 2, day: 20, isLunar: false },
+  { name: "홍영숙 생신", month: 2, day: 17, isLunar: true },
+  { name: "합동차례", month: 3, day: 10, isLunar: true },
+  { name: "이준성 생일", month: 3, day: 24, isLunar: false },
+  { name: "방예선 생신", month: 3, day: 12, isLunar: true },
+  { name: "이정우 생신", month: 5, day: 10, isLunar: true },
+  { name: "이현수 생일", month: 7, day: 7, isLunar: false },
+  { name: "박경희 기일", month: 7, day: 19, isLunar: true },
+  { name: "할아버지 기일", month: 12, day: 8, isLunar: true },
+  { name: "양슬기 생일", month: 12, day: 14, isLunar: false }
+];
+
+const getAnniversariesForYear = (year) => {
+  return ANNIVERSARIES.map(ann => {
+    if (ann.isLunar) {
+      try {
+        const result = solarLunar.lunar2solar(year, ann.month, ann.day);
+        if (result && result.cYear && result.cMonth && result.cDay) {
+          const monthStr = String(result.cMonth).padStart(2, '0');
+          const dayStr = String(result.cDay).padStart(2, '0');
+          return {
+            id: `ann-${ann.name}-${year}`,
+            title: `${ann.name} (음력)`,
+            dateStr: `${result.cYear}-${monthStr}-${dayStr}`,
+            isAnniversary: true,
+            isEvent: false
+          };
+        }
+      } catch (e) {
+        console.error("Lunar conversion error:", e);
+      }
+      return null;
+    } else {
+      const monthStr = String(ann.month).padStart(2, '0');
+      const dayStr = String(ann.day).padStart(2, '0');
+      return {
+        id: `ann-${ann.name}-${year}`,
+        title: ann.name,
+        dateStr: `${year}-${monthStr}-${dayStr}`,
+        isAnniversary: true,
+        isEvent: false
+      };
+    }
+  }).filter(Boolean);
+};
 
 function App() {
   // Authentication State
@@ -1007,11 +1056,16 @@ function App() {
               }
 
               const getCellEvents = (dateStr) => {
-                return plans.filter(p => {
+                const yearAnniversaries = getAnniversariesForYear(year);
+                const cellAnniversaries = yearAnniversaries.filter(a => a.dateStr === dateStr);
+
+                const normalEvents = plans.filter(p => {
                   const hasAccess = currentUser?.role === 'admin' || p.members.includes(currentUser?.name);
                   if (!hasAccess) return false;
                   return p.startDate <= dateStr && dateStr <= p.endDate;
                 });
+
+                return [...cellAnniversaries, ...normalEvents];
               };
 
               const getHoliday = (dateStr) => {
@@ -1107,7 +1161,7 @@ function App() {
                             {cellEvents.map(e => (
                               <div
                                 key={e.id}
-                                className={`calendar-dot ${e.isEvent ? 'event' : 'trip'}`}
+                                className={`calendar-dot ${e.isAnniversary ? 'anniversary' : (e.isEvent ? 'event' : 'trip')}`}
                                 title={e.title}
                               />
                             ))}
@@ -1133,39 +1187,41 @@ function App() {
                               key={e.id}
                               className="selected-day-event-item"
                               onClick={() => {
-                                if (!e.isEvent) {
+                                if (!e.isEvent && !e.isAnniversary) {
                                   fetchSinglePlan(e.id);
                                 }
                               }}
-                              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: e.isAnniversary ? 'default' : 'pointer' }}
                             >
                               <span>
-                                <span className={`event-type-tag ${e.isEvent ? 'event' : 'trip'}`} style={{ marginRight: '6px' }}>
-                                  {e.isEvent ? '행사' : '여행'}
+                                <span className={`event-type-tag ${e.isAnniversary ? 'anniversary' : (e.isEvent ? 'event' : 'trip')}`} style={{ marginRight: '6px' }}>
+                                  {e.isAnniversary ? '기념일' : (e.isEvent ? '행사' : '여행')}
                                 </span>
                                 {e.title}
                               </span>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                {!e.isEvent && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>자세히 ➔</span>}
-                                <button
-                                  className="logout-btn"
-                                  style={{
-                                    padding: '2px 8px',
-                                    fontSize: '0.7rem',
-                                    margin: 0,
-                                    border: '1px solid var(--danger)',
-                                    borderRadius: '6px',
-                                    color: 'var(--danger)',
-                                    background: 'transparent',
-                                    cursor: 'pointer'
-                                  }}
-                                  onClick={(event) => {
-                                    event.stopPropagation();
-                                    handleDeletePlan(e.id);
-                                  }}
-                                >
-                                  삭제
-                                </button>
+                                {!e.isEvent && !e.isAnniversary && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>자세히 ➔</span>}
+                                {!e.isAnniversary && (
+                                  <button
+                                    className="logout-btn"
+                                    style={{
+                                      padding: '2px 8px',
+                                      fontSize: '0.7rem',
+                                      margin: 0,
+                                      border: '1px solid var(--danger)',
+                                      borderRadius: '6px',
+                                      color: 'var(--danger)',
+                                      background: 'transparent',
+                                      cursor: 'pointer'
+                                    }}
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      handleDeletePlan(e.id);
+                                    }}
+                                  >
+                                    삭제
+                                  </button>
+                                )}
                               </div>
                             </div>
                           ))}

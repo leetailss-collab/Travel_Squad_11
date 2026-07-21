@@ -32,14 +32,16 @@
                 "text": "도착해서 게이트 5번 앞으로 모여주세요!",
                 "time": "오전 10:05"
               }
-            ]
+            ],
+            "duration": 150
           },
           {
             "id": 1002,
             "time": "12:30",
             "name": "자매국수",
             "description": "점심 식사 (고기국수)",
-            "comments": []
+            "comments": [],
+            "duration": 150
           },
           {
             "id": 1003,
@@ -53,14 +55,16 @@
                 "text": "아이들 돗자리랑 여벌 옷 챙겨갈게요.",
                 "time": "오후 1:15"
               }
-            ]
+            ],
+            "duration": 180
           },
           {
             "id": 1004,
             "time": "18:00",
             "name": "숙소 체크인",
             "description": "서귀포 가족 펜션",
-            "comments": []
+            "comments": [],
+            "duration": 60
           }
         ]
       }
@@ -118,7 +122,8 @@
             "time": "13:00",
             "name": "경주 버스터미널 도착",
             "description": "택시 탑승",
-            "comments": []
+            "comments": [],
+            "duration": 60
           },
           {
             "id": 2002,
@@ -132,7 +137,8 @@
                 "text": "한복점 예약해 뒀어요!",
                 "time": "오전 11:20"
               }
-            ]
+            ],
+            "duration": 60
           }
         ]
       }
@@ -221,7 +227,8 @@
             "name": "집 출발",
             "description": "출국심사",
             "category": "이동",
-            "comments": []
+            "comments": [],
+            "duration": 165
           },
           {
             "id": 4002,
@@ -229,7 +236,8 @@
             "name": "인천공항 이륙",
             "description": "나리타행 출발",
             "category": "이동",
-            "comments": []
+            "comments": [],
+            "duration": 185
           },
           {
             "id": 4003,
@@ -237,7 +245,8 @@
             "name": "나리타공항 착륙",
             "description": "입국심사",
             "category": "이동",
-            "comments": []
+            "comments": [],
+            "duration": 40
           },
           {
             "id": 4004,
@@ -247,7 +256,8 @@
             "category": "이동",
             "estimatedCost": 1500,
             "currency": "JPY",
-            "comments": []
+            "comments": [],
+            "duration": 90
           },
           {
             "id": 4005,
@@ -255,7 +265,8 @@
             "name": "숙소 도착",
             "description": "토부호텔 레반트 도쿄, 짐 맡기기",
             "category": "숙소",
-            "comments": []
+            "comments": [],
+            "duration": 60
           },
           {
             "id": 4006,
@@ -266,7 +277,8 @@
             "estimatedCost": 3500,
             "currency": "JPY",
             "tip": "시겐 카이센동 2600엔도 추천. 츠키지 시장 구경(도둑 조심). 터렛커피 라떼맛집",
-            "comments": []
+            "comments": [],
+            "duration": 60
           },
           {
             "id": 4007,
@@ -274,7 +286,8 @@
             "name": "호텔 체크인",
             "description": "토부호텔 레반트 도쿄",
             "category": "숙소",
-            "comments": []
+            "comments": [],
+            "duration": 10
           },
           {
             "id": 4008,
@@ -283,7 +296,8 @@
             "description": "도쿄에서 가장 오래된 절. 규모, 볼거리, 먹거리 풍성",
             "category": "관광",
             "tip": "지하철 이동 30분",
-            "comments": []
+            "comments": [],
+            "duration": 50
           },
           {
             "id": 4009,
@@ -291,7 +305,8 @@
             "name": "나카미세도리 거리",
             "description": "가장 오래된 상점가. 아사히 스카이룸 옥상에 황금 거품",
             "category": "관광",
-            "comments": []
+            "comments": [],
+            "duration": 60
           },
           {
             "id": 4010,
@@ -300,7 +315,8 @@
             "description": "전망대 예약은 온라인 구매가 저렴. 해질 무렵 올라가면 낮과 야경 동시 감상",
             "category": "관광",
             "needsReservation": true,
-            "comments": []
+            "comments": [],
+            "duration": 120
           },
           {
             "id": 4011,
@@ -311,7 +327,8 @@
             "estimatedCost": 5000,
             "currency": "JPY",
             "tip": "몬자거리 산책도 함께 추천",
-            "comments": []
+            "comments": [],
+            "duration": 60
           },
           {
             "id": 4012,
@@ -320,7 +337,8 @@
             "description": "마츠야 백화점(디올,화장품), HOKA매장, OK긴자(다이소,GU,유니클로), MUJI, LOFT, ABC마트, 세리아, 긴자식스",
             "category": "쇼핑",
             "tip": "게스트카드 발급 가능. 라이프베케이션에서 일본 사케·위스키 구입",
-            "comments": []
+            "comments": [],
+            "duration": 120
           },
           {
             "id": 4013,
@@ -331,7 +349,8 @@
             "estimatedCost": 1000,
             "currency": "JPY",
             "tip": "새벽 4시까지 영업",
-            "comments": []
+            "comments": [],
+            "duration": 60
           }
         ]
       },
@@ -346,7 +365,8 @@
             "name": "아침 - 숙소 간편식",
             "description": "숙소에서 간단히 식사",
             "category": "식사",
-            "comments": []
+            "comments": [],
+            "duration": 90
           },
           {
             "id": 4015,
@@ -355,7 +375,8 @@
             "description": "메이지 신궁→하라주쿠→오모테산도→캣스트리트→시부야→시부야 스카이",
             "category": "관광",
             "tip": "지하철 이동 40분",
-            "comments": []
+            "comments": [],
+            "duration": 60
           },
           {
             "id": 4016,
@@ -363,7 +384,8 @@
             "name": "하라주쿠 다케시타도리",
             "description": "400미터 길거리, 도쿄 10대 소녀들로 붐비는 곳. 마리온 크레페 유명(호객행위 조심)",
             "category": "관광",
-            "comments": []
+            "comments": [],
+            "duration": 90
           },
           {
             "id": 4017,
@@ -373,7 +395,8 @@
             "category": "식사",
             "estimatedCost": 2000,
             "currency": "JPY",
-            "comments": []
+            "comments": [],
+            "duration": 90
           },
           {
             "id": 4018,
@@ -381,7 +404,8 @@
             "name": "오모테산도 카페거리",
             "description": "도쿄의 샹젤리제",
             "category": "관광",
-            "comments": []
+            "comments": [],
+            "duration": 90
           },
           {
             "id": 4019,
@@ -389,7 +413,8 @@
             "name": "시부야 스크램블 교차로",
             "description": "에스컬레이터 사진은 내려갈 때 찍어야 배경이 잘 담김",
             "category": "관광",
-            "comments": []
+            "comments": [],
+            "duration": 120
           },
           {
             "id": 4020,
@@ -399,7 +424,8 @@
             "category": "식사",
             "estimatedCost": 2500,
             "currency": "JPY",
-            "comments": []
+            "comments": [],
+            "duration": 90
           },
           {
             "id": 4021,
@@ -411,7 +437,8 @@
             "estimatedCost": 2450,
             "currency": "JPY",
             "tip": "줄서기 2시간 예상. 미리 예약 필수 (¥2,450~)",
-            "comments": []
+            "comments": [],
+            "duration": 60
           }
         ]
       },
@@ -428,7 +455,8 @@
             "category": "식사",
             "estimatedCost": 1000,
             "currency": "JPY",
-            "comments": []
+            "comments": [],
+            "duration": 90
           },
           {
             "id": 4023,
@@ -436,7 +464,8 @@
             "name": "긴자 쇼핑",
             "description": "긴자역→긴자 식스→중앙거리(주오도리) 산책→유니클로 긴자점→이토야→미츠코시 지하 식품관",
             "category": "쇼핑",
-            "comments": []
+            "comments": [],
+            "duration": 180
           },
           {
             "id": 4024,
@@ -446,7 +475,8 @@
             "category": "식사",
             "estimatedCost": 1500,
             "currency": "JPY",
-            "comments": []
+            "comments": [],
+            "duration": 120
           },
           {
             "id": 4025,
@@ -458,7 +488,8 @@
             "estimatedCost": 1850,
             "currency": "JPY",
             "tip": "예약 필수 (¥1,850~)",
-            "comments": []
+            "comments": [],
+            "duration": 180
           },
           {
             "id": 4026,
@@ -469,7 +500,8 @@
             "estimatedCost": 1230,
             "currency": "JPY",
             "tip": "롯폰기 힐스 전망대 360도 도심 풍경과 후지산 감상 (¥1,230~)",
-            "comments": []
+            "comments": [],
+            "duration": 60
           }
         ]
       },
@@ -484,7 +516,8 @@
             "name": "아침 - 숙소 간편식",
             "description": "숙소에서 간단히 식사",
             "category": "식사",
-            "comments": []
+            "comments": [],
+            "duration": 60
           },
           {
             "id": 4028,
@@ -492,7 +525,8 @@
             "name": "호텔 체크아웃",
             "description": "지하철 이동 40분",
             "category": "숙소",
-            "comments": []
+            "comments": [],
+            "duration": 60
           },
           {
             "id": 4029,
@@ -502,7 +536,8 @@
             "category": "식사",
             "estimatedCost": 3000,
             "currency": "JPY",
-            "comments": []
+            "comments": [],
+            "duration": 60
           },
           {
             "id": 4030,
@@ -510,7 +545,8 @@
             "name": "센카쿠반라이",
             "description": "센캬쿠반라이 산책 및 족욕",
             "category": "관광",
-            "comments": []
+            "comments": [],
+            "duration": 60
           },
           {
             "id": 4031,
@@ -519,7 +555,8 @@
             "description": "모래사장을 걸으며 도쿄만과 레인보우브리지 감상",
             "category": "관광",
             "tip": "유리카모메 탑승",
-            "comments": []
+            "comments": [],
+            "duration": 60
           },
           {
             "id": 4032,
@@ -527,7 +564,8 @@
             "name": "자유여신상 & 레인보우브리지",
             "description": "뉴욕의 자유의 여신상을 본떠 만든 축소 복제품. 바다와 도시가 어우러진 개방감",
             "category": "관광",
-            "comments": []
+            "comments": [],
+            "duration": 150
           },
           {
             "id": 4033,
@@ -537,7 +575,8 @@
             "category": "이동",
             "estimatedCost": 1500,
             "currency": "JPY",
-            "comments": []
+            "comments": [],
+            "duration": 90
           },
           {
             "id": 4034,
@@ -547,7 +586,8 @@
             "category": "식사",
             "estimatedCost": 2000,
             "currency": "JPY",
-            "comments": []
+            "comments": [],
+            "duration": 180
           },
           {
             "id": 4035,
@@ -555,7 +595,8 @@
             "name": "나리타공항 이륙",
             "description": "출국심사 후 탑승",
             "category": "이동",
-            "comments": []
+            "comments": [],
+            "duration": 150
           },
           {
             "id": 4036,
@@ -563,7 +604,8 @@
             "name": "인천공항 착륙",
             "description": "입국심사 후 귀가. 약 24:00 집 도착",
             "category": "이동",
-            "comments": []
+            "comments": [],
+            "duration": 60
           }
         ]
       }
