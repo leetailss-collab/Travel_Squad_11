@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // Korean Holiday Name Mapping
 const HOLIDAY_NAMES_KO = {
@@ -172,8 +172,11 @@ function App() {
   // Form States inside detail tabs
   const [newPlace, setNewPlace] = useState({
     day: 1, time: '', name: '', description: '', category: '관광', estimatedCost: '',
-    currency: '', needsReservation: false, tip: '', payer: ''
+    currency: '', needsReservation: false, tip: '', payer: '', duration: 60
   });
+
+  const [editingPlace, setEditingPlace] = useState(null); // Place object currently being edited
+  const pressTimerRef = useRef(null);
   const [newCheck, setNewCheck] = useState({ title: '', assignee: '' });
   const [newExpense, setNewExpense] = useState({ title: '', amount: '', payer: '', date: '' });
 
@@ -500,6 +503,55 @@ function App() {
     }
   };
 
+  // Helper functions for time calculations and cascading shift
+  const timeToMinutes = (t) => {
+    if (!t) return 0;
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  };
+
+  const minutesToTime = (m) => {
+    const h = Math.floor(m / 60) % 24;
+    const min = m % 60;
+    return `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+  };
+
+  const shiftItineraryTimes = (places) => {
+    // Sort by start time first
+    const sorted = [...places].sort((a, b) => a.time.localeCompare(b.time));
+    
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const current = sorted[i];
+      const currentStart = timeToMinutes(current.time);
+      const duration = Number(current.duration) || 0;
+      const currentEnd = currentStart + duration;
+      
+      const next = sorted[i + 1];
+      const nextStart = timeToMinutes(next.time);
+      
+      if (nextStart < currentEnd) {
+        next.time = minutesToTime(currentEnd);
+      }
+    }
+    
+    sorted.sort((a, b) => a.time.localeCompare(b.time));
+    return sorted;
+  };
+
+  // Long-press event handlers for itinerary cards
+  const handleStartPress = (place) => {
+    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
+    pressTimerRef.current = setTimeout(() => {
+      setEditingPlace({ ...place, duration: place.duration || 0 });
+    }, 700);
+  };
+
+  const handleCancelPress = () => {
+    if (pressTimerRef.current) {
+      clearTimeout(pressTimerRef.current);
+    }
+  };
+
   // Add Itinerary Place
   const handleAddItinerary = (e) => {
     e.preventDefault();
@@ -525,6 +577,7 @@ function App() {
     const costValue = newPlace.estimatedCost ? Number(newPlace.estimatedCost) : 0;
     const costCurrency = newPlace.currency || plan.currency || 'KRW';
     const payerValue = newPlace.payer || currentUser.name;
+    const durationValue = newPlace.duration ? Number(newPlace.duration) : 60; // default 1 hour
 
     const newPlaceObj = {
       id: placeId,
@@ -537,6 +590,7 @@ function App() {
       needsReservation: newPlace.needsReservation,
       tip: newPlace.tip,
       payer: payerValue,
+      duration: durationValue,
       comments: []
     };
 
@@ -548,13 +602,13 @@ function App() {
       });
     } else {
       updatedPlan.itinerary[dayIndex].places.push(newPlaceObj);
-      updatedPlan.itinerary[dayIndex].places.sort((a, b) => a.time.localeCompare(b.time));
+      updatedPlan.itinerary[dayIndex].places = shiftItineraryTimes(updatedPlan.itinerary[dayIndex].places);
     }
 
     // Auto-sync to expenses if there is a positive cost
     if (costValue > 0) {
       const newExpenseItem = {
-        id: placeId, // Link using same ID (or can use placeId explicitly as custom property)
+        id: placeId,
         placeId: placeId,
         title: `[일정] ${newPlace.name}`,
         amount: Math.round(costCurrency === 'KRW' ? costValue : costValue * (costCurrency === (plan.currency || 'KRW') ? exchangeRate.rate : (FALLBACK_KRW_RATES[costCurrency] || 1))),
@@ -569,9 +623,122 @@ function App() {
     saveUpdatedPlan(updatedPlan);
     setNewPlace({
       day: 1, time: '', name: '', description: '', category: '관광', estimatedCost: '',
-      currency: plan.currency || 'KRW', needsReservation: false, tip: '', payer: ''
+      currency: plan.currency || 'KRW', needsReservation: false, tip: '', payer: '', duration: 60
     });
     setShowModal(false);
+  };
+
+  // Edit Itinerary Place
+  const handleEditItinerary = (e) => {
+    e.preventDefault();
+    if (!editingPlace || !editingPlace.name || !editingPlace.time) return;
+
+    const updatedPlan = { ...plan };
+    let found = false;
+    let dayNo = 1;
+    
+    const getTargetDate = (start, dayNo) => {
+      try {
+        const date = new Date(start);
+        date.setDate(date.getDate() + (dayNo - 1));
+        return date.toISOString().split('T')[0];
+      } catch (e) {
+        return start;
+      }
+    };
+
+    for (let d = 0; d < updatedPlan.itinerary.length; d++) {
+      const dayItem = updatedPlan.itinerary[d];
+      const idx = dayItem.places.findIndex(p => p.id === editingPlace.id);
+      if (idx !== -1) {
+        dayNo = dayItem.day;
+        const costValue = editingPlace.estimatedCost ? Number(editingPlace.estimatedCost) : 0;
+        const costCurrency = editingPlace.currency || plan.currency || 'KRW';
+        const payerValue = editingPlace.payer || currentUser.name;
+        const durationValue = editingPlace.duration ? Number(editingPlace.duration) : 0;
+
+        dayItem.places[idx] = {
+          ...dayItem.places[idx],
+          time: editingPlace.time,
+          name: editingPlace.name,
+          duration: durationValue,
+          category: editingPlace.category,
+          description: editingPlace.description,
+          estimatedCost: costValue,
+          currency: costCurrency,
+          needsReservation: editingPlace.needsReservation,
+          tip: editingPlace.tip,
+          payer: payerValue
+        };
+
+        // Cascade shifting for this specific day
+        dayItem.places = shiftItineraryTimes(dayItem.places);
+        found = true;
+
+        // Auto-sync or update linked expense
+        const targetDateStr = getTargetDate(plan.startDate, dayNo);
+        const expenseIdx = updatedPlan.expenses.findIndex(exp => exp.placeId === editingPlace.id || exp.id === editingPlace.id);
+        
+        if (costValue > 0) {
+          const expenseAmount = Math.round(costCurrency === 'KRW' ? costValue : costValue * (costCurrency === (plan.currency || 'KRW') ? exchangeRate.rate : (FALLBACK_KRW_RATES[costCurrency] || 1)));
+          const updatedExpenseItem = {
+            id: editingPlace.id,
+            placeId: editingPlace.id,
+            title: `[일정] ${editingPlace.name}`,
+            amount: expenseAmount,
+            originalAmount: costValue,
+            currency: costCurrency,
+            payer: payerValue,
+            date: targetDateStr
+          };
+          if (expenseIdx !== -1) {
+            updatedPlan.expenses[expenseIdx] = updatedExpenseItem;
+          } else {
+            updatedPlan.expenses.push(updatedExpenseItem);
+          }
+        } else {
+          // If cost became 0 or empty, delete the linked expense
+          if (expenseIdx !== -1) {
+            updatedPlan.expenses.splice(expenseIdx, 1);
+          }
+        }
+        break;
+      }
+    }
+
+    if (found) {
+      saveUpdatedPlan(updatedPlan);
+    }
+    setEditingPlace(null);
+  };
+
+  // Delete Itinerary Place
+  const handleDeletePlace = (placeId) => {
+    if (!window.confirm("정말로 이 일정을 삭제하시겠습니까?")) return;
+
+    const updatedPlan = { ...plan };
+    let found = false;
+
+    for (let d = 0; d < updatedPlan.itinerary.length; d++) {
+      const dayItem = updatedPlan.itinerary[d];
+      const idx = dayItem.places.findIndex(p => p.id === placeId);
+      if (idx !== -1) {
+        dayItem.places.splice(idx, 1);
+        found = true;
+        break;
+      }
+    }
+
+    // Also delete any linked expense
+    const expenseIdx = updatedPlan.expenses.findIndex(exp => exp.placeId === placeId || exp.id === placeId);
+    if (expenseIdx !== -1) {
+      updatedPlan.expenses.splice(expenseIdx, 1);
+    }
+
+    if (found) {
+      saveUpdatedPlan(updatedPlan);
+    }
+    setEditingPlace(null);
   };
 
   // Add Comment to Place
@@ -1236,8 +1403,28 @@ function App() {
                           dayItem.places.map((place) => (
                             <div key={place.id} className="timeline-item" style={{ marginBottom: '8px' }}>
                               <div className="timeline-dot"></div>
-                              <div className="timeline-content">
-                                <div className="timeline-time">{place.time}</div>
+                              <div 
+                                className="timeline-content"
+                                onMouseDown={() => handleStartPress(place)}
+                                onMouseUp={handleCancelPress}
+                                onMouseLeave={handleCancelPress}
+                                onTouchStart={() => handleStartPress(place)}
+                                onTouchEnd={handleCancelPress}
+                                onTouchMove={handleCancelPress}
+                                onDoubleClick={() => setEditingPlace({ ...place, duration: place.duration || 0 })}
+                                title="더블클릭 또는 길게 눌러 일정 수정"
+                              >
+                                <div className="timeline-time">
+                                  {place.time}
+                                  {place.duration > 0 && (
+                                    <span className="timeline-duration">
+                                      🕒 {place.duration >= 60 
+                                        ? `${Math.floor(place.duration / 60)}시간${place.duration % 60 > 0 ? ` ${place.duration % 60}분` : ''}` 
+                                        : `${place.duration}분`} 체류
+                                    </span>
+                                  )}
+                                  <span className="timeline-edit-hint">(꾹 누르거나 더블클릭하여 수정)</span>
+                                </div>
                                 <div className="timeline-title-row">
                                   <div className="timeline-place">{place.name}</div>
                                   {place.category && <span className={`category-badge category-${place.category}`}>{place.category}</span>}
@@ -1464,6 +1651,20 @@ function App() {
                       <input type="time" required className="form-control" value={newPlace.time} onChange={e => setNewPlace({ ...newPlace, time: e.target.value })} />
                     </div>
                     <div className="form-group">
+                      <label>체류 시간 (점유 시간)</label>
+                      <select className="form-control" value={newPlace.duration} onChange={e => setNewPlace({ ...newPlace, duration: Number(e.target.value) })}>
+                        <option value={0}>설정 안 함 (0분)</option>
+                        <option value={30}>30분</option>
+                        <option value={60}>1시간</option>
+                        <option value={90}>1시간 30분</option>
+                        <option value={120}>2시간</option>
+                        <option value={150}>2시간 30분</option>
+                        <option value={180}>3시간</option>
+                        <option value={240}>4시간</option>
+                        <option value={300}>5시간</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
                       <label>장소/일정 이름</label>
                       <input type="text" required placeholder="예: 함덕 해수욕장" className="form-control" value={newPlace.name} onChange={e => setNewPlace({ ...newPlace, name: e.target.value })} />
                     </div>
@@ -1554,6 +1755,84 @@ function App() {
                     <button type="submit" className="submit-btn">경비 등록하기</button>
                   </form>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Edit Place Modal */}
+          {editingPlace && (
+            <div className="modal-overlay" onClick={() => setEditingPlace(null)}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h3>📅 일정 상세 수정</h3>
+                  <button className="close-btn" onClick={() => setEditingPlace(null)}>×</button>
+                </div>
+                <form onSubmit={handleEditItinerary}>
+                  <div className="form-group">
+                    <label>시간 (HH:MM)</label>
+                    <input type="time" required className="form-control" value={editingPlace.time} onChange={e => setEditingPlace({ ...editingPlace, time: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label>체류 시간 (점유 시간)</label>
+                    <select className="form-control" value={editingPlace.duration} onChange={e => setEditingPlace({ ...editingPlace, duration: Number(e.target.value) })}>
+                      <option value={0}>설정 안 함 (0분)</option>
+                      <option value={30}>30분</option>
+                      <option value={60}>1시간</option>
+                      <option value={90}>1시간 30분</option>
+                      <option value={120}>2시간</option>
+                      <option value={150}>2시간 30분</option>
+                      <option value={180}>3시간</option>
+                      <option value={240}>4시간</option>
+                      <option value={300}>5시간</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>장소/일정 이름</label>
+                    <input type="text" required placeholder="예: 함덕 해수욕장" className="form-control" value={editingPlace.name} onChange={e => setEditingPlace({ ...editingPlace, name: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label>카테고리</label>
+                    <select className="form-control" value={editingPlace.category} onChange={e => setEditingPlace({ ...editingPlace, category: e.target.value })}>
+                      {['관광', '식사', '쇼핑', '이동', '숙소', '기타'].map(category => <option key={category} value={category}>{category}</option>)}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>메모/설명</label>
+                    <textarea placeholder="예: 바다 구경 및 망고주스 마시기" className="form-control" value={editingPlace.description || ''} onChange={e => setEditingPlace({ ...editingPlace, description: e.target.value })}></textarea>
+                  </div>
+                  <div className="form-group">
+                    <label>예상 비용 (선택사항)</label>
+                    <div className="cost-input-row">
+                      <select className="form-control currency-select" value={editingPlace.currency || planCurrency} onChange={e => setEditingPlace({ ...editingPlace, currency: e.target.value })}>
+                        <option value={planCurrency}>{planCurrencyMeta.symbol} {planCurrencyMeta.name}</option>
+                        {planCurrency !== 'KRW' && <option value="KRW">₩ 원</option>}
+                      </select>
+                      <input type="number" min="0" placeholder="금액 입력" className="form-control" value={editingPlace.estimatedCost || ''} onChange={e => setEditingPlace({ ...editingPlace, estimatedCost: e.target.value })} />
+                    </div>
+                    {editingPlace.estimatedCost && <div className="cost-preview">{formatCostComparison(editingPlace.estimatedCost, editingPlace.currency || planCurrency)}</div>}
+                  </div>
+                  <label className="reservation-check">
+                    <input type="checkbox" checked={editingPlace.needsReservation || false} onChange={e => setEditingPlace({ ...editingPlace, needsReservation: e.target.checked })} />
+                    🎫 사전 예약이 필요한 일정
+                  </label>
+                  <div className="form-group">
+                    <label>팁/메모</label>
+                    <textarea placeholder="예: 해질 무렵 방문, 온라인 예매 권장" className="form-control" value={editingPlace.tip || ''} onChange={e => setEditingPlace({ ...editingPlace, tip: e.target.value })}></textarea>
+                  </div>
+                  <div className="form-group">
+                    <label>결제자</label>
+                    <select className="form-control" value={editingPlace.payer || currentUser.name} onChange={e => setEditingPlace({ ...editingPlace, payer: e.target.value })}>
+                      {plan.members.map((m, idx) => (
+                        <option key={idx} value={m}>{m}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                    <button type="submit" className="submit-btn" style={{ flex: 1 }}>수정 완료</button>
+                    <button type="button" className="delete-btn-danger" onClick={() => handleDeletePlace(editingPlace.id)} style={{ width: 'auto', marginTop: 0, padding: '10px 16px' }}>일정 삭제</button>
+                  </div>
+                </form>
               </div>
             </div>
           )}

@@ -1227,3 +1227,51 @@ body {
   color: var(--text-main);
 }
 
+/* Timeline Interactive Styles & Duration Badges */
+.timeline-content {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  user-select: none; /* Prevent text selection during long press */
+}
+
+.timeline-content:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.timeline-duration {
+  margin-left: 8px;
+  color: var(--text-muted);
+  font-weight: normal;
+  font-size: 0.7rem;
+  background: var(--border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.timeline-edit-hint {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: normal;
+  margin-left: 4px;
+}
+
+.delete-btn-danger {
+  background-color: #ef4444 !important;
+  color: white !important;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: 600;
+  margin-top: 8px;
+  transition: background-color 0.2s;
+}
+
+.delete-btn-danger:hover {
+  background-color: #dc2626 !important;
+}
+
+

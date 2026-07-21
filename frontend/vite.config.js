@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: '우리가족 여행 계획기',
-        short_name: '가족여행',
+        name: 'Travel Squad 11',
+        short_name: 'Travel Squad 11',
         description: '실시간으로 소통하며 짜는 우리 가족 맞춤 여행 계획 앱',
         theme_color: '#4f46e5',
         background_color: '#f8fafc',
