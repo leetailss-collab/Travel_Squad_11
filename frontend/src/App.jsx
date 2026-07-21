@@ -148,6 +148,19 @@ const DEFAULT_MOCK_PLANS = [
 const getAnniversariesForYear = (year, anniversariesList) => {
   if (!anniversariesList || anniversariesList.length === 0) return [];
   return anniversariesList.map(ann => {
+    const baseYear = Number(ann.year) || year;
+    const diff = year - baseYear;
+    let titleSuffix = '';
+    if (diff > 0) {
+      if (ann.type === 'birthday') {
+        titleSuffix = ` (${diff}회)`;
+      } else if (ann.type === 'memorial') {
+        titleSuffix = ` (${diff}주기)`;
+      } else {
+        titleSuffix = ` (${diff}주년)`;
+      }
+    }
+
     if (ann.isLunar) {
       try {
         const result = solarLunar.lunar2solar(year, ann.month, ann.day);
@@ -156,14 +169,16 @@ const getAnniversariesForYear = (year, anniversariesList) => {
           const dayStr = String(result.cDay).padStart(2, '0');
           return {
             id: ann.id || `ann-${ann.name}-${year}`,
-            title: `${ann.name} (음력)`,
+            title: `${ann.name}${titleSuffix} (음력)`,
             dateStr: `${result.cYear}-${monthStr}-${dayStr}`,
             isAnniversary: true,
             isEvent: false,
             name: ann.name,
+            year: baseYear,
             month: ann.month,
             day: ann.day,
             isLunar: true,
+            type: ann.type || 'other',
             rawId: ann.id
           };
         }
@@ -176,14 +191,16 @@ const getAnniversariesForYear = (year, anniversariesList) => {
       const dayStr = String(ann.day).padStart(2, '0');
       return {
         id: ann.id || `ann-${ann.name}-${year}`,
-        title: ann.name,
+        title: `${ann.name}${titleSuffix}`,
         dateStr: `${year}-${monthStr}-${dayStr}`,
         isAnniversary: true,
         isEvent: false,
         name: ann.name,
+        year: baseYear,
         month: ann.month,
         day: ann.day,
         isLunar: false,
+        type: ann.type || 'other',
         rawId: ann.id
       };
     }
@@ -241,7 +258,7 @@ function App() {
   const [anniversaries, setAnniversaries] = useState([]);
   const [editingAnniversary, setEditingAnniversary] = useState(null);
   const [showAddAnniversaryModal, setShowAddAnniversaryModal] = useState(false);
-  const [newAnniversary, setNewAnniversary] = useState({ name: '', month: 1, day: 1, isLunar: false });
+  const [newAnniversary, setNewAnniversary] = useState({ name: '', year: new Date().getFullYear(), month: 1, day: 1, isLunar: false, type: 'birthday' });
 
   // Fetch Korean national holidays dynamically when calendar year changes
   useEffect(() => {
@@ -837,9 +854,11 @@ function App() {
         body: JSON.stringify({
           id: editingAnniversary.rawId,
           name: editingAnniversary.name,
+          year: editingAnniversary.year,
           month: editingAnniversary.month,
           day: editingAnniversary.day,
-          isLunar: editingAnniversary.isLunar
+          isLunar: editingAnniversary.isLunar,
+          type: editingAnniversary.type
         })
       });
       if (response.ok) {
@@ -1338,9 +1357,11 @@ function App() {
                             onClick={() => {
                               setNewAnniversary({
                                 name: '',
+                                year: new Date().getFullYear(),
                                 month: 1,
                                 day: 1,
-                                isLunar: false
+                                isLunar: false,
+                                type: 'birthday'
                               });
                               setShowAddAnniversaryModal(true);
                             }}
@@ -2217,8 +2238,20 @@ function App() {
             </div>
             <form onSubmit={handleAddAnniversary}>
               <div className="form-group">
+                <label>기념일 구분</label>
+                <select className="form-control" value={newAnniversary.type} onChange={e => setNewAnniversary({ ...newAnniversary, type: e.target.value })}>
+                  <option value="birthday">생일 (생신)</option>
+                  <option value="memorial">기일 (사망일)</option>
+                  <option value="other">기타 기념일</option>
+                </select>
+              </div>
+              <div className="form-group">
                 <label>기념일 이름</label>
                 <input type="text" required placeholder="예: 할머니 생신" className="form-control" value={newAnniversary.name} onChange={e => setNewAnniversary({ ...newAnniversary, name: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>기준 연도 (태어난 해 / 사망한 해 / 기준년도)</label>
+                <input type="number" required placeholder="예: 1985" className="form-control" value={newAnniversary.year} onChange={e => setNewAnniversary({ ...newAnniversary, year: Number(e.target.value) })} />
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <div className="form-group" style={{ flex: 1 }}>
@@ -2254,8 +2287,20 @@ function App() {
             </div>
             <form onSubmit={handleSaveAnniversaryEdit}>
               <div className="form-group">
+                <label>기념일 구분</label>
+                <select className="form-control" value={editingAnniversary.type || 'other'} onChange={e => setEditingAnniversary({ ...editingAnniversary, type: e.target.value })}>
+                  <option value="birthday">생일 (생신)</option>
+                  <option value="memorial">기일 (사망일)</option>
+                  <option value="other">기타 기념일</option>
+                </select>
+              </div>
+              <div className="form-group">
                 <label>기념일 이름</label>
                 <input type="text" required className="form-control" value={editingAnniversary.name} onChange={e => setEditingAnniversary({ ...editingAnniversary, name: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>기준 연도 (태어난 해 / 사망한 해 / 기준년도)</label>
+                <input type="number" required className="form-control" value={editingAnniversary.year || ''} onChange={e => setEditingAnniversary({ ...editingAnniversary, year: Number(e.target.value) })} />
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <div className="form-group" style={{ flex: 1 }}>

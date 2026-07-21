@@ -243,9 +243,11 @@ const saveAnniversary = async (data) => {
     const item = {
       id,
       name: data.name,
+      year: Number(data.year || 2026),
       month: Number(data.month),
       day: Number(data.day),
-      isLunar: Boolean(data.isLunar)
+      isLunar: Boolean(data.isLunar),
+      type: data.type || 'other'
     };
     await db.collection('anniversaries').doc(id).set(item);
     return item;
