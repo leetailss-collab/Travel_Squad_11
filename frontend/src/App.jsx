@@ -235,11 +235,15 @@ function App() {
   // Form States inside detail tabs
   const [newPlace, setNewPlace] = useState({
     day: 1, time: '', name: '', address: '', description: '', category: '관광', estimatedCost: '',
-    currency: '', needsReservation: false, tip: '', payer: '', duration: 60
+    currency: '', needsReservation: false, tip: '', payer: '', duration: 60, images: []
   });
 
   const [editingPlace, setEditingPlace] = useState(null); // Place object currently being edited
+  const [uploading, setUploading] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState(null);
   const pressTimerRef = useRef(null);
+  const addImgInputRef = useRef(null);
+  const editImgInputRef = useRef(null);
   const [newCheck, setNewCheck] = useState({ title: '', assignee: '' });
   const [newExpense, setNewExpense] = useState({ title: '', amount: '', payer: '', date: '' });
 
@@ -269,7 +273,7 @@ function App() {
 
   // Trip Meta (Accommodation & Transportation) Edit States
   const [showEditMetaModal, setShowEditMetaModal] = useState(false);
-  const [editMeta, setEditMeta] = useState({ accName: '', accLocation: '', accHighlight: '', transText: '' });
+  const [editMeta, setEditMeta] = useState({ accName: '', accLocation: '', accHighlight: '', transText: '', startDate: '', endDate: '' });
 
   const openConfirm = (title, message, onConfirm) => {
     setConfirmModal({
@@ -502,7 +506,9 @@ function App() {
         if (t.route) parts.push(t.route);
         if (t.cost) parts.push(t.cost);
         return parts.join(' · ');
-      }).join('\n') : ''
+      }).join('\n') : '',
+      startDate: plan.startDate || '',
+      endDate: plan.endDate || ''
     });
     setShowEditMetaModal(true);
   };
@@ -510,6 +516,20 @@ function App() {
   const handleSaveMeta = (e) => {
     e.preventDefault();
     if (!plan) return;
+
+    // 0. Date Validation
+    const startStr = editMeta.startDate;
+    const endStr = editMeta.endDate;
+    if (!startStr || !endStr) {
+      alert("시작일과 종료일을 모두 입력해주세요.");
+      return;
+    }
+    const start = new Date(startStr);
+    const end = new Date(endStr);
+    if (start > end) {
+      alert("시작일은 종료일보다 이전이거나 같아야 합니다.");
+      return;
+    }
 
     const updatedPlan = { ...plan };
 
@@ -540,8 +560,59 @@ function App() {
       delete updatedPlan.transportation;
     }
 
-    saveUpdatedPlan(updatedPlan);
-    setShowEditMetaModal(false);
+    // 3. Process Date changes and Itinerary
+    const calculateDays = (sStr, eStr) => {
+      const s = new Date(sStr);
+      const e = new Date(eStr);
+      return Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
+    };
+
+    const oldDays = calculateDays(plan.startDate, plan.endDate);
+    const newDays = calculateDays(startStr, endStr);
+
+    const performSave = (finalPlan) => {
+      finalPlan.startDate = startStr;
+      finalPlan.endDate = endStr;
+
+      // Rebuild itinerary
+      const newItinerary = [];
+      for (let d = 1; d <= newDays; d++) {
+        const targetDate = new Date(startStr);
+        targetDate.setDate(targetDate.getDate() + (d - 1));
+        const dateStr = targetDate.toISOString().split('T')[0];
+        const existing = plan.itinerary ? plan.itinerary.find(item => item.day === d) : null;
+        if (existing) {
+          newItinerary.push({ ...existing, date: dateStr });
+        } else {
+          newItinerary.push({ day: d, date: dateStr, places: [] });
+        }
+      }
+      finalPlan.itinerary = newItinerary;
+
+      saveUpdatedPlan(finalPlan);
+      setShowEditMetaModal(false);
+    };
+
+    if (newDays < oldDays) {
+      // Check if any deleted days contain places
+      const affectedDays = (plan.itinerary || []).filter(item => item.day > newDays && item.places && item.places.length > 0);
+      if (affectedDays.length > 0) {
+        const deletedPlacesText = affectedDays.map(item => {
+          const placeNames = item.places.map(p => p.name).join(', ');
+          return `${item.day}일차: [${placeNames}]`;
+        }).join('\n');
+
+        openConfirm(
+          "⚠️ 여행 기간 단축 경고",
+          `여행 기간을 단축하면 아래 일정이 영구적으로 삭제됩니다. 계속하시겠습니까?\n\n${deletedPlacesText}`,
+          () => performSave(updatedPlan)
+        );
+        return;
+      }
+    }
+
+    // If days are not reduced or no places are lost, proceed immediately
+    performSave(updatedPlan);
   };
 
   const fetchAnniversaries = async () => {
@@ -807,6 +878,99 @@ function App() {
         console.warn("Offline: deletion queued or failed on server:", err);
       }
     });
+  };
+
+  // Handle Multiple Image Uploads to server
+  const uploadImages = async (files) => {
+    if (!files || files.length === 0) return [];
+    
+    setUploading(true);
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('files', files[i]);
+    }
+    
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUploading(false);
+        return data.urls || [];
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (err) {
+      console.error("Image upload failed:", err);
+      alert("이미지 업로드에 실패했습니다. (오프라인 모드에서는 이미지 업로드가 불가능합니다)");
+      setUploading(false);
+      return [];
+    }
+  };
+
+  // Add uploaded URLs to the corresponding active form state (newPlace or editingPlace)
+  const handleImageAttach = async (files, isEdit = false) => {
+    const urls = await uploadImages(files);
+    if (urls.length === 0) return;
+    
+    if (isEdit) {
+      setEditingPlace(prev => ({
+        ...prev,
+        images: [...(prev.images || []), ...urls]
+      }));
+    } else {
+      setNewPlace(prev => ({
+        ...prev,
+        images: [...(prev.images || []), ...urls]
+      }));
+    }
+  };
+
+  // Paste Event Handler (Ctrl+V)
+  const handlePasteImages = (e, isEdit = false) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    
+    const filesToUpload = [];
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) filesToUpload.push(file);
+      }
+    }
+    if (filesToUpload.length > 0) {
+      e.preventDefault();
+      handleImageAttach(filesToUpload, isEdit);
+    }
+  };
+
+  // Drop Event Handler
+  const handleDropImages = (e, isEdit = false) => {
+    e.preventDefault();
+    const files = e.dataTransfer?.files;
+    if (!files || files.length === 0) return;
+    
+    const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (imageFiles.length > 0) {
+      handleImageAttach(imageFiles, isEdit);
+    }
+  };
+
+  // Remove single image from temporary list
+  const handleRemoveImage = (index, isEdit = false) => {
+    if (isEdit) {
+      setEditingPlace(prev => ({
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index)
+      }));
+    } else {
+      setNewPlace(prev => ({
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index)
+      }));
+    }
   };
 
   // Helper functions for time calculations and cascading shift
@@ -1916,6 +2080,35 @@ function App() {
                                   {place.category && <span className={`category-badge category-${place.category}`}>{place.category}</span>}
                                 </div>
                                 {place.description && <div className="timeline-desc">{place.description}</div>}
+                                
+                                {place.images && place.images.length > 0 && (
+                                  <div className="timeline-images-gallery" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '8px 0', scrollbarWidth: 'thin' }}>
+                                    {place.images.map((url, imgIdx) => (
+                                      <img
+                                        key={imgIdx}
+                                        src={url}
+                                        alt={`${place.name} ${imgIdx}`}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setLightboxImage(url);
+                                        }}
+                                        style={{
+                                          width: '100px',
+                                          height: '100px',
+                                          objectFit: 'cover',
+                                          borderRadius: '8px',
+                                          cursor: 'pointer',
+                                          border: '1px solid var(--border)',
+                                          flexShrink: 0,
+                                          transition: 'transform 0.2s'
+                                        }}
+                                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                                        onMouseLeave={(e) => e.target.style.transform = 'scale(1.0)'}
+                                      />
+                                    ))}
+                                  </div>
+                                )}
+
                                 <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
                                   {place.address && <span>📍 {place.address}</span>}
                                   <a
@@ -2257,6 +2450,82 @@ function App() {
                         ))}
                       </select>
                     </div>
+
+                    <div className="form-group">
+                      <label>📸 사진 첨부 (클릭하여 파일 선택 / Ctrl+V 붙여넣기 / 드래그앤드롭)</label>
+                      <div 
+                        className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
+                        onClick={() => addImgInputRef.current?.click()}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => handleDropImages(e, false)}
+                        onPaste={(e) => handlePasteImages(e, false)}
+                        tabIndex={0}
+                        style={{
+                          border: '2px dashed var(--border)',
+                          borderRadius: '8px',
+                          padding: '16px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          backgroundColor: 'var(--bg-muted, #f9f9f9)',
+                          transition: 'all 0.2s',
+                          outline: 'none',
+                          fontSize: '0.85rem',
+                          color: 'var(--text-muted)'
+                        }}
+                      >
+                        {uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 복사한 이미지를 여기에 붙여넣거나 클릭해서 업로드'}
+                      </div>
+                      <input 
+                        type="file" 
+                        ref={addImgInputRef} 
+                        style={{ display: 'none' }} 
+                        multiple 
+                        accept="image/*" 
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            handleImageAttach(e.target.files, false);
+                          }
+                        }} 
+                      />
+                      {newPlace.images && newPlace.images.length > 0 && (
+                        <div className="image-preview-container" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
+                          {newPlace.images.map((url, index) => (
+                            <div key={index} className="image-preview-wrapper" style={{ position: 'relative', width: '70px', height: '70px' }}>
+                              <img 
+                                src={url} 
+                                alt="preview" 
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border)' }} 
+                              />
+                              <button 
+                                type="button" 
+                                className="remove-img-btn" 
+                                onClick={() => handleRemoveImage(index, false)}
+                                style={{
+                                  position: 'absolute',
+                                  top: '-6px',
+                                  right: '-6px',
+                                  width: '18px',
+                                  height: '18px',
+                                  borderRadius: '50%',
+                                  backgroundColor: 'rgba(0,0,0,0.6)',
+                                  color: '#fff',
+                                  border: 'none',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  cursor: 'pointer',
+                                  fontSize: '11px',
+                                  padding: 0
+                                }}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
                     <button type="submit" className="submit-btn">일정 등록하기</button>
                   </form>
                 )}
@@ -2382,6 +2651,81 @@ function App() {
                         <option key={idx} value={m}>{m}</option>
                       ))}
                     </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label>📸 사진 첨부 (클릭하여 파일 선택 / Ctrl+V 붙여넣기 / 드래그앤드롭)</label>
+                    <div 
+                      className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
+                      onClick={() => editImgInputRef.current?.click()}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => handleDropImages(e, true)}
+                      onPaste={(e) => handlePasteImages(e, true)}
+                      tabIndex={0}
+                      style={{
+                        border: '2px dashed var(--border)',
+                        borderRadius: '8px',
+                        padding: '16px',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        backgroundColor: 'var(--bg-muted, #f9f9f9)',
+                        transition: 'all 0.2s',
+                        outline: 'none',
+                        fontSize: '0.85rem',
+                        color: 'var(--text-muted)'
+                      }}
+                    >
+                      {uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 복사한 이미지를 여기에 붙여넣거나 클릭해서 업로드'}
+                    </div>
+                    <input 
+                      type="file" 
+                      ref={editImgInputRef} 
+                      style={{ display: 'none' }} 
+                      multiple 
+                      accept="image/*" 
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          handleImageAttach(e.target.files, true);
+                        }
+                      }} 
+                    />
+                    {editingPlace.images && editingPlace.images.length > 0 && (
+                      <div className="image-preview-container" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
+                        {editingPlace.images.map((url, index) => (
+                          <div key={index} className="image-preview-wrapper" style={{ position: 'relative', width: '70px', height: '70px' }}>
+                            <img 
+                              src={url} 
+                              alt="preview" 
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border)' }} 
+                            />
+                            <button 
+                              type="button" 
+                              className="remove-img-btn" 
+                              onClick={() => handleRemoveImage(index, true)}
+                              style={{
+                                position: 'absolute',
+                                top: '-6px',
+                                right: '-6px',
+                                width: '18px',
+                                height: '18px',
+                                borderRadius: '50%',
+                                  backgroundColor: 'rgba(0,0,0,0.6)',
+                                  color: '#fff',
+                                  border: 'none',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  cursor: 'pointer',
+                                  fontSize: '11px',
+                                  padding: 0
+                              }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   
                   <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
@@ -2791,14 +3135,26 @@ function App() {
         <div className="modal-overlay" style={{ zIndex: 1100 }}>
           <div className="modal-content" style={{ maxHeight: '85dvh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>✏️ 숙소 및 교통 정보 편집</h3>
+              <h3>✏️ 여행 정보 및 일정 편집</h3>
               <button className="close-btn" onClick={() => setShowEditMetaModal(false)}>×</button>
             </div>
             <form onSubmit={handleSaveMeta}>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: '1.4' }}>
-                숙소명을 비워두면 홈화면 및 요약 영역에서 숙소 칸이 제거됩니다.
+                여행 날짜나 숙소, 교통 수단 정보를 수정할 수 있습니다.
               </div>
               
+              <div style={{ fontWeight: 'bold', marginBottom: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>📅 여행 일정 설정</div>
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                  <label>시작일</label>
+                  <input type="date" className="form-control" value={editMeta.startDate} onChange={e => setEditMeta({ ...editMeta, startDate: e.target.value })} required />
+                </div>
+                <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                  <label>종료일</label>
+                  <input type="date" className="form-control" value={editMeta.endDate} onChange={e => setEditMeta({ ...editMeta, endDate: e.target.value })} required />
+                </div>
+              </div>
+
               <div style={{ fontWeight: 'bold', marginBottom: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>🏨 숙소 설정</div>
               <div className="form-group">
                 <label>숙소 이름</label>
@@ -2830,6 +3186,55 @@ function App() {
                 <button type="submit" className="submit-btn" style={{ flex: 1, padding: '12px', fontSize: '0.95rem' }}>저장 완료</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox Modal */}
+      {lightboxImage && (
+        <div 
+          className="modal-overlay" 
+          onClick={() => setLightboxImage(null)}
+          style={{ zIndex: 1200, backgroundColor: 'rgba(0, 0, 0, 0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        >
+          <div 
+            style={{ 
+              position: 'relative', 
+              maxWidth: '90vw', 
+              maxHeight: '90vh', 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center' 
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              src={lightboxImage} 
+              alt="Enlarged view" 
+              style={{ 
+                maxWidth: '100%', 
+                maxHeight: '85vh', 
+                objectFit: 'contain', 
+                borderRadius: '8px', 
+                boxShadow: '0 4px 20px rgba(0,0,0,0.5)' 
+              }} 
+            />
+            <button 
+              onClick={() => setLightboxImage(null)}
+              style={{
+                position: 'absolute',
+                top: '-40px',
+                right: '0',
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: '#fff',
+                fontSize: '32px',
+                cursor: 'pointer',
+                outline: 'none'
+              }}
+            >
+              ×
+            </button>
           </div>
         </div>
       )}

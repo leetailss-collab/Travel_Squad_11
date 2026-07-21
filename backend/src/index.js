@@ -1,14 +1,50 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 require('dotenv').config();
 const dbService = require('./services/dbService');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Ensure upload directory exists
+const uploadsDir = path.join(__dirname, '../public/uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Multer storage config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
+const upload = multer({ storage: storage });
+
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(uploadsDir));
+
+// Upload Images API
+app.post('/api/upload', upload.array('files'), (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: '업로드할 파일이 없습니다.' });
+    }
+    const filePaths = req.files.map(file => `/uploads/${file.filename}`);
+    res.json({ urls: filePaths });
+  } catch (err) {
+    console.error("Upload error:", err);
+    res.status(500).json({ message: "파일 업로드 중 오류가 발생했습니다." });
+  }
+});
 
 // Authentication API
 app.post('/api/auth/login', async (req, res) => {

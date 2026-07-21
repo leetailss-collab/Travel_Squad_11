@@ -36,3 +36,6 @@ Thumbs.db
 # Local Node Runtime & Temp files
 .node/
 *.pdf
+
+# Backend Uploads
+backend/public/uploads/
