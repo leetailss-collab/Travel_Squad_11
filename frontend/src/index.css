@@ -60,6 +60,7 @@ body {
   max-width: 480px; /* Mobile width constraint on desktop */
   margin: 0 auto;
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--bg-app);
   display: flex;
   flex-direction: column;
@@ -141,10 +142,6 @@ body {
   margin-bottom: 16px;
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
-}
-
-.card:active {
-  transform: scale(0.98);
 }
 
 .card-title {
@@ -587,6 +584,10 @@ body {
   padding: 24px;
   box-shadow: var(--shadow-lg);
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 85vh;
+  max-height: 85dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal-header {
@@ -1247,6 +1248,25 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+.timeline-content:active {
+  transform: scale(0.97) !important;
+  box-shadow: none !important;
+  background-color: var(--border) !important;
+}
+.route-recommend-btn {
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.route-recommend-btn:hover {
+  background-color: var(--border) !important;
+}
+
+.route-recommend-btn:active {
+  transform: scale(0.95) !important;
+  box-shadow: none !important;
+  background-color: var(--primary-light) !important;
+}
+
 .timeline-duration {
   margin-left: 8px;
   color: var(--text-muted);
@@ -1281,5 +1301,48 @@ body {
 .delete-btn-danger:hover {
   background-color: #dc2626 !important;
 }
+
+/* Home Screen Card Delete Button */
+.delete-trip-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.delete-trip-btn:hover {
+  color: var(--danger) !important;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Custom Confirm Modal Content styling */
+.custom-confirm-content {
+  border-radius: var(--radius);
+  max-width: 340px;
+  margin: auto 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+  animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
 
 

@@ -1,0 +1,102 @@
+import json
+import sys
+
+file_path = r"c:\Users\HyunSoo\Documents\Travel_Squad_11\backend\data\plans.json"
+
+with open(file_path, "r", encoding="utf-8") as f:
+    plans = json.load(f)
+
+new_plan = {
+  "id": 4,
+  "title": "일본 도쿄 가족여행",
+  "startDate": "2026-09-18",
+  "endDate": "2026-09-21",
+  "members": ["이현수", "양슬기", "이준성", "이은성", "이해성"],
+  "manager": "이현수",
+  "currency": "JPY",
+  "accommodation": { "name": "토부호텔 레반트 도쿄", "location": "긴시초역", "highlight": "스카이트리 전망뷰" },
+  "transportation": [
+    { "type": "리무진 버스", "route": "나리타공항 ↔ 숙소", "cost": 1500, "currency": "JPY" },
+    { "type": "도쿄 메트로 72시간 패스", "cost": 13900, "currency": "KRW", "note": "지하철 위주 동선, 주요역 무인발권기에서 QR코드 스캔" }
+  ],
+  "itinerary": [
+    {
+      "day": 1, "date": "2026-09-18", "title": "출국, 전통과 현대",
+      "places": [
+        {"id":4001, "time":"05:00", "name":"집 출발", "description":"출국심사", "category":"이동", "comments":[]},
+        {"id":4002, "time":"07:45", "name":"인천공항 이륙", "description":"나리타행 출발", "category":"이동", "comments":[]},
+        {"id":4003, "time":"10:50", "name":"나리타공항 착륙", "description":"입국심사", "category":"이동", "comments":[]},
+        {"id":4004, "time":"11:30", "name":"리무진 버스 탑승", "description":"공항에서 구입(신용카드 가능)", "category":"이동", "estimatedCost":1500, "currency":"JPY", "comments":[]},
+        {"id":4005, "time":"13:00", "name":"숙소 도착", "description":"토부호텔 레반트 도쿄, 짐 맡기기", "category":"숙소", "comments":[]},
+        {"id":4006, "time":"14:00", "name":"점심 - 이로도리쓰키지", "description":"오마카세 런치 (우니 추가)", "category":"식사", "estimatedCost":3500, "currency":"JPY", "tip":"시겐 카이센동 2600엔도 추천. 츠키지 시장 구경(도둑 조심). 터렛커피 라떼맛집", "comments":[]},
+        {"id":4007, "time":"15:00", "name":"호텔 체크인", "description":"토부호텔 레반트 도쿄", "category":"숙소", "comments":[]},
+        {"id":4008, "time":"15:10", "name":"아사쿠사 센소지", "description":"도쿄에서 가장 오래된 절. 규모, 볼거리, 먹거리 풍성", "category":"관광", "tip":"지하철 이동 30분", "comments":[]},
+        {"id":4009, "time":"16:00", "name":"나카미세도리 거리", "description":"가장 오래된 상점가. 아사히 스카이룸 옥상에 황금 거품", "category":"관광", "comments":[]},
+        {"id":4010, "time":"17:00", "name":"도쿄 스카이트리 전망대", "description":"전망대 예약은 온라인 구매가 저렴. 해질 무렵 올라가면 낮과 야경 동시 감상", "category":"관광", "needsReservation":True, "comments":[]},
+        {"id":4011, "time":"19:00", "name":"저녁 - 츠키시마 몬자 타마토야", "description":"명란+떡+치즈 몬자(멘타이모치치즈) 추천, 2명 5000엔 정도", "category":"식사", "estimatedCost":5000, "currency":"JPY", "tip":"몬자거리 산책도 함께 추천", "comments":[]},
+        {"id":4012, "time":"20:00", "name":"긴자 쇼핑", "description":"마츠야 백화점(디올,화장품), HOKA매장, OK긴자(다이소,GU,유니클로), MUJI, LOFT, ABC마트, 세리아, 긴자식스", "category":"쇼핑", "tip":"게스트카드 발급 가능. 라이프베케이션에서 일본 사케·위스키 구입", "comments":[]},
+        {"id":4013, "time":"22:00", "name":"야식 - 아부라소바 긴자구미", "description":"마제소바·아부라소바. 면사리 추가 약 340엔", "category":"식사", "estimatedCost":1000, "currency":"JPY", "tip":"새벽 4시까지 영업", "comments":[]}
+      ]
+    },
+    {
+      "day": 2, "date": "2026-09-19", "title": "도쿄 감성",
+      "places": [
+        {"id":4014, "time":"08:00", "name":"아침 - 숙소 간편식", "description":"숙소에서 간단히 식사", "category":"식사", "comments":[]},
+        {"id":4015, "time":"09:30", "name":"메이지 진구", "description":"메이지 신궁→하라주쿠→오모테산도→캣스트리트→시부야→시부야 스카이", "category":"관광", "tip":"지하철 이동 40분", "comments":[]},
+        {"id":4016, "time":"10:30", "name":"하라주쿠 다케시타도리", "description":"400미터 길거리, 도쿄 10대 소녀들로 붐비는 곳. 마리온 크레페 유명(호객행위 조심)", "category":"관광", "comments":[]},
+        {"id":4017, "time":"12:00", "name":"점심 - 규카츠 모토무라", "description":"위드 하라주쿠점, 길거리 맛집", "category":"식사", "estimatedCost":2000, "currency":"JPY", "comments":[]},
+        {"id":4018, "time":"13:30", "name":"오모테산도 카페거리", "description":"도쿄의 샹젤리제", "category":"관광", "comments":[]},
+        {"id":4019, "time":"15:00", "name":"시부야 스크램블 교차로", "description":"에스컬레이터 사진은 내려갈 때 찍어야 배경이 잘 담김", "category":"관광", "comments":[]},
+        {"id":4020, "time":"17:00", "name":"저녁 - 시부야 돈카츠 아키라", "description":"연어카츠 추천", "category":"식사", "estimatedCost":2500, "currency":"JPY", "comments":[]},
+        {"id":4021, "time":"18:30", "name":"시부야 스카이 야경", "description":"시부야스크램블스퀘어 1층 엘베→14층→루프탑. 모서리 사진 먼저(직원 있음)→가운데 사진", "category":"관광", "needsReservation":True, "estimatedCost":2450, "currency":"JPY", "tip":"줄서기 2시간 예상. 미리 예약 필수 (¥2,450~)", "comments":[]}
+      ]
+    },
+    {
+      "day": 3, "date": "2026-09-20", "title": "먹거리, 사진명소",
+      "places": [
+        {"id":4022, "time":"07:30", "name":"아침 - 츠키지 시장", "description":"야마초 계란말이(웨이팅 많음)", "category":"식사", "estimatedCost":1000, "currency":"JPY", "comments":[]},
+        {"id":4023, "time":"09:00", "name":"긴자 쇼핑", "description":"긴자역→긴자 식스→중앙거리(주오도리) 산책→유니클로 긴자점→이토야→미츠코시 지하 식품관", "category":"쇼핑", "comments":[]},
+        {"id":4024, "time":"12:00", "name":"점심 - 도쿄역 라멘 스트리트", "description":"마루노우치 역사와 광장 사진 촬영, 캐릭터 스트리트 구경, KITTE 6층 전망테라스(무료)", "category":"식사", "estimatedCost":1500, "currency":"JPY", "comments":[]},
+        {"id":4025, "time":"14:00", "name":"팀립 보더리스", "description":"디지털 아트 미술관. 빛, 음악, 거울, 프로젝션이 결합된 공간", "category":"관광", "needsReservation":True, "estimatedCost":1850, "currency":"JPY", "tip":"예약 필수 (¥1,850~)", "comments":[]},
+        {"id":4026, "time":"17:00", "name":"도쿄 야경", "description":"아자부다이 힐즈나 롯폰기 힐즈에서 바라보는 도쿄타워", "category":"관광", "estimatedCost":1230, "currency":"JPY", "tip":"롯폰기 힐스 전망대 360도 도심 풍경과 후지산 감상 (¥1,230~)", "comments":[]}
+      ]
+    },
+    {
+      "day": 4, "date": "2026-09-21", "title": "편안함, 마무리, 입국",
+      "places": [
+        {"id":4027, "time":"08:00", "name":"아침 - 숙소 간편식", "description":"숙소에서 간단히 식사", "category":"식사", "comments":[]},
+        {"id":4028, "time":"09:00", "name":"호텔 체크아웃", "description":"지하철 이동 40분", "category":"숙소", "comments":[]},
+        {"id":4029, "time":"10:00", "name":"도요스 시장", "description":"도요스 시장에서 초밥, 현지분위기", "category":"식사", "estimatedCost":3000, "currency":"JPY", "comments":[]},
+        {"id":4030, "time":"11:00", "name":"센카쿠반라이", "description":"센캬쿠반라이 산책 및 족욕", "category":"관광", "comments":[]},
+        {"id":4031, "time":"12:00", "name":"오다이바", "description":"모래사장을 걸으며 도쿄만과 레인보우브리지 감상", "category":"관광", "tip":"유리카모메 탑승", "comments":[]},
+        {"id":4032, "time":"13:00", "name":"자유여신상 & 레인보우브리지", "description":"뉴욕의 자유의 여신상을 본떠 만든 축소 복제품. 바다와 도시가 어우러진 개방감", "category":"관광", "comments":[]},
+        {"id":4033, "time":"15:30", "name":"리무진 버스 탑승", "description":"나리타공항으로 이동", "category":"이동", "estimatedCost":1500, "currency":"JPY", "comments":[]},
+        {"id":4034, "time":"17:00", "name":"저녁 - 나리타 카와토요", "description":"장어덮밥. 더라운지 바우처 공짜 + 생맥주추가", "category":"식사", "estimatedCost":2000, "currency":"JPY", "comments":[]},
+        {"id":4035, "time":"20:00", "name":"나리타공항 이륙", "description":"출국심사 후 탑승", "category":"이동", "comments":[]},
+        {"id":4036, "time":"22:30", "name":"인천공항 착륙", "description":"입국심사 후 귀가. 약 24:00 집 도착", "category":"이동", "comments":[]}
+      ]
+    }
+  ],
+  "expenses": [],
+  "checklists": [
+    {"id":501, "title":"여권", "checked":False, "assignee":"이현수"},
+    {"id":502, "title":"충전기 (멀티어댑터)", "checked":False, "assignee":"이현수"},
+    {"id":503, "title":"휴대폰, 리모컨, 셀카봉", "checked":False, "assignee":"양슬기"},
+    {"id":504, "title":"양우산 (햇빛과 소나기 대비)", "checked":False, "assignee":"양슬기"},
+    {"id":505, "title":"모자, 선글라스, 손수건, 선크림", "checked":False, "assignee":"양슬기"},
+    {"id":506, "title":"겉옷 (기능성)", "checked":False, "assignee":"이현수"},
+    {"id":507, "title":"상비약 (처방약, 소화제, 진통제 등)", "checked":False, "assignee":"이현수"},
+    {"id":508, "title":"도쿄 메트로 패스 72시간 (성인 13,900원)", "checked":False, "assignee":"이현수"},
+    {"id":509, "title":"항공권 예매 확인", "checked":False, "assignee":"이현수"},
+    {"id":510, "title":"숙소 예약 확인 (토부호텔 레반트 도쿄)", "checked":False, "assignee":"이현수"},
+    {"id":511, "title":"시부야 스카이 예약", "checked":False, "assignee":"이현수"},
+    {"id":512, "title":"팀립 보더리스 예약", "checked":False, "assignee":"이현수"},
+    {"id":513, "title":"스카이트리 전망대 온라인 예약", "checked":False, "assignee":"이현수"}
+  ]
+}
+
+plans.append(new_plan)
+
+with open(file_path, "w", encoding="utf-8") as f:
+    json.dump(plans, f, ensure_ascii=False, indent=2)
+print("SUCCESS")

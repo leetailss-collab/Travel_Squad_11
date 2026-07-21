@@ -196,6 +196,41 @@ app.delete('/api/anniversaries/:id', async (req, res) => {
   }
 });
 
+// Get all trash items
+app.get('/api/trash', async (req, res) => {
+  try {
+    const list = await dbService.getTrash();
+    res.json(list);
+  } catch (err) {
+    console.error("Get trash error:", err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+// Restore plan from trash
+app.post('/api/trash/:id/restore', async (req, res) => {
+  try {
+    const success = await dbService.restorePlan(req.params.id);
+    if (!success) return res.status(404).json({ message: "복구할 일정을 찾을 수 없습니다." });
+    res.json({ message: "일정이 복구되었습니다." });
+  } catch (err) {
+    console.error("Restore plan error:", err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+// Delete plan permanently from trash
+app.delete('/api/trash/:id', async (req, res) => {
+  try {
+    const success = await dbService.deletePlanPermanently(req.params.id);
+    if (!success) return res.status(404).json({ message: "영구 삭제할 일정을 찾을 수 없습니다." });
+    res.json({ message: "일정이 영구 삭제되었습니다." });
+  } catch (err) {
+    console.error("Delete plan permanently error:", err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
 app.get('/health', (req, res) => {
   res.send('Server is healthy');
 });

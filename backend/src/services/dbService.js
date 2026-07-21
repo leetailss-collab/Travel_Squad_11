@@ -107,12 +107,16 @@ const createPlan = async (planData) => {
   }
 };
 
-// 5. Delete plan (checks both collections and deletes it from the one it belongs to)
+// 5. Delete plan (moves it to the trash collection with deletedAt date)
 const deletePlan = async (id) => {
   try {
     const planRef = db.collection('plans').doc(String(id));
     const planDoc = await planRef.get();
     if (planDoc.exists) {
+      await db.collection('trash').doc(String(id)).set({
+        ...planDoc.data(),
+        deletedAt: new Date().toISOString()
+      });
       await planRef.delete();
       return true;
     }
@@ -120,6 +124,10 @@ const deletePlan = async (id) => {
     const eventRef = db.collection('events').doc(String(id));
     const eventDoc = await eventRef.get();
     if (eventDoc.exists) {
+      await db.collection('trash').doc(String(id)).set({
+        ...eventDoc.data(),
+        deletedAt: new Date().toISOString()
+      });
       await eventRef.delete();
       return true;
     }
@@ -130,6 +138,83 @@ const deletePlan = async (id) => {
     throw err;
   }
 };
+
+// 5.2 Get all trash items and auto-clean expired ones (older than 15 days)
+const getTrash = async () => {
+  try {
+    await cleanExpiredTrash();
+    const snapshot = await db.collection('trash').get();
+    const list = [];
+    snapshot.forEach(doc => {
+      list.push(doc.data());
+    });
+    return list;
+  } catch (err) {
+    console.error("Error getting trash from Firestore:", err);
+    return [];
+  }
+};
+
+// 5.3 Restore plan from trash
+const restorePlan = async (id) => {
+  try {
+    const trashRef = db.collection('trash').doc(String(id));
+    const trashDoc = await trashRef.get();
+    if (!trashDoc.exists) return false;
+
+    const data = trashDoc.data();
+    const { deletedAt, ...planData } = data;
+
+    const targetCollection = planData.isEvent ? 'events' : 'plans';
+    await db.collection(targetCollection).doc(String(id)).set(planData);
+    await trashRef.delete();
+    return true;
+  } catch (err) {
+    console.error(`Error restoring plan ${id} from Firestore:`, err);
+    throw err;
+  }
+};
+
+// 5.4 Delete plan permanently from trash
+const deletePlanPermanently = async (id) => {
+  try {
+    await db.collection('trash').doc(String(id)).delete();
+    return true;
+  } catch (err) {
+    console.error(`Error permanently deleting plan ${id} from Firestore:`, err);
+    throw err;
+  }
+};
+
+// 5.5 Auto-clean expired trash (older than 15 days)
+const cleanExpiredTrash = async () => {
+  try {
+    const snapshot = await db.collection('trash').get();
+    const now = new Date();
+    const FIFTEEN_DAYS_MS = 15 * 24 * 60 * 60 * 1000;
+    const batch = db.batch();
+    let hasDeletions = false;
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.deletedAt) {
+        const deletedTime = new Date(data.deletedAt);
+        if (now - deletedTime > FIFTEEN_DAYS_MS) {
+          batch.delete(doc.ref);
+          hasDeletions = true;
+        }
+      }
+    });
+
+    if (hasDeletions) {
+      await batch.commit();
+      console.log("Cleaned up expired trash items older than 15 days.");
+    }
+  } catch (err) {
+    console.error("Error cleaning expired trash in Firestore:", err);
+  }
+};
+
 
 // 6. Sync full plan (updates the correct collection)
 const syncPlan = async (id, planData) => {
@@ -194,6 +279,7 @@ const addPlace = async (planId, day, date, places) => {
       id: p.id || Date.now() + Math.random(),
       time: p.time,
       name: p.name,
+      address: p.address || '',
       description: p.description || '',
       category: p.category || '관광',
       estimatedCost: Number(p.estimatedCost ?? p.cost) || 0,
@@ -279,5 +365,8 @@ module.exports = {
   addPlace,
   getAnniversaries,
   saveAnniversary,
-  deleteAnniversary
+  deleteAnniversary,
+  getTrash,
+  restorePlan,
+  deletePlanPermanently
 };

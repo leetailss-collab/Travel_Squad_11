@@ -234,7 +234,7 @@ function App() {
 
   // Form States inside detail tabs
   const [newPlace, setNewPlace] = useState({
-    day: 1, time: '', name: '', description: '', category: '관광', estimatedCost: '',
+    day: 1, time: '', name: '', address: '', description: '', category: '관광', estimatedCost: '',
     currency: '', needsReservation: false, tip: '', payer: '', duration: 60
   });
 
@@ -259,6 +259,33 @@ function App() {
   const [editingAnniversary, setEditingAnniversary] = useState(null);
   const [showAddAnniversaryModal, setShowAddAnniversaryModal] = useState(false);
   const [newAnniversary, setNewAnniversary] = useState({ name: '', year: new Date().getFullYear(), month: 1, day: 1, isLunar: false, type: 'birthday' });
+
+  // Trash States
+  const [trashPlans, setTrashPlans] = useState([]);
+  const [showTrashModal, setShowTrashModal] = useState(false);
+
+  // Custom Confirm Modal State & Functions
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
+
+  // Trip Meta (Accommodation & Transportation) Edit States
+  const [showEditMetaModal, setShowEditMetaModal] = useState(false);
+  const [editMeta, setEditMeta] = useState({ accName: '', accLocation: '', accHighlight: '', transText: '' });
+
+  const openConfirm = (title, message, onConfirm) => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {
+        onConfirm();
+        closeConfirm();
+      }
+    });
+  };
+
+  const closeConfirm = () => {
+    setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
+  };
 
   // Fetch Korean national holidays dynamically when calendar year changes
   useEffect(() => {
@@ -309,15 +336,213 @@ function App() {
     return () => { cancelled = true; };
   }, [plan?.currency]);
 
-  // Load User and Plans on mount
+  // Save states to sessionStorage for refresh recovery
+  useEffect(() => {
+    sessionStorage.setItem('travel_squad_view', view);
+  }, [view]);
+
+  useEffect(() => {
+    if (selectedPlanId) {
+      sessionStorage.setItem('travel_squad_selected_plan_id', String(selectedPlanId));
+    } else {
+      sessionStorage.removeItem('travel_squad_selected_plan_id');
+    }
+  }, [selectedPlanId]);
+
+  useEffect(() => {
+    sessionStorage.setItem('travel_squad_active_tab', activeTab);
+  }, [activeTab]);
+
+  // Body scroll lock effect when any modal is open
+  useEffect(() => {
+    const isModalOpen = showModal || showAddTripModal || showAddEventModal || showEditMembersModal || showAddAnniversaryModal || editingPlace || editingAnniversary || confirmModal.isOpen || showTrashModal || showEditMetaModal;
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showModal, showAddTripModal, showAddEventModal, showEditMembersModal, showAddAnniversaryModal, editingPlace, editingAnniversary, confirmModal.isOpen, showTrashModal, showEditMetaModal]);
+
+  // Modal Back Button Handling (For Mobile Browser Back Gesture/Button)
+  useEffect(() => {
+    const isModalOpen = showModal || showAddTripModal || showAddEventModal || showEditMembersModal || showAddAnniversaryModal || !!editingPlace || !!editingAnniversary || confirmModal.isOpen || showTrashModal || showEditMetaModal;
+
+    const handlePopState = (event) => {
+      if (isModalOpen) {
+        setShowModal(false);
+        setShowAddTripModal(false);
+        setShowAddEventModal(false);
+        setShowEditMembersModal(false);
+        setShowAddAnniversaryModal(false);
+        setEditingPlace(null);
+        setEditingAnniversary(null);
+        setShowTrashModal(false);
+        setShowEditMetaModal(false);
+        closeConfirm();
+      }
+    };
+
+    if (isModalOpen) {
+      window.history.pushState({ modalOpen: true }, '');
+      window.addEventListener('popstate', handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [showModal, showAddTripModal, showAddEventModal, showEditMembersModal, showAddAnniversaryModal, editingPlace, editingAnniversary]);
+
+  // Load User, Plans and restore state on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('family_travel_user');
     if (savedUser) {
       setCurrentUser(JSON.parse(savedUser));
     }
-    fetchPlans();
-    fetchAnniversaries();
+
+    const restoreState = async () => {
+      await fetchPlans();
+      await fetchAnniversaries();
+      await fetchTrashPlans();
+
+      const savedView = sessionStorage.getItem('travel_squad_view');
+      const savedPlanId = sessionStorage.getItem('travel_squad_selected_plan_id');
+      const savedActiveTab = sessionStorage.getItem('travel_squad_active_tab');
+
+      if (savedView === 'detail' && savedPlanId) {
+        const id = Number(savedPlanId);
+        try {
+          const response = await fetch(`/api/plans/${id}`);
+          if (response.ok) {
+            const data = await response.json();
+            setPlan(data);
+            setSelectedPlanId(id);
+            setView('detail');
+          }
+        } catch (e) {
+          console.warn("Restore state single plan fetch failed", e);
+        }
+        if (savedActiveTab) {
+          setActiveTab(savedActiveTab);
+        }
+      }
+    };
+
+    restoreState();
   }, []);
+
+  const fetchTrashPlans = async () => {
+    try {
+      const response = await fetch('/api/trash');
+      if (response.ok) {
+        const data = await response.json();
+        setTrashPlans(data);
+      }
+    } catch (err) {
+      console.warn("Failed to fetch trash plans:", err);
+    }
+  };
+
+  const handleRestorePlan = async (id) => {
+    try {
+      const response = await fetch(`/api/trash/${id}/restore`, {
+        method: 'POST'
+      });
+      if (response.ok) {
+        await fetchTrashPlans();
+        await fetchPlans();
+      }
+    } catch (err) {
+      console.error("Failed to restore plan:", err);
+    }
+  };
+
+  const handleDeletePermanently = async (id) => {
+    try {
+      const response = await fetch(`/api/trash/${id}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        await fetchTrashPlans();
+      }
+    } catch (err) {
+      console.error("Failed to delete plan permanently:", err);
+    }
+  };
+
+  const getAutoAccommodations = () => {
+    if (!plan || !plan.itinerary) return [];
+    const accList = [];
+    const sortedDays = [...plan.itinerary].sort((a, b) => a.day - b.day);
+    sortedDays.forEach(dayItem => {
+      const sortedPlaces = [...dayItem.places].sort((a, b) => a.time.localeCompare(b.time));
+      sortedPlaces.forEach(place => {
+        if (place.category === '숙소') {
+          accList.push({
+            name: place.name,
+            address: place.address,
+            day: dayItem.day
+          });
+        }
+      });
+    });
+    return accList;
+  };
+
+  const openEditMetaModal = () => {
+    if (!plan) return;
+    setEditMeta({
+      accName: plan.accommodation?.name || '',
+      accLocation: plan.accommodation?.location || '',
+      accHighlight: plan.accommodation?.highlight || '',
+      transText: plan.transportation ? plan.transportation.map(t => {
+        let parts = [t.type];
+        if (t.route) parts.push(t.route);
+        if (t.cost) parts.push(t.cost);
+        return parts.join(' · ');
+      }).join('\n') : ''
+    });
+    setShowEditMetaModal(true);
+  };
+
+  const handleSaveMeta = (e) => {
+    e.preventDefault();
+    if (!plan) return;
+
+    const updatedPlan = { ...plan };
+
+    // 1. Process Accommodation
+    if (editMeta.accName.trim()) {
+      updatedPlan.accommodation = {
+        name: editMeta.accName.trim(),
+        location: editMeta.accLocation.trim() || undefined,
+        highlight: editMeta.accHighlight.trim() || undefined
+      };
+    } else {
+      delete updatedPlan.accommodation;
+    }
+
+    // 2. Process Transportation
+    if (editMeta.transText.trim()) {
+      const lines = editMeta.transText.split('\n').map(l => l.trim()).filter(Boolean);
+      updatedPlan.transportation = lines.map(line => {
+        const parts = line.split('·').map(p => p.trim());
+        return {
+          type: parts[0] || '기타',
+          route: parts[1] || '',
+          cost: parts[2] ? Number(parts[2]) : 0,
+          currency: plan.currency || 'KRW'
+        };
+      });
+    } else {
+      delete updatedPlan.transportation;
+    }
+
+    saveUpdatedPlan(updatedPlan);
+    setShowEditMetaModal(false);
+  };
 
   const fetchAnniversaries = async () => {
     try {
@@ -557,32 +782,31 @@ function App() {
   };
 
   // Delete Travel Plan or Family Event
-  const handleDeletePlan = async (id) => {
-    const isConfirmed = window.confirm("정말로 이 일정(여행/행사)을 삭제하시겠습니까?");
-    if (!isConfirmed) return;
-
-    // Optimistically update local state
-    const updatedPlans = plans.filter(p => p.id !== id);
-    setPlans(updatedPlans);
-    localStorage.setItem('family_travel_plans', JSON.stringify(updatedPlans));
-    
-    // Clear selection if deleted plan was active
-    if (selectedPlanId === id) {
-      setPlan(null);
-      setSelectedPlanId(null);
-      setView('home');
-    }
-
-    try {
-      const response = await fetch(`/api/plans/${id}`, {
-        method: 'DELETE'
-      });
-      if (!response.ok) {
-        throw new Error('Failed to delete on server');
+  const handleDeletePlan = (id) => {
+    openConfirm("🗑️ 일정 삭제", "정말로 이 일정(여행/행사)을 삭제하시겠습니까? 삭제된 일정은 복구할 수 없습니다.", async () => {
+      // Optimistically update local state
+      const updatedPlans = plans.filter(p => p.id !== id);
+      setPlans(updatedPlans);
+      localStorage.setItem('family_travel_plans', JSON.stringify(updatedPlans));
+      
+      // Clear selection if deleted plan was active
+      if (selectedPlanId === id) {
+        setPlan(null);
+        setSelectedPlanId(null);
+        setView('home');
       }
-    } catch (err) {
-      console.warn("Offline: deletion queued or failed on server:", err);
-    }
+
+      try {
+        const response = await fetch(`/api/plans/${id}`, {
+          method: 'DELETE'
+        });
+        if (!response.ok) {
+          throw new Error('Failed to delete on server');
+        }
+      } catch (err) {
+        console.warn("Offline: deletion queued or failed on server:", err);
+      }
+    });
   };
 
   // Helper functions for time calculations and cascading shift
@@ -621,14 +845,16 @@ function App() {
   };
 
   // Long-press event handlers for itinerary cards
-  const handleStartPress = (place) => {
+  const handleStartPress = (e, place) => {
+    if (e) e.stopPropagation();
     if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
     pressTimerRef.current = setTimeout(() => {
       setEditingPlace({ ...place, duration: place.duration || 0 });
     }, 700);
   };
 
-  const handleCancelPress = () => {
+  const handleCancelPress = (e) => {
+    if (e) e.stopPropagation();
     if (pressTimerRef.current) {
       clearTimeout(pressTimerRef.current);
     }
@@ -665,6 +891,7 @@ function App() {
       id: placeId,
       time: newPlace.time,
       name: newPlace.name,
+      address: newPlace.address || '',
       description: newPlace.description,
       category: newPlace.category,
       estimatedCost: costValue,
@@ -704,7 +931,7 @@ function App() {
 
     saveUpdatedPlan(updatedPlan);
     setNewPlace({
-      day: 1, time: '', name: '', description: '', category: '관광', estimatedCost: '',
+      day: 1, time: '', name: '', address: '', description: '', category: '관광', estimatedCost: '',
       currency: plan.currency || 'KRW', needsReservation: false, tip: '', payer: '', duration: 60
     });
     setShowModal(false);
@@ -743,6 +970,7 @@ function App() {
           ...dayItem.places[idx],
           time: editingPlace.time,
           name: editingPlace.name,
+          address: editingPlace.address || '',
           duration: durationValue,
           category: editingPlace.category,
           description: editingPlace.description,
@@ -796,9 +1024,8 @@ function App() {
 
   // Delete Itinerary Place
   const handleDeletePlace = (placeId) => {
-    if (!window.confirm("정말로 이 일정을 삭제하시겠습니까?")) return;
-
-    const updatedPlan = { ...plan };
+    openConfirm("🗑️ 일정 삭제", "정말로 이 세부 일정을 삭제하시겠습니까?", () => {
+      const updatedPlan = { ...plan };
     let found = false;
 
     for (let d = 0; d < updatedPlan.itinerary.length; d++) {
@@ -821,6 +1048,7 @@ function App() {
       saveUpdatedPlan(updatedPlan);
     }
     setEditingPlace(null);
+    });
   };
 
   // Anniversary Handlers
@@ -870,19 +1098,20 @@ function App() {
     }
   };
 
-  const handleDeleteAnniversary = async (id) => {
-    if (!window.confirm("정말로 이 기념일을 삭제하시겠습니까?")) return;
-    try {
-      const response = await fetch(`/api/anniversaries/${id}`, {
-        method: 'DELETE'
-      });
-      if (response.ok) {
-        await fetchAnniversaries();
-        setEditingAnniversary(null);
+  const handleDeleteAnniversary = (id) => {
+    openConfirm("🗑️ 기념일 삭제", "정말로 이 기념일을 삭제하시겠습니까?", async () => {
+      try {
+        const response = await fetch(`/api/anniversaries/${id}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          await fetchAnniversaries();
+          setEditingAnniversary(null);
+        }
+      } catch (err) {
+        console.error("Failed to delete anniversary:", err);
       }
-    } catch (err) {
-      console.error("Failed to delete anniversary:", err);
-    }
+    });
   };
 
   // Add Comment to Place
@@ -1377,7 +1606,19 @@ function App() {
             })() }
 
             {/* Active & Upcoming Trips */}
-            <div className="section-title">📅 예정된 & 진행 중인 여행</div>
+            <div className="section-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>📅 예정된 & 진행 중인 여행</span>
+              <button 
+                className="btn-secondary-sm" 
+                style={{ flex: 'none', padding: '6px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                onClick={() => {
+                  fetchTrashPlans();
+                  setShowTrashModal(true);
+                }}
+              >
+                🗑️ 휴지통
+              </button>
+            </div>
             {activeTrips.length === 0 ? (
               <div className="empty-state">진행 예정인 여행이 없습니다.</div>
             ) : (
@@ -1385,7 +1626,19 @@ function App() {
                 <div key={p.id} className="trip-card" onClick={() => fetchSinglePlan(p.id)}>
                   <div className="trip-card-header">
                     <span className="badge badge-active">예정됨</span>
-                    <span className="trip-date">{p.startDate} ~ {p.endDate}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+                      <span className="trip-date">{p.startDate} ~ {p.endDate}</span>
+                      <button
+                        className="delete-trip-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeletePlan(p.id);
+                        }}
+                        title="일정 삭제"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </div>
                   <h3>{p.title}</h3>
                   <div className="trip-card-footer">
@@ -1409,7 +1662,19 @@ function App() {
                 <div key={p.id} className="trip-card past-trip" onClick={() => fetchSinglePlan(p.id)}>
                   <div className="trip-card-header">
                     <span className="badge badge-past">다녀옴</span>
-                    <span className="trip-date">{p.startDate} ~ {p.endDate}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+                      <span className="trip-date">{p.startDate} ~ {p.endDate}</span>
+                      <button
+                        className="delete-trip-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeletePlan(p.id);
+                        }}
+                        title="일정 삭제"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </div>
                   <h3>{p.title}</h3>
                   <div className="trip-card-footer">
@@ -1543,15 +1808,43 @@ function App() {
                     </span>
                     {exchangeRate.updatedAt && <small>{exchangeRate.updatedAt.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 갱신</small>}
                   </div>
-                  {(plan.accommodation || plan.transportation?.length > 0) && (
+                  {(plan.accommodation || getAutoAccommodations().length > 0 || plan.transportation?.length > 0) && (
                     <div className="travel-meta-grid">
-                      {plan.accommodation && (
-                        <div className="travel-meta-card">
-                          <strong>🏨 숙소</strong>
-                          <span>{plan.accommodation.name}</span>
-                          <small>{[plan.accommodation.location, plan.accommodation.highlight].filter(Boolean).join(' · ')}</small>
-                        </div>
-                      )}
+                      {(plan.accommodation || getAutoAccommodations().length > 0) && (() => {
+                        const autoAccs = getAutoAccommodations();
+                        const hasManualAcc = !!plan.accommodation;
+                        return (
+                          <div className="travel-meta-card">
+                            <strong>🏨 숙소</strong>
+                            {hasManualAcc ? (
+                              <>
+                                <span>{plan.accommodation.name}</span>
+                                <small>{[plan.accommodation.location, plan.accommodation.highlight].filter(Boolean).join(' · ')}</small>
+                              </>
+                            ) : (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                {autoAccs.length === 1 ? (
+                                  <>
+                                    <span>{autoAccs[0].name}</span>
+                                    <small style={{ color: 'var(--success)', fontWeight: 600 }}>
+                                      [Day {autoAccs[0].day} 일정 자동 반영{autoAccs[0].address ? ` · ${autoAccs[0].address}` : ''}]
+                                    </small>
+                                  </>
+                                ) : (
+                                  autoAccs.map((acc, idx) => (
+                                    <div key={idx} style={{ display: 'flex', flexDirection: 'column', borderBottom: idx < autoAccs.length - 1 ? '1px dashed var(--border)' : 'none', paddingBottom: idx < autoAccs.length - 1 ? '4px' : '0', marginBottom: idx < autoAccs.length - 1 ? '4px' : '0' }}>
+                                      <span style={{ fontSize: '0.86rem', fontWeight: 600 }}>{idx + 1}차: {acc.name}</span>
+                                      <small style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.72rem' }}>
+                                        [Day {acc.day} 일정{acc.address ? ` · ${acc.address}` : ''}]
+                                      </small>
+                                    </div>
+                                  ))
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
                       {plan.transportation?.length > 0 && (
                         <div className="travel-meta-card">
                           <strong>🚇 교통</strong>
@@ -1565,6 +1858,13 @@ function App() {
                       )}
                     </div>
                   )}
+                  <button 
+                    className="btn-secondary-sm" 
+                    style={{ width: 'auto', marginTop: '12px', padding: '6px 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    onClick={openEditMetaModal}
+                  >
+                    ✏️ 숙소/교통 정보 편집
+                  </button>
                 </div>
                 {plan.itinerary.length === 0 ? (
                   <div className="empty-state">
@@ -1582,18 +1882,22 @@ function App() {
                         {dayItem.places.length === 0 ? (
                           <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>아직 등록된 일정이 없습니다.</div>
                         ) : (
-                          dayItem.places.map((place) => (
-                            <div key={place.id} className="timeline-item" style={{ marginBottom: '8px' }}>
-                              <div className="timeline-dot"></div>
+                          dayItem.places.map((place, idx) => (
+                            <React.Fragment key={place.id}>
+                              <div className="timeline-item" style={{ marginBottom: '8px' }}>
+                                <div className="timeline-dot"></div>
                               <div 
                                 className="timeline-content"
-                                onMouseDown={() => handleStartPress(place)}
-                                onMouseUp={handleCancelPress}
-                                onMouseLeave={handleCancelPress}
-                                onTouchStart={() => handleStartPress(place)}
-                                onTouchEnd={handleCancelPress}
-                                onTouchMove={handleCancelPress}
-                                onDoubleClick={() => setEditingPlace({ ...place, duration: place.duration || 0 })}
+                                onMouseDown={(e) => handleStartPress(e, place)}
+                                onMouseUp={(e) => handleCancelPress(e)}
+                                onMouseLeave={(e) => handleCancelPress(e)}
+                                onTouchStart={(e) => handleStartPress(e, place)}
+                                onTouchEnd={(e) => handleCancelPress(e)}
+                                onTouchMove={(e) => handleCancelPress(e)}
+                                onDoubleClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingPlace({ ...place, duration: place.duration || 0 });
+                                }}
                                 title="더블클릭 또는 길게 눌러 일정 수정"
                               >
                                 <div className="timeline-time">
@@ -1612,6 +1916,21 @@ function App() {
                                   {place.category && <span className={`category-badge category-${place.category}`}>{place.category}</span>}
                                 </div>
                                 {place.description && <div className="timeline-desc">{place.description}</div>}
+                                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                                  {place.address && <span>📍 {place.address}</span>}
+                                  <a
+                                    href={planCurrency === 'KRW'
+                                      ? `https://m.map.naver.com/search2/search.naver?query=${encodeURIComponent(place.address || place.name)}`
+                                      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address || place.name)}`
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', marginLeft: place.address ? '6px' : '0' }}
+                                  >
+                                    🗺️ {place.address ? '지도 보기' : '지도 검색'} ➔
+                                  </a>
+                                </div>
                                 {(place.estimatedCost > 0 || place.cost > 0) && (
                                   <div className="timeline-cost">
                                     💴 {formatCostComparison(place.estimatedCost ?? place.cost, place.currency || (place.estimatedCost ? planCurrency : 'KRW'))}
@@ -1664,7 +1983,54 @@ function App() {
                                 )}
                               </div>
                             </div>
-                          ))
+                            {idx < dayItem.places.length - 1 && (
+                              <div className="route-recommend-box" style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                margin: '8px 0 16px 50px', 
+                                gap: '8px',
+                                position: 'relative' 
+                              }}>
+                                <div style={{ 
+                                  position: 'absolute', 
+                                  left: '-26px', 
+                                  top: '-16px', 
+                                  bottom: '-8px', 
+                                  width: '2px', 
+                                  borderLeft: '2px dashed var(--primary)', 
+                                  opacity: 0.5 
+                                }}></div>
+                                
+                                <a
+                                  className="route-recommend-btn"
+                                  href={planCurrency === 'KRW'
+                                    ? `https://map.naver.com/p/directions/${encodeURIComponent(place.address || place.name)},,/${encodeURIComponent(dayItem.places[idx+1].address || dayItem.places[idx+1].name)},,/transit`
+                                    : `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(place.address || place.name)}&destination=${encodeURIComponent(dayItem.places[idx+1].address || dayItem.places[idx+1].name)}&travelmode=transit`
+                                  }
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  style={{
+                                    fontSize: '0.73rem',
+                                    color: 'var(--primary)',
+                                    textDecoration: 'none',
+                                    background: 'var(--bg-app)',
+                                    padding: '5px 12px',
+                                    borderRadius: '20px',
+                                    border: '1px solid var(--border)',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    fontWeight: 700,
+                                    boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+                                  }}
+                                >
+                                  🚗 {place.name} ➔ {dayItem.places[idx+1].name} 이동 경로
+                                </a>
+                              </div>
+                            )}
+                          </React.Fragment>
+                        ))
                         )}
                       </div>
                     </div>
@@ -1851,6 +2217,10 @@ function App() {
                       <input type="text" required placeholder="예: 함덕 해수욕장" className="form-control" value={newPlace.name} onChange={e => setNewPlace({ ...newPlace, name: e.target.value })} />
                     </div>
                     <div className="form-group">
+                      <label>주소 (선택사항)</label>
+                      <input type="text" placeholder="예: 제주 제주시 조천읍 함덕리" className="form-control" value={newPlace.address || ''} onChange={e => setNewPlace({ ...newPlace, address: e.target.value })} />
+                    </div>
+                    <div className="form-group">
                       <label>카테고리</label>
                       <select className="form-control" value={newPlace.category} onChange={e => setNewPlace({ ...newPlace, category: e.target.value })}>
                         {['관광', '식사', '쇼핑', '이동', '숙소', '기타'].map(category => <option key={category} value={category}>{category}</option>)}
@@ -1971,6 +2341,10 @@ function App() {
                   <div className="form-group">
                     <label>장소/일정 이름</label>
                     <input type="text" required placeholder="예: 함덕 해수욕장" className="form-control" value={editingPlace.name} onChange={e => setEditingPlace({ ...editingPlace, name: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label>주소 (선택사항)</label>
+                    <input type="text" placeholder="예: 제주 제주시 조천읍 함덕리" className="form-control" value={editingPlace.address || ''} onChange={e => setEditingPlace({ ...editingPlace, address: e.target.value })} />
                   </div>
                   <div className="form-group">
                     <label>카테고리</label>
@@ -2323,6 +2697,137 @@ function App() {
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button type="submit" className="submit-btn" style={{ flex: 1 }}>수정 완료</button>
                 <button type="button" className="delete-btn-danger" onClick={() => handleDeleteAnniversary(editingAnniversary.rawId)} style={{ width: 'auto', marginTop: 0, padding: '10px 16px' }}>삭제</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Confirm Modal */}
+      {confirmModal.isOpen && (
+        <div className="modal-overlay" style={{ zIndex: 2000, display: 'flex', alignItems: 'center' }}>
+          <div className="modal-content custom-confirm-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header" style={{ marginBottom: '16px' }}>
+              <h3>{confirmModal.title}</h3>
+              <button className="close-btn" onClick={closeConfirm}>×</button>
+            </div>
+            <div style={{ marginBottom: '24px', fontSize: '0.92rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+              {confirmModal.message}
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button className="btn-secondary-sm" onClick={closeConfirm} style={{ padding: '12px', fontSize: '0.9rem', margin: 0 }}>취소</button>
+              <button className="delete-btn-danger" onClick={confirmModal.onConfirm} style={{ flex: 1, marginTop: 0, padding: '12px', fontSize: '0.9rem' }}>삭제</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Trash Modal */}
+      {showTrashModal && (
+        <div className="modal-overlay" style={{ zIndex: 1100 }}>
+          <div className="modal-content" style={{ maxHeight: '85dvh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>🗑️ 휴지통 (15일 보관)</h3>
+              <button className="close-btn" onClick={() => setShowTrashModal(false)}>×</button>
+            </div>
+            
+            {trashPlans.length === 0 ? (
+              <div className="empty-state" style={{ margin: '20px 0' }}>휴지통이 비어 있습니다.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', margin: '16px 0' }}>
+                {trashPlans.map(p => {
+                  const deletedDate = new Date(p.deletedAt);
+                  const now = new Date();
+                  const diffTime = now - deletedDate;
+                  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                  const daysLeft = Math.max(0, 15 - diffDays);
+                  
+                  return (
+                    <div key={p.id} className="card" style={{ margin: 0, padding: '16px', background: 'var(--bg-app)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                        <span>{p.startDate} ~ {p.endDate}</span>
+                        <span style={{ color: daysLeft <= 3 ? 'var(--danger)' : 'var(--warning)', fontWeight: 700 }}>
+                          {daysLeft}일 후 영구 삭제
+                        </span>
+                      </div>
+                      <h4 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '12px' }}>{p.title}</h4>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button 
+                          className="btn-secondary-sm" 
+                          style={{ padding: '8px', fontSize: '0.8rem', margin: 0 }}
+                          onClick={() => handleRestorePlan(p.id)}
+                        >
+                          복구
+                        </button>
+                        <button 
+                          className="delete-btn-danger" 
+                          style={{ flex: 1, marginTop: 0, padding: '8px', fontSize: '0.8rem' }}
+                          onClick={() => {
+                            openConfirm(
+                              "⚠️ 영구 삭제", 
+                              `"${p.title}" 일정을 영구히 삭제하시겠습니까? 삭제된 정보는 다시는 복구할 수 없습니다.`, 
+                              () => handleDeletePermanently(p.id)
+                            );
+                          }}
+                        >
+                          영구 삭제
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            
+            <button className="submit-btn" style={{ marginTop: '16px' }} onClick={() => setShowTrashModal(false)}>
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Meta (Accommodation & Transportation) Modal */}
+      {showEditMetaModal && (
+        <div className="modal-overlay" style={{ zIndex: 1100 }}>
+          <div className="modal-content" style={{ maxHeight: '85dvh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>✏️ 숙소 및 교통 정보 편집</h3>
+              <button className="close-btn" onClick={() => setShowEditMetaModal(false)}>×</button>
+            </div>
+            <form onSubmit={handleSaveMeta}>
+              <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: '1.4' }}>
+                숙소명을 비워두면 홈화면 및 요약 영역에서 숙소 칸이 제거됩니다.
+              </div>
+              
+              <div style={{ fontWeight: 'bold', marginBottom: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>🏨 숙소 설정</div>
+              <div className="form-group">
+                <label>숙소 이름</label>
+                <input type="text" placeholder="예: 토요코인 도쿄 호텔" className="form-control" value={editMeta.accName} onChange={e => setEditMeta({ ...editMeta, accName: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>숙소 위치/설명</label>
+                <input type="text" placeholder="예: 신주쿠역 도보 5분" className="form-control" value={editMeta.accLocation} onChange={e => setEditMeta({ ...editMeta, accLocation: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>추가 특징 (하이라이트)</label>
+                <input type="text" placeholder="예: 조식 무료 제공" className="form-control" value={editMeta.accHighlight} onChange={e => setEditMeta({ ...editMeta, accHighlight: e.target.value })} />
+              </div>
+
+              <div style={{ fontWeight: 'bold', marginTop: '20px', marginBottom: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>🚇 교통수단 설정</div>
+              <div className="form-group">
+                <label>교통 내역 (줄바꿈으로 여러 개 입력 가능)</label>
+                <textarea 
+                  placeholder="입력형식: 교통종류 · 상세설명 · 예상비용&#10;예: 비행기 · 인천-나리타 왕복 · 450000&#10;예: 넥스 열차 · 나리타공항-도쿄 · 3200" 
+                  rows="4" 
+                  className="form-control" 
+                  value={editMeta.transText} 
+                  onChange={e => setEditMeta({ ...editMeta, transText: e.target.value })}
+                ></textarea>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', marginTop: '24px' }}>
+                <button type="button" className="btn-secondary-sm" style={{ padding: '12px', fontSize: '0.95rem', margin: 0 }} onClick={() => setShowEditMetaModal(false)}>취소</button>
+                <button type="submit" className="submit-btn" style={{ flex: 1, padding: '12px', fontSize: '0.95rem' }}>저장 완료</button>
               </div>
             </form>
           </div>
