@@ -1151,7 +1151,7 @@ function App() {
               }
 
               const getCellEvents = (dateStr) => {
-                const yearAnniversaries = getAnniversariesForYear(year);
+                const yearAnniversaries = getAnniversariesForYear(year, anniversaries);
                 const cellAnniversaries = yearAnniversaries.filter(a => a.dateStr === dateStr);
 
                 const normalEvents = plans.filter(p => {
