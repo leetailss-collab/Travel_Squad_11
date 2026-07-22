@@ -244,8 +244,8 @@ function App() {
   const pressTimerRef = useRef(null);
   const addImgInputRef = useRef(null);
   const editImgInputRef = useRef(null);
-  const [newCheck, setNewCheck] = useState({ title: '', assignee: '' });
-  const [newExpense, setNewExpense] = useState({ title: '', amount: '', payer: '', date: '' });
+  const [newCheck, setNewCheck] = useState({ title: '', assignee: '', category: '공통' });
+  const [newExpense, setNewExpense] = useState({ title: '', amount: '', payer: '', date: '', category: '기타' });
 
   // Calendar & Event States
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
@@ -273,7 +273,12 @@ function App() {
 
   // Trip Meta (Accommodation & Transportation) Edit States
   const [showEditMetaModal, setShowEditMetaModal] = useState(false);
-  const [editMeta, setEditMeta] = useState({ accName: '', accLocation: '', accHighlight: '', transText: '', startDate: '', endDate: '' });
+  const [editMeta, setEditMeta] = useState({ title: '', accName: '', accLocation: '', accHighlight: '', transText: '', startDate: '', endDate: '' });
+
+  // Sub-tabs filters
+  const [selectedDayFilter, setSelectedDayFilter] = useState('all');
+  const [selectedChecklistFilter, setSelectedChecklistFilter] = useState('all');
+  const [selectedExpenseFilter, setSelectedExpenseFilter] = useState('all');
 
   const openConfirm = (title, message, onConfirm) => {
     setConfirmModal({
@@ -498,6 +503,7 @@ function App() {
   const openEditMetaModal = () => {
     if (!plan) return;
     setEditMeta({
+      title: plan.title || '',
       accName: plan.accommodation?.name || '',
       accLocation: plan.accommodation?.location || '',
       accHighlight: plan.accommodation?.highlight || '',
@@ -517,7 +523,13 @@ function App() {
     e.preventDefault();
     if (!plan) return;
 
-    // 0. Date Validation
+    // 0. Title & Date Validation
+    const newTitle = editMeta.title ? editMeta.title.trim() : '';
+    if (!newTitle) {
+      alert("여행 제목을 입력해주세요.");
+      return;
+    }
+
     const startStr = editMeta.startDate;
     const endStr = editMeta.endDate;
     if (!startStr || !endStr) {
@@ -531,7 +543,7 @@ function App() {
       return;
     }
 
-    const updatedPlan = { ...plan };
+    const updatedPlan = { ...plan, title: newTitle };
 
     // 1. Process Accommodation
     if (editMeta.accName.trim()) {
@@ -1345,12 +1357,13 @@ function App() {
       id: Date.now(),
       title: newCheck.title,
       checked: false,
-      assignee: newCheck.assignee || '미지정'
+      assignee: newCheck.assignee || '미지정',
+      category: newCheck.category || '공통'
     };
     updatedPlan.checklists.push(newItem);
     
     saveUpdatedPlan(updatedPlan);
-    setNewCheck({ title: '', assignee: '' });
+    setNewCheck({ title: '', assignee: '', category: '공통' });
     setShowModal(false);
   };
 
@@ -1365,12 +1378,13 @@ function App() {
       title: newExpense.title,
       amount: parseInt(newExpense.amount),
       payer: newExpense.payer || plan.members[0],
-      date: newExpense.date || new Date().toISOString().split('T')[0]
+      date: newExpense.date || new Date().toISOString().split('T')[0],
+      category: newExpense.category || '기타'
     };
     updatedPlan.expenses.push(newItem);
 
     saveUpdatedPlan(updatedPlan);
-    setNewExpense({ title: '', amount: '', payer: '', date: '' });
+    setNewExpense({ title: '', amount: '', payer: '', date: '', category: '기타' });
     setShowModal(false);
   };
 
@@ -1867,105 +1881,34 @@ function App() {
       {view === 'detail' && plan && (
         <>
           {/* Header */}
-          <header className="app-header">
-            <button className="back-btn" onClick={() => setView('home')}>← 홈</button>
-            {isEditingTitle ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: 1, maxWidth: '200px' }}>
-                <input
-                  type="text"
-                  className="form-control"
-                  style={{
-                    fontSize: '0.9rem',
-                    padding: '4px 6px',
-                    margin: 0,
-                    flex: 1,
-                    minWidth: '80px',
-                    maxWidth: '130px',
-                    fontWeight: '700',
-                    height: '32px'
-                  }}
-                  value={tempTitle}
-                  onChange={(e) => setTempTitle(e.target.value)}
-                  onBlur={handleSaveTitle}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSaveTitle();
-                    if (e.key === 'Escape') setIsEditingTitle(false);
-                  }}
-                  autoFocus
-                />
-                <button 
-                  onMouseDown={(e) => { e.preventDefault(); handleSaveTitle(); }}
-                  onTouchStart={(e) => { e.preventDefault(); handleSaveTitle(); }}
-                  style={{ 
-                    background: 'none', 
-                    border: 'none', 
-                    fontSize: '1.2rem', 
-                    cursor: 'pointer', 
-                    padding: '2px 4px', 
-                    color: 'var(--primary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                  title="저장"
-                >
-                  ✓
-                </button>
-                <button 
-                  onMouseDown={(e) => { e.preventDefault(); setIsEditingTitle(false); }}
-                  onTouchStart={(e) => { e.preventDefault(); setIsEditingTitle(false); }}
-                  style={{ 
-                    background: 'none', 
-                    border: 'none', 
-                    fontSize: '1.2rem', 
-                    cursor: 'pointer', 
-                    padding: '2px 4px', 
-                    color: 'var(--danger)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                  title="취소"
-                >
-                  ✗
-                </button>
-              </div>
-            ) : (
-              <div 
-                className="logo" 
-                style={{ fontSize: '1.05rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
-                onClick={() => {
-                  setTempTitle(plan.title);
-                  setIsEditingTitle(true);
-                }}
-                title="클릭하여 제목 수정"
-              >
-                {plan.title} <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>✏️</span>
-              </div>
-            )}
-            <div className="avatar-group">
-              {plan.members.slice(0, 3).map((m, idx) => (
-                <div key={idx} className="avatar">{m[0]}</div>
-              ))}
-              {plan.members.length > 3 && (
-                <div className="avatar">+{plan.members.length - 3}</div>
-              )}
+          <header className="app-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', gap: '8px' }}>
+            <button className="back-btn" onClick={() => setView('home')} style={{ fontSize: '1.25rem', padding: '6px', margin: 0, display: 'flex', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer' }} title="홈으로 이동">🏠</button>
+            <div className="header-tabs" style={{ display: 'flex', flex: 1, justifyContent: 'center', gap: '4px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+              <button className={`tab-btn ${activeTab === 'itinerary' ? 'active' : ''}`} style={{ padding: '8px 12px', fontSize: '0.92rem', minWidth: '65px', margin: 0 }} onClick={() => setActiveTab('itinerary')}>일정</button>
+              <button className={`tab-btn ${activeTab === 'checklist' ? 'active' : ''}`} style={{ padding: '8px 12px', fontSize: '0.92rem', minWidth: '65px', margin: 0 }} onClick={() => setActiveTab('checklist')}>준비물</button>
+              <button className={`tab-btn ${activeTab === 'expense' ? 'active' : ''}`} style={{ padding: '8px 12px', fontSize: '0.92rem', minWidth: '65px', margin: 0 }} onClick={() => setActiveTab('expense')}>경비</button>
+              <button className={`tab-btn ${activeTab === 'members' ? 'active' : ''}`} style={{ padding: '8px 12px', fontSize: '0.92rem', minWidth: '65px', margin: 0 }} onClick={() => {
+                setActiveTab('members');
+                // Reset sub-filters on changing tabs
+                setSelectedDayFilter('all');
+                setSelectedChecklistFilter('all');
+                setSelectedExpenseFilter('all');
+              }}>구성원</button>
             </div>
+            <div style={{ width: '32px' }}></div>
           </header>
 
           {/* Main Content Area */}
-          <main className="app-content">
-            <div className="tabs">
-              <button className={`tab-btn ${activeTab === 'itinerary' ? 'active' : ''}`} onClick={() => setActiveTab('itinerary')}>📅 일정</button>
-              <button className={`tab-btn ${activeTab === 'checklist' ? 'active' : ''}`} onClick={() => setActiveTab('checklist')}>🎒 준비물</button>
-              <button className={`tab-btn ${activeTab === 'expense' ? 'active' : ''}`} onClick={() => setActiveTab('expense')}>💰 경비</button>
-              <button className={`tab-btn ${activeTab === 'members' ? 'active' : ''}`} onClick={() => setActiveTab('members')}>👥 가족</button>
-            </div>
-
+          <main className="app-content" style={{ marginTop: '0' }}>
             {/* 1. ITINERARY TAB */}
             {activeTab === 'itinerary' && (
               <div>
                 <div className="trip-summary-panel">
+                  <div className="trip-summary-title-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <h2 className="trip-summary-title" style={{ margin: 0, fontSize: '1.35rem', fontWeight: 'bold' }}>
+                      {plan.title}
+                    </h2>
+                  </div>
                   <div className="trip-date-summary">🗓️ {plan.startDate} ~ {plan.endDate}</div>
                   <div className="exchange-rate-line">
                     💱 현재 환율: 1{planCurrencyMeta.name} ≈ {exchangeRate.rate.toLocaleString('ko-KR', { maximumFractionDigits: 2 })}원
@@ -2032,13 +1975,72 @@ function App() {
                     ✏️ 숙소/교통 정보 편집
                   </button>
                 </div>
+
+                {/* 2차 Day 필터 바 */}
+                {plan.itinerary.length > 0 && (
+                  <div className="sub-filter-bar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '12px 4px 16px 4px', scrollbarWidth: 'none' }}>
+                    <button 
+                      className={`filter-chip ${selectedDayFilter === 'all' ? 'active' : ''}`}
+                      onClick={() => setSelectedDayFilter('all')}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '20px',
+                        border: '1px solid var(--border)',
+                        background: selectedDayFilter === 'all' ? 'var(--primary)' : 'var(--bg-card)',
+                        color: selectedDayFilter === 'all' ? '#fff' : 'var(--text)',
+                        fontSize: '0.82rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
+                      }}
+                    >
+                      전체 일정
+                    </button>
+                    {Array.from({ length: Math.max(1, Math.ceil((new Date(plan.endDate) - new Date(plan.startDate)) / (1000 * 60 * 60 * 24)) + 1) }).map((_, i) => {
+                      const dVal = i + 1;
+                      const isActive = selectedDayFilter === String(dVal);
+                      return (
+                        <button 
+                          key={dVal}
+                          className={`filter-chip ${isActive ? 'active' : ''}`}
+                          onClick={() => setSelectedDayFilter(String(dVal))}
+                          style={{
+                            padding: '6px 14px',
+                            borderRadius: '20px',
+                            border: '1px solid var(--border)',
+                            background: isActive ? 'var(--primary)' : 'var(--bg-card)',
+                            color: isActive ? '#fff' : 'var(--text)',
+                            fontSize: '0.82rem',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0
+                          }}
+                        >
+                          {dVal}일차 (Day {dVal})
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
                 {plan.itinerary.length === 0 ? (
                   <div className="empty-state">
                     아직 등록된 일정이 없습니다. 우측 하단의 + 버튼을 눌러 첫 일정을 등록해 보세요!
                   </div>
                 ) : (
-                  plan.itinerary.map((dayItem) => (
-                    <div key={dayItem.day} className="card" style={{ padding: '20px 16px' }}>
+                  (() => {
+                    const filteredItinerary = selectedDayFilter === 'all'
+                      ? plan.itinerary
+                      : plan.itinerary.filter(d => d.day === Number(selectedDayFilter));
+                    
+                    if (filteredItinerary.length === 0) {
+                      return <div className="empty-state">선택한 날짜에 등록된 일정이 없습니다.</div>;
+                    }
+
+                    return filteredItinerary.map((dayItem) => (
+                      <div key={dayItem.day} className="card" style={{ padding: '20px 16px' }}>
                       <h3 className="card-title day-heading">
                         Day {dayItem.day}
                         {dayItem.title && <span className="day-theme">{dayItem.title}</span>}
@@ -2230,7 +2232,8 @@ function App() {
                       </div>
                     </div>
                   ))
-                )}
+                })()
+              )}
               </div>
             )}
 
@@ -2238,55 +2241,133 @@ function App() {
             {activeTab === 'checklist' && (
               <div className="card">
                 <h3 className="card-title">🎒 체크리스트</h3>
+                
+                {/* 2차 준비물 필터 바 */}
+                <div className="sub-filter-bar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '4px 0 16px 0', scrollbarWidth: 'none' }}>
+                  {['all', '공통', '개인', '예약', '기타'].map(cat => (
+                    <button
+                      key={cat}
+                      className={`filter-chip ${selectedChecklistFilter === cat ? 'active' : ''}`}
+                      onClick={() => setSelectedChecklistFilter(cat)}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '20px',
+                        border: '1px solid var(--border)',
+                        background: selectedChecklistFilter === cat ? 'var(--primary)' : 'var(--bg-card)',
+                        color: selectedChecklistFilter === cat ? '#fff' : 'var(--text)',
+                        fontSize: '0.82rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
+                      }}
+                    >
+                      {cat === 'all' ? '전체' : cat}
+                    </button>
+                  ))}
+                </div>
+
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {plan.checklists.length === 0 ? (
-                    <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px 0' }}>준비물이 없습니다. 추가해 보세요!</div>
-                  ) : (
-                    plan.checklists.map((item) => (
+                  {(() => {
+                    const filtered = plan.checklists.filter(item => {
+                      const itemCat = item.category || '공통';
+                      return selectedChecklistFilter === 'all' || itemCat === selectedChecklistFilter;
+                    });
+
+                    if (filtered.length === 0) {
+                      return <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px 0' }}>선택한 분류의 준비물이 없습니다.</div>;
+                    }
+
+                    return filtered.map((item) => (
                       <div key={item.id} className="checklist-item" onClick={() => handleToggleCheck(item.id)}>
                         <div className={`checkbox-custom ${item.checked ? 'checked' : ''}`}></div>
-                        <div className={`checklist-text ${item.checked ? 'checked' : ''}`}>{item.title}</div>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <div className={`checklist-text ${item.checked ? 'checked' : ''}`}>{item.title}</div>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>🏷️ {item.category || '공통'}</span>
+                        </div>
                         <div className="checklist-assignee">{item.assignee}</div>
                       </div>
-                    ))
-                  )}
+                    ));
+                  })()}
                 </div>
               </div>
             )}
 
             {/* 3. EXPENSE TAB */}
             {activeTab === 'expense' && (
-              <div>
-                <div className="card" style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))', color: 'white' }}>
-                  <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>총 지출액</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: '800', marginTop: '4px' }}>
-                    {totalExpense.toLocaleString()} 원
-                  </div>
-                  <div style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '8px' }}>
-                    인당 평균: {Math.round(totalExpense / plan.members.length).toLocaleString()} 원 ({plan.members.length}명 기준)
-                  </div>
-                </div>
+              (() => {
+                const filteredExpenses = plan.expenses.filter(item => {
+                  const itemCat = item.category || '기타';
+                  return selectedExpenseFilter === 'all' || itemCat === selectedExpenseFilter;
+                });
+                const filteredTotal = filteredExpenses.reduce((sum, item) => sum + (item.amount || 0), 0);
 
-                <div className="card">
-                  <h3 className="card-title">💰 경비 상세 내역</h3>
+                return (
                   <div>
-                    {plan.expenses.length === 0 ? (
-                      <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px 0' }}>등록된 경비 내역이 없습니다.</div>
-                    ) : (
-                      plan.expenses.map((item) => (
-                        <div key={item.id} className="expense-item">
-                          <div className="expense-info">
-                            <h4>{item.title}</h4>
-                            <p>{item.date}</p>
-                            <span className="expense-payer">{item.payer} 결제</span>
-                          </div>
-                          <div className="expense-amount">{item.amount.toLocaleString()} 원</div>
-                        </div>
-                      ))
-                    )}
+                    {/* 2차 경비 필터 바 */}
+                    <div className="sub-filter-bar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '4px 4px 16px 4px', scrollbarWidth: 'none' }}>
+                      {['all', '교통', '숙박', '식비', '쇼핑', '관광', '기타'].map(cat => (
+                        <button
+                          key={cat}
+                          className={`filter-chip ${selectedExpenseFilter === cat ? 'active' : ''}`}
+                          onClick={() => setSelectedExpenseFilter(cat)}
+                          style={{
+                            padding: '6px 14px',
+                            borderRadius: '20px',
+                            border: '1px solid var(--border)',
+                            background: selectedExpenseFilter === cat ? 'var(--primary)' : 'var(--bg-card)',
+                            color: selectedExpenseFilter === cat ? '#fff' : 'var(--text)',
+                            fontSize: '0.82rem',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0
+                          }}
+                        >
+                          {cat === 'all' ? '전체' : cat}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="card" style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))', color: 'white' }}>
+                      <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>
+                        {selectedExpenseFilter === 'all' ? '총 지출액' : `${selectedExpenseFilter} 지출액`}
+                      </div>
+                      <div style={{ fontSize: '1.75rem', fontWeight: '800', marginTop: '4px' }}>
+                        {filteredTotal.toLocaleString()} 원
+                      </div>
+                      <div style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '8px' }}>
+                        인당 평균: {Math.round(filteredTotal / plan.members.length).toLocaleString()} 원 ({plan.members.length}명 기준)
+                      </div>
+                    </div>
+
+                    <div className="card">
+                      <h3 className="card-title">💰 경비 상세 내역</h3>
+                      <div>
+                        {filteredExpenses.length === 0 ? (
+                          <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px 0' }}>등록된 경비 내역이 없습니다.</div>
+                        ) : (
+                          filteredExpenses.map((item) => (
+                            <div key={item.id} className="expense-item">
+                              <div className="expense-info">
+                                <h4 style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                                  {item.title} 
+                                  <span style={{ fontSize: '0.68rem', fontWeight: 'normal', color: 'var(--text-muted)', backgroundColor: 'var(--border)', padding: '2px 6px', borderRadius: '4px' }}>
+                                    {item.category || '기타'}
+                                  </span>
+                                </h4>
+                                <p>{item.date}</p>
+                                <span className="expense-payer">{item.payer} 결제</span>
+                              </div>
+                              <div className="expense-amount">{item.amount.toLocaleString()} 원</div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                );
+              })()
             )}
 
             {/* 4. MEMBERS TAB */}
@@ -2548,6 +2629,15 @@ function App() {
                         ))}
                       </select>
                     </div>
+                    <div className="form-group">
+                      <label>분류</label>
+                      <select className="form-control" value={newCheck.category || '공통'} onChange={e => setNewCheck({ ...newCheck, category: e.target.value })}>
+                        <option value="공통">공통 준비물</option>
+                        <option value="개인">개인 준비물</option>
+                        <option value="예약">예약 관련 (티켓 등)</option>
+                        <option value="기타">기타</option>
+                      </select>
+                    </div>
                     <button type="submit" className="submit-btn">준비물 등록하기</button>
                   </form>
                 )}
@@ -2562,6 +2652,17 @@ function App() {
                     <div className="form-group">
                       <label>금액 (원)</label>
                       <input type="number" required placeholder="금액 입력" className="form-control" value={newExpense.amount} onChange={e => setNewExpense({ ...newExpense, amount: e.target.value })} />
+                    </div>
+                    <div className="form-group">
+                      <label>분류</label>
+                      <select className="form-control" value={newExpense.category || '기타'} onChange={e => setNewExpense({ ...newExpense, category: e.target.value })}>
+                        <option value="교통">교통비 (항공/주유/택시 등)</option>
+                        <option value="숙박">숙박비 (호텔/펜션 등)</option>
+                        <option value="식비">식비 (식사/카페/마트 등)</option>
+                        <option value="쇼핑">쇼핑 (선물/기념품 등)</option>
+                        <option value="관광">관광 (입장료/체험 등)</option>
+                        <option value="기타">기타</option>
+                      </select>
                     </div>
                     <div className="form-group">
                       <label>결제자</label>
@@ -3142,9 +3243,14 @@ function App() {
             </div>
             <form onSubmit={handleSaveMeta}>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: '1.4' }}>
-                여행 날짜나 숙소, 교통 수단 정보를 수정할 수 있습니다.
+                여행 제목과 날짜, 숙소, 교통 수단 정보를 수정할 수 있습니다.
               </div>
               
+              <div style={{ fontWeight: 'bold', marginBottom: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>✏️ 여행 제목 설정</div>
+              <div className="form-group">
+                <input type="text" placeholder="예: 우리 가족 도쿄 여행" className="form-control" value={editMeta.title} onChange={e => setEditMeta({ ...editMeta, title: e.target.value })} required />
+              </div>
+
               <div style={{ fontWeight: 'bold', marginBottom: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>📅 여행 일정 설정</div>
               <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
                 <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
