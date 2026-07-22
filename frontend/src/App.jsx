@@ -1064,7 +1064,8 @@ function App() {
       tip: newPlace.tip,
       payer: payerValue,
       duration: durationValue,
-      comments: []
+      comments: [],
+      images: newPlace.images || []
     };
 
     if (dayIndex === -1) {
@@ -1096,7 +1097,7 @@ function App() {
     saveUpdatedPlan(updatedPlan);
     setNewPlace({
       day: 1, time: '', name: '', address: '', description: '', category: '관광', estimatedCost: '',
-      currency: plan.currency || 'KRW', needsReservation: false, tip: '', payer: '', duration: 60
+      currency: plan.currency || 'KRW', needsReservation: false, tip: '', payer: '', duration: 60, images: []
     });
     setShowModal(false);
   };
@@ -1142,7 +1143,8 @@ function App() {
           currency: costCurrency,
           needsReservation: editingPlace.needsReservation,
           tip: editingPlace.tip,
-          payer: payerValue
+          payer: payerValue,
+          images: editingPlace.images || []
         };
 
         // Cascade shifting for this specific day
