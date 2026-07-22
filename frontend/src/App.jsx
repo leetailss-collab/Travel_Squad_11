@@ -64,17 +64,17 @@ const detectTripCurrency = (title = '') => {
 
 // Pre-registered Family Users
 const FAM_USERS = [
-  { name: "이정우", pin: "570413", role: "user" },
-  { name: "홍영숙", pin: "630124", role: "user" },
-  { name: "이진수", pin: "850119", role: "user" },
-  { name: "이아름", pin: "880803", role: "user" },
-  { name: "이현수", pin: "870707", role: "admin" },
-  { name: "양슬기", pin: "871214", role: "user" },
-  { name: "이준성", pin: "110324", role: "user" },
-  { name: "이은성", pin: "140813", role: "user" },
-  { name: "이해성", pin: "200220", role: "user" },
-  { name: "이하성", pin: "210930", role: "user" },
-  { name: "이주성", pin: "231110", role: "user" }
+  { name: "이정우", pin: "570413", birth: "1957.04.13", engName: "LEE JUNG WOO", role: "user" },
+  { name: "홍영숙", pin: "630124", birth: "1963.01.24", engName: "HONG YOUNGSOOK", role: "user" },
+  { name: "이진수", pin: "850119", birth: "1985.01.19", engName: "LEE JINSOO", role: "user" },
+  { name: "이아름", pin: "880803", birth: "1988.08.03", engName: "LEE AHREUM", role: "user" },
+  { name: "이현수", pin: "870707", birth: "1987.07.07", engName: "LEE HYUNSOO", role: "admin" },
+  { name: "양슬기", pin: "871214", birth: "1987.12.14", engName: "YANG SEULGI", role: "user" },
+  { name: "이준성", pin: "110324", birth: "2011.03.24", engName: "LEE JUNSEONG", role: "user" },
+  { name: "이은성", pin: "130813", birth: "2013.08.13", engName: "LEE EUNSEONG", role: "user" },
+  { name: "이해성", pin: "200220", birth: "2020.02.20", engName: "LEE HAESEONG", role: "user" },
+  { name: "이하성", pin: "210930", birth: "2021.09.30", engName: "LEE HASEONG", role: "user" },
+  { name: "이주성", pin: "231110", birth: "2023.11.10", engName: "LEE JUSEONG", role: "user" }
 ];
 
 // Calculate international (man) age based on 6-digit YYMMDD pin
@@ -235,7 +235,8 @@ function App() {
   // Form States inside detail tabs
   const [newPlace, setNewPlace] = useState({
     day: 1, time: '', name: '', address: '', description: '', category: '관광', estimatedCost: '',
-    currency: '', needsReservation: false, tip: '', payer: '', duration: 60, images: []
+    currency: '', needsReservation: false, isReservationCompleted: false, tip: '', payer: '', duration: 60, images: [],
+    transportType: '', transportDuration: ''
   });
 
   const [editingPlace, setEditingPlace] = useState(null); // Place object currently being edited
@@ -1074,11 +1075,14 @@ function App() {
       estimatedCost: costValue,
       currency: costCurrency,
       needsReservation: newPlace.needsReservation,
+      isReservationCompleted: newPlace.isReservationCompleted || false,
       tip: newPlace.tip,
       payer: payerValue,
       duration: durationValue,
       comments: [],
-      images: newPlace.images || []
+      images: newPlace.images || [],
+      transportType: newPlace.transportType || '',
+      transportDuration: newPlace.transportDuration || ''
     };
 
     if (dayIndex === -1) {
@@ -1110,7 +1114,8 @@ function App() {
     saveUpdatedPlan(updatedPlan);
     setNewPlace({
       day: 1, time: '', name: '', address: '', description: '', category: '관광', estimatedCost: '',
-      currency: plan.currency || 'KRW', needsReservation: false, tip: '', payer: '', duration: 60, images: []
+      currency: plan.currency || 'KRW', needsReservation: false, isReservationCompleted: false, tip: '', payer: '', duration: 60, images: [],
+      transportType: '', transportDuration: ''
     });
     setShowModal(false);
   };
@@ -1155,9 +1160,12 @@ function App() {
           estimatedCost: costValue,
           currency: costCurrency,
           needsReservation: editingPlace.needsReservation,
+          isReservationCompleted: editingPlace.isReservationCompleted || false,
           tip: editingPlace.tip,
           payer: payerValue,
-          images: editingPlace.images || []
+          images: editingPlace.images || [],
+          transportType: editingPlace.transportType || '',
+          transportDuration: editingPlace.transportDuration || ''
         };
 
         // Cascade shifting for this specific day
@@ -1228,6 +1236,24 @@ function App() {
     }
     setEditingPlace(null);
     });
+  };
+
+  // Toggle Reservation Complete state directly
+  const handleToggleReservationComplete = (e, placeId) => {
+    e.stopPropagation();
+    const updatedPlan = { ...plan };
+    let found = false;
+    for (const dayItem of updatedPlan.itinerary) {
+      const place = dayItem.places.find(p => p.id === placeId);
+      if (place) {
+        place.isReservationCompleted = !place.isReservationCompleted;
+        found = true;
+        break;
+      }
+    }
+    if (found) {
+      saveUpdatedPlan(updatedPlan);
+    }
   };
 
   // Anniversary Handlers
@@ -1922,17 +1948,25 @@ function App() {
             borderBottom: '1px solid var(--border)'
           }}>
             <button className="back-btn" onClick={() => setView('home')} style={{ fontSize: '1.25rem', padding: '6px', margin: 0, display: 'flex', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer' }} title="홈으로 이동">🏠</button>
-            <div className="header-tabs" style={{ display: 'flex', flex: 1, justifyContent: 'center', gap: '4px', overflowX: 'auto', scrollbarWidth: 'none' }}>
-              <button className={`tab-btn ${activeTab === 'itinerary' ? 'active' : ''}`} style={{ padding: '8px 12px', fontSize: '0.92rem', minWidth: '65px', margin: 0 }} onClick={() => setActiveTab('itinerary')}>일정</button>
-              <button className={`tab-btn ${activeTab === 'checklist' ? 'active' : ''}`} style={{ padding: '8px 12px', fontSize: '0.92rem', minWidth: '65px', margin: 0 }} onClick={() => setActiveTab('checklist')}>준비물</button>
-              <button className={`tab-btn ${activeTab === 'expense' ? 'active' : ''}`} style={{ padding: '8px 12px', fontSize: '0.92rem', minWidth: '65px', margin: 0 }} onClick={() => setActiveTab('expense')}>경비</button>
-              <button className={`tab-btn ${activeTab === 'members' ? 'active' : ''}`} style={{ padding: '8px 12px', fontSize: '0.92rem', minWidth: '65px', margin: 0 }} onClick={() => {
+            <div className="header-tabs" style={{ display: 'flex', flex: 1, justifyContent: 'center', gap: '6px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+              <button className={`tab-btn ${activeTab === 'itinerary' ? 'active' : ''}`} style={{ padding: '8px 10px', fontSize: '0.88rem', margin: 0, display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => setActiveTab('itinerary')}>
+                <span>📅</span><span>일정</span>
+              </button>
+              <button className={`tab-btn ${activeTab === 'checklist' ? 'active' : ''}`} style={{ padding: '8px 10px', fontSize: '0.88rem', margin: 0, display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => setActiveTab('checklist')}>
+                <span>🎒</span><span>준비물</span>
+              </button>
+              <button className={`tab-btn ${activeTab === 'expense' ? 'active' : ''}`} style={{ padding: '8px 10px', fontSize: '0.88rem', margin: 0, display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => setActiveTab('expense')}>
+                <span>💰</span><span>경비</span>
+              </button>
+              <button className={`tab-btn ${activeTab === 'members' ? 'active' : ''}`} style={{ padding: '8px 10px', fontSize: '0.88rem', margin: 0, display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => {
                 setActiveTab('members');
                 // Reset sub-filters on changing tabs
                 setSelectedDayFilter('all');
                 setSelectedChecklistFilter('all');
                 setSelectedExpenseFilter('all');
-              }}>구성원</button>
+              }}>
+                <span>👥</span><span>가족</span>
+              </button>
             </div>
             <div style={{ width: '32px' }}></div>
           </header>
@@ -1943,10 +1977,28 @@ function App() {
             {activeTab === 'itinerary' && (
               <div>
                 <div className="trip-summary-panel">
-                  <div className="trip-summary-title-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <div className="trip-summary-title-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', gap: '12px' }}>
                     <h2 className="trip-summary-title" style={{ margin: 0, fontSize: '1.35rem', fontWeight: 'bold' }}>
                       {plan.title}
                     </h2>
+                    <button 
+                      className="btn-secondary-sm" 
+                      style={{ 
+                        flex: 'none', 
+                        width: 'fit-content', 
+                        padding: '6px 12px', 
+                        fontSize: '0.75rem', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        gap: '4px', 
+                        margin: 0,
+                        marginLeft: 'auto'
+                      }}
+                      onClick={openEditMetaModal}
+                    >
+                      ✏️정보 편집
+                    </button>
                   </div>
                   <div className="trip-date-summary">🗓️ {plan.startDate} ~ {plan.endDate}</div>
                   <div className="exchange-rate-line">
@@ -1975,7 +2027,7 @@ function App() {
                                   <>
                                     <span>{autoAccs[0].name}</span>
                                     <small style={{ color: 'var(--success)', fontWeight: 600 }}>
-                                      [Day {autoAccs[0].day} 일정 자동 반영{autoAccs[0].address ? ` · ${autoAccs[0].address}` : ''}]
+                                      [{autoAccs[0].day}일차 일정 자동 반영{autoAccs[0].address ? ` · ${autoAccs[0].address}` : ''}]
                                     </small>
                                   </>
                                 ) : (
@@ -1983,7 +2035,7 @@ function App() {
                                     <div key={idx} style={{ display: 'flex', flexDirection: 'column', borderBottom: idx < autoAccs.length - 1 ? '1px dashed var(--border)' : 'none', paddingBottom: idx < autoAccs.length - 1 ? '4px' : '0', marginBottom: idx < autoAccs.length - 1 ? '4px' : '0' }}>
                                       <span style={{ fontSize: '0.86rem', fontWeight: 600 }}>{idx + 1}차: {acc.name}</span>
                                       <small style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.72rem' }}>
-                                        [Day {acc.day} 일정{acc.address ? ` · ${acc.address}` : ''}]
+                                        [{acc.day}일차 일정{acc.address ? ` · ${acc.address}` : ''}]
                                       </small>
                                     </div>
                                   ))
@@ -2006,13 +2058,7 @@ function App() {
                       )}
                     </div>
                   )}
-                  <button 
-                    className="btn-secondary-sm" 
-                    style={{ width: 'auto', marginTop: '12px', padding: '6px 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}
-                    onClick={openEditMetaModal}
-                  >
-                    ✏️ 숙소/교통 정보 편집
-                  </button>
+
                 </div>
 
                 {/* 2차 Day 필터 바 */}
@@ -2057,7 +2103,7 @@ function App() {
                             flexShrink: 0
                           }}
                         >
-                          {dVal}일차 (Day {dVal})
+                          {dVal}일차
                         </button>
                       );
                     })}
@@ -2081,7 +2127,7 @@ function App() {
                     return filteredItinerary.map((dayItem) => (
                       <div key={dayItem.day} className="card" style={{ padding: '20px 16px' }}>
                       <h3 className="card-title day-heading">
-                        Day {dayItem.day}
+                        {dayItem.day}일차
                         {dayItem.title && <span className="day-theme">{dayItem.title}</span>}
                         <span className="day-date">({dayItem.date})</span>
                       </h3>
@@ -2116,7 +2162,6 @@ function App() {
                                         : `${place.duration}분`} 체류
                                     </span>
                                   )}
-                                  <span className="timeline-edit-hint">(꾹 누르거나 더블클릭하여 수정)</span>
                                 </div>
                                 <div className="timeline-title-row">
                                   <div className="timeline-place">{place.name}</div>
@@ -2152,8 +2197,17 @@ function App() {
                                   </div>
                                 )}
 
-                                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
-                                  {place.address && <span>📍 {place.address}</span>}
+                                {(place.estimatedCost > 0 || place.cost > 0) && (
+                                  <div className="timeline-cost">
+                                    💴 {formatCostComparison(place.estimatedCost ?? place.cost, place.currency || (place.estimatedCost ? planCurrency : 'KRW'))}
+                                    {place.payer && <span> · {place.payer} 결제</span>}
+                                  </div>
+                                )}
+                                {place.tip && <div className="timeline-tip">💡 {place.tip}</div>}
+                                
+                                {/* Unified Action Buttons Row */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
+                                  {/* Map Icon Link */}
                                   <a
                                     href={planCurrency === 'KRW'
                                       ? `https://m.map.naver.com/search2/search.naver?query=${encodeURIComponent(place.address || place.name)}`
@@ -2162,26 +2216,54 @@ function App() {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={(e) => e.stopPropagation()}
-                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', marginLeft: place.address ? '6px' : '0' }}
+                                    title={place.address ? `지도 보기: ${place.address}` : '지도 검색'}
+                                    className="comments-toggle"
+                                    style={{ marginTop: 0, padding: '4px 8px', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', textDecoration: 'none' }}
                                   >
-                                    🗺️ {place.address ? '지도 보기' : '지도 검색'} ➔
+                                    <span>🗺️</span><span>보기</span>
                                   </a>
-                                </div>
-                                {(place.estimatedCost > 0 || place.cost > 0) && (
-                                  <div className="timeline-cost">
-                                    💴 {formatCostComparison(place.estimatedCost ?? place.cost, place.currency || (place.estimatedCost ? planCurrency : 'KRW'))}
-                                    {place.payer && <span> · {place.payer} 결제</span>}
+
+                                  {/* Comments Toggle Button */}
+                                  <div 
+                                    className="comments-toggle" 
+                                    onClick={() => toggleCommentsDrawer(place.id)}
+                                    style={{ marginTop: 0 }}
+                                  >
+                                    💬 {place.comments ? place.comments.length : 0}개 보기
                                   </div>
-                                )}
-                                {place.needsReservation && <div className="reservation-required">🎫 예약 필요</div>}
-                                {place.tip && <div className="timeline-tip">💡 {place.tip}</div>}
-                                
-                                {/* Comments Toggle Button */}
-                                <div className="comments-toggle" onClick={() => toggleCommentsDrawer(place.id)}>
-                                  💬 코멘트 {place.comments ? place.comments.length : 0}개
-                                  <span style={{ marginLeft: '4px', fontSize: '0.7rem' }}>
-                                    {toggledComments[place.id] ? '▲ 접기' : '▼ 보기'}
-                                  </span>
+
+                                  {/* Reservation Badge */}
+                                  {place.needsReservation && (
+                                    place.isReservationCompleted ? (
+                                      <div 
+                                        className="reservation-completed" 
+                                        onClick={(e) => handleToggleReservationComplete(e, place.id)}
+                                        title="클릭하여 예약 필요로 상태 전환"
+                                        style={{ 
+                                          marginTop: 0, 
+                                          padding: '4px 8px', 
+                                          borderRadius: '6px', 
+                                          color: '#047857', 
+                                          backgroundColor: '#d1fae5', 
+                                          fontSize: '0.75rem', 
+                                          fontWeight: 700, 
+                                          display: 'inline-block',
+                                          cursor: 'pointer'
+                                        }}
+                                      >
+                                        ✅ 예약 완료
+                                      </div>
+                                    ) : (
+                                      <div 
+                                        className="reservation-required" 
+                                        onClick={(e) => handleToggleReservationComplete(e, place.id)}
+                                        title="클릭하여 예약 완료로 상태 전환"
+                                        style={{ marginTop: 0, padding: '4px 8px', cursor: 'pointer' }}
+                                      >
+                                        🎫 예약 필요
+                                      </div>
+                                    )
+                                  )}
                                 </div>
 
                                 {/* Comments Drawer */}
@@ -2219,50 +2301,88 @@ function App() {
                                 )}
                               </div>
                             </div>
-                            {idx < dayItem.places.length - 1 && (
+                            {idx < dayItem.places.length - 1 && !(
+                              place.address && 
+                              dayItem.places[idx+1]?.address && 
+                              place.address.trim() !== '' && 
+                              place.address.trim().toLowerCase() === dayItem.places[idx+1].address.trim().toLowerCase()
+                            ) && (
                               <div className="route-recommend-box" style={{ 
                                 display: 'flex', 
                                 alignItems: 'center', 
-                                margin: '8px 0 16px 50px', 
+                                margin: '2px 0 2px 42px', 
                                 gap: '8px',
                                 position: 'relative' 
                               }}>
                                 <div style={{ 
                                   position: 'absolute', 
                                   left: '-26px', 
-                                  top: '-16px', 
-                                  bottom: '-8px', 
+                                  top: '-18px', 
+                                  bottom: '-10px', 
                                   width: '2px', 
                                   borderLeft: '2px dashed var(--primary)', 
-                                  opacity: 0.5 
+                                  opacity: 0.3 
                                 }}></div>
                                 
-                                <a
-                                  className="route-recommend-btn"
-                                  href={planCurrency === 'KRW'
-                                    ? `https://map.naver.com/p/directions/${encodeURIComponent(place.address || place.name)},,/${encodeURIComponent(dayItem.places[idx+1].address || dayItem.places[idx+1].name)},,/transit`
-                                    : `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(place.address || place.name)}&destination=${encodeURIComponent(dayItem.places[idx+1].address || dayItem.places[idx+1].name)}&travelmode=transit`
-                                  }
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  style={{
-                                    fontSize: '0.73rem',
-                                    color: 'var(--primary)',
-                                    textDecoration: 'none',
-                                    background: 'var(--bg-app)',
-                                    padding: '5px 12px',
-                                    borderRadius: '20px',
-                                    border: '1px solid var(--border)',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    fontWeight: 700,
-                                    boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-                                  }}
-                                >
-                                  🚗 {place.name} ➔ {dayItem.places[idx+1].name} 이동 경로
-                                </a>
+                                <div style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  background: 'var(--bg-card)',
+                                  border: '1px solid var(--border)',
+                                  padding: '4px 10px',
+                                  borderRadius: '20px',
+                                  fontSize: '0.75rem',
+                                  color: 'var(--text-muted)',
+                                  boxShadow: 'var(--shadow-sm)'
+                                }}>
+                                  {/* Transit info text */}
+                                  {place.transportType ? (
+                                    <span style={{ fontWeight: '600', color: 'var(--text)' }}>
+                                      {place.transportType === '대중교통' && '🚌 '}
+                                      {place.transportType === '자차' && '🚗 '}
+                                      {place.transportType === '도보' && '🚶 '}
+                                      {place.transportType === '기타' && '🚇 '}
+                                      {place.transportType} {place.transportDuration ? `${place.transportDuration}분` : ''} 이동
+                                    </span>
+                                  ) : (
+                                    <span 
+                                      style={{ cursor: 'pointer', opacity: 0.7 }} 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditingPlace({ ...place, duration: place.duration || 0 });
+                                      }}
+                                      title="클릭하여 이동 정보 입력"
+                                    >
+                                      🚇 이동 정보 기입
+                                    </span>
+                                  )}
+
+                                  <span style={{ color: 'var(--border)' }}>|</span>
+
+                                  {/* Maps link */}
+                                  <a
+                                    href={planCurrency === 'KRW'
+                                      ? `https://map.naver.com/p/directions/${encodeURIComponent(place.address || place.name)},,/${encodeURIComponent(dayItem.places[idx+1].address || dayItem.places[idx+1].name)},,/transit`
+                                      : `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(place.address || place.name)}&destination=${encodeURIComponent(dayItem.places[idx+1].address || dayItem.places[idx+1].name)}&travelmode=transit`
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    style={{
+                                      color: 'var(--primary)',
+                                      textDecoration: 'none',
+                                      fontWeight: '700',
+                                      fontSize: '0.72rem',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '2px'
+                                    }}
+                                    title="지도 검색 열기"
+                                  >
+                                    🗺️ 이동경로(test) ➔
+                                  </a>
+                                </div>
                               </div>
                             )}
                           </React.Fragment>
@@ -2486,10 +2606,18 @@ function App() {
                           <div className="avatar" style={{ margin: 0, width: '40px', height: '40px', fontSize: '1.1rem' }}>{m[0]}</div>
                           <div>
                             <div style={{ fontWeight: '600' }}>
-                              {m} {age !== null && <span style={{ fontSize: '0.85rem', fontWeight: 'normal', color: 'var(--text-muted)', marginLeft: '6px' }}>(만 {age}세)</span>}
+                              {m} 
+                              {userObj?.engName && <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginLeft: '6px', fontWeight: 'normal' }}>{userObj.engName}</span>}
+                              {age !== null && <span style={{ fontSize: '0.85rem', fontWeight: 'normal', color: 'var(--text-muted)', marginLeft: '6px' }}>(만 {age}세)</span>}
                             </div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                              {isPlanManager ? '👑 여행 총괄 관리자' : '참여자'}
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', gap: '8px', alignItems: 'center', marginTop: '2px' }}>
+                              <span>{isPlanManager ? '👑 여행 총괄 관리자' : '참여자'}</span>
+                              {userObj?.birth && (
+                                <>
+                                  <span style={{ opacity: 0.5 }}>|</span>
+                                  <span>🎂 {userObj.birth}</span>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -2506,25 +2634,7 @@ function App() {
             <button className="fab" onClick={() => setShowModal(true)}>+</button>
           )}
 
-          {/* Bottom Navigation */}
-          <nav className="bottom-nav">
-            <div className={`nav-item ${activeTab === 'itinerary' ? 'active' : ''}`} onClick={() => setActiveTab('itinerary')}>
-              <span className="nav-icon">📅</span>
-              <span>일정</span>
-            </div>
-            <div className={`nav-item ${activeTab === 'checklist' ? 'active' : ''}`} onClick={() => setActiveTab('checklist')}>
-              <span className="nav-icon">🎒</span>
-              <span>준비물</span>
-            </div>
-            <div className={`nav-item ${activeTab === 'expense' ? 'active' : ''}`} onClick={() => setActiveTab('expense')}>
-              <span className="nav-icon">💰</span>
-              <span>경비</span>
-            </div>
-            <div className={`nav-item ${activeTab === 'members' ? 'active' : ''}`} onClick={() => setActiveTab('members')}>
-              <span className="nav-icon">👥</span>
-              <span>가족</span>
-            </div>
-          </nav>
+          {/* Bottom Navigation removed and merged to Header */}
 
           {/* Add Item Modal */}
           {showModal && (
@@ -2546,7 +2656,7 @@ function App() {
                       <label>여행 일자 선택</label>
                       <select className="form-control" value={newPlace.day} onChange={e => setNewPlace({ ...newPlace, day: e.target.value })}>
                         {Array.from({ length: Math.max(1, Math.ceil((new Date(plan.endDate) - new Date(plan.startDate)) / (1000 * 60 * 60 * 24)) + 1) }).map((_, i) => (
-                          <option key={i} value={i + 1}>Day {i + 1}</option>
+                          <option key={i} value={i + 1}>{i + 1}일차</option>
                         ))}
                       </select>
                     </div>
@@ -2601,6 +2711,28 @@ function App() {
                       <input type="checkbox" checked={newPlace.needsReservation} onChange={e => setNewPlace({ ...newPlace, needsReservation: e.target.checked })} />
                       🎫 사전 예약이 필요한 일정
                     </label>
+                    {newPlace.needsReservation && (
+                      <label className="reservation-check" style={{ marginTop: '8px', marginLeft: '16px' }}>
+                        <input type="checkbox" checked={newPlace.isReservationCompleted || false} onChange={e => setNewPlace({ ...newPlace, isReservationCompleted: e.target.checked })} />
+                        ✅ 예약 완료함
+                      </label>
+                    )}
+                    <div style={{ display: 'flex', gap: '12px', marginTop: '12px', marginBottom: '12px' }}>
+                      <div className="form-group" style={{ flex: 1.5, marginBottom: 0 }}>
+                        <label>다음 장소 이동 수단</label>
+                        <select className="form-control" value={newPlace.transportType || ''} onChange={e => setNewPlace({ ...newPlace, transportType: e.target.value })}>
+                          <option value="">설정 안 함</option>
+                          <option value="대중교통">🚌 대중교통</option>
+                          <option value="자차">🚗 자차</option>
+                          <option value="도보">🚶 도보</option>
+                          <option value="기타">🚇 기타</option>
+                        </select>
+                      </div>
+                      <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                        <label>소요 시간 (분)</label>
+                        <input type="number" min="0" placeholder="예: 15" className="form-control" value={newPlace.transportDuration || ''} onChange={e => setNewPlace({ ...newPlace, transportDuration: e.target.value })} />
+                      </div>
+                    </div>
                     <div className="form-group">
                       <label>팁/메모</label>
                       <textarea placeholder="예: 해질 무렵 방문, 온라인 예매 권장" className="form-control" value={newPlace.tip} onChange={e => setNewPlace({ ...newPlace, tip: e.target.value })}></textarea>
@@ -2608,6 +2740,7 @@ function App() {
                     <div className="form-group">
                       <label>결제자</label>
                       <select className="form-control" value={newPlace.payer || currentUser.name} onChange={e => setNewPlace({ ...newPlace, payer: e.target.value })}>
+                        <option value="미지정">미지정</option>
                         {plan.members.map((m, idx) => (
                           <option key={idx} value={m}>{m}</option>
                         ))}
@@ -2747,6 +2880,7 @@ function App() {
                     <div className="form-group">
                       <label>결제자</label>
                       <select className="form-control" value={newExpense.payer} onChange={e => setNewExpense({ ...newExpense, payer: e.target.value })}>
+                        <option value="미지정">미지정</option>
                         {plan.members.map((m, idx) => (
                           <option key={idx} value={m}>{m}</option>
                         ))}
@@ -2823,6 +2957,28 @@ function App() {
                     <input type="checkbox" checked={editingPlace.needsReservation || false} onChange={e => setEditingPlace({ ...editingPlace, needsReservation: e.target.checked })} />
                     🎫 사전 예약이 필요한 일정
                   </label>
+                  {editingPlace.needsReservation && (
+                    <label className="reservation-check" style={{ marginTop: '8px', marginLeft: '16px' }}>
+                      <input type="checkbox" checked={editingPlace.isReservationCompleted || false} onChange={e => setEditingPlace({ ...editingPlace, isReservationCompleted: e.target.checked })} />
+                      ✅ 예약 완료함
+                    </label>
+                  )}
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '12px', marginBottom: '12px' }}>
+                    <div className="form-group" style={{ flex: 1.5, marginBottom: 0 }}>
+                      <label>다음 장소 이동 수단</label>
+                      <select className="form-control" value={editingPlace.transportType || ''} onChange={e => setEditingPlace({ ...editingPlace, transportType: e.target.value })}>
+                        <option value="">설정 안 함</option>
+                        <option value="대중교통">🚌 대중교통</option>
+                        <option value="자차">🚗 자차</option>
+                        <option value="도보">🚶 도보</option>
+                        <option value="기타">🚇 기타</option>
+                      </select>
+                    </div>
+                    <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                      <label>소요 시간 (분)</label>
+                      <input type="number" min="0" placeholder="예: 15" className="form-control" value={editingPlace.transportDuration || ''} onChange={e => setEditingPlace({ ...editingPlace, transportDuration: e.target.value })} />
+                    </div>
+                  </div>
                   <div className="form-group">
                     <label>팁/메모</label>
                     <textarea placeholder="예: 해질 무렵 방문, 온라인 예매 권장" className="form-control" value={editingPlace.tip || ''} onChange={e => setEditingPlace({ ...editingPlace, tip: e.target.value })}></textarea>
@@ -2830,6 +2986,7 @@ function App() {
                   <div className="form-group">
                     <label>결제자</label>
                     <select className="form-control" value={editingPlace.payer || currentUser.name} onChange={e => setEditingPlace({ ...editingPlace, payer: e.target.value })}>
+                      <option value="미지정">미지정</option>
                       {plan.members.map((m, idx) => (
                         <option key={idx} value={m}>{m}</option>
                       ))}
@@ -3318,7 +3475,7 @@ function App() {
         <div className="modal-overlay" style={{ zIndex: 1100 }}>
           <div className="modal-content" style={{ maxHeight: '85dvh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>✏️ 여행 정보 및 일정 편집</h3>
+              <h3>여행일정 및 요약</h3>
               <button className="close-btn" onClick={() => setShowEditMetaModal(false)}>×</button>
             </div>
             <form onSubmit={handleSaveMeta}>
@@ -3326,7 +3483,7 @@ function App() {
                 여행 제목과 날짜, 숙소, 교통 수단 정보를 수정할 수 있습니다.
               </div>
               
-              <div style={{ fontWeight: 'bold', marginBottom: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>✏️ 여행 제목 설정</div>
+              <div style={{ fontWeight: 'bold', marginBottom: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>여행 타이틀</div>
               <div className="form-group">
                 <input type="text" placeholder="예: 우리 가족 도쿄 여행" className="form-control" value={editMeta.title} onChange={e => setEditMeta({ ...editMeta, title: e.target.value })} required />
               </div>

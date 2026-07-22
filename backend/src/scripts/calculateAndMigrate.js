@@ -27,17 +27,17 @@ const timeToMinutes = (t) => {
 // Data files
 const PLANS_FILE = path.join(__dirname, '../../data/plans.json');
 const FAM_USERS = [
-  { name: "이정우", pin: "570413", role: "user" },
-  { name: "홍영숙", pin: "630124", role: "user" },
-  { name: "이진수", pin: "850119", role: "user" },
-  { name: "이아름", pin: "880803", role: "user" },
-  { name: "이현수", pin: "870707", role: "admin" },
-  { name: "양슬기", pin: "871214", role: "user" },
-  { name: "이준성", pin: "110324", role: "user" },
-  { name: "이은성", pin: "140813", role: "user" },
-  { name: "이해성", pin: "200220", role: "user" },
-  { name: "이하성", pin: "210930", role: "user" },
-  { name: "이주성", pin: "231110", role: "user" }
+  { name: "이정우", pin: "570413", birth: "1957.04.13", engName: "LEE JUNG WOO", role: "user" },
+  { name: "홍영숙", pin: "630124", birth: "1963.01.24", engName: "HONG YOUNGSOOK", role: "user" },
+  { name: "이진수", pin: "850119", birth: "1985.01.19", engName: "LEE JINSOO", role: "user" },
+  { name: "이아름", pin: "880803", birth: "1988.08.03", engName: "LEE AHREUM", role: "user" },
+  { name: "이현수", pin: "870707", birth: "1987.07.07", engName: "LEE HYUNSOO", role: "admin" },
+  { name: "양슬기", pin: "871214", birth: "1987.12.14", engName: "YANG SEULGI", role: "user" },
+  { name: "이준성", pin: "110324", birth: "2011.03.24", engName: "LEE JUNSEONG", role: "user" },
+  { name: "이은성", pin: "130813", birth: "2013.08.13", engName: "LEE EUNSEONG", role: "user" },
+  { name: "이해성", pin: "200220", birth: "2020.02.20", engName: "LEE HAESEONG", role: "user" },
+  { name: "이하성", pin: "210930", birth: "2021.09.30", engName: "LEE HASEONG", role: "user" },
+  { name: "이주성", pin: "231110", birth: "2023.11.10", engName: "LEE JUSEONG", role: "user" }
 ];
 
 const run = async () => {
