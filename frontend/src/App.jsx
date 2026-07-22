@@ -245,6 +245,7 @@ function App() {
   const addImgInputRef = useRef(null);
   const editImgInputRef = useRef(null);
   const [newCheck, setNewCheck] = useState({ title: '', assignee: '', category: '공통' });
+  const [editingCheck, setEditingCheck] = useState(null);
   const [newExpense, setNewExpense] = useState({ title: '', amount: '', payer: '', date: '', category: '기타' });
 
   // Calendar & Event States
@@ -1367,6 +1368,32 @@ function App() {
     setShowModal(false);
   };
 
+  // Edit Checklist Item
+  const handleEditChecklist = (e) => {
+    e.preventDefault();
+    if (!editingCheck || !editingCheck.title) return;
+
+    const updatedPlan = { ...plan };
+    const idx = updatedPlan.checklists.findIndex(c => c.id === editingCheck.id);
+    if (idx !== -1) {
+      updatedPlan.checklists[idx] = {
+        ...updatedPlan.checklists[idx],
+        title: editingCheck.title,
+        assignee: editingCheck.assignee || '미지정',
+        category: editingCheck.category || '공통'
+      };
+      saveUpdatedPlan(updatedPlan);
+    }
+    setEditingCheck(null);
+  };
+
+  // Delete Checklist Item
+  const handleDeleteChecklist = (itemId) => {
+    const updatedPlan = { ...plan };
+    updatedPlan.checklists = updatedPlan.checklists.filter(c => c.id !== itemId);
+    saveUpdatedPlan(updatedPlan);
+  };
+
   // Add Expense Item
   const handleAddExpense = (e) => {
     e.preventDefault();
@@ -2297,7 +2324,48 @@ function App() {
                           <div className={`checklist-text ${item.checked ? 'checked' : ''}`}>{item.title}</div>
                           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>🏷️ {item.category || '공통'}</span>
                         </div>
-                        <div className="checklist-assignee">{item.assignee}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div className="checklist-assignee" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{item.assignee}</div>
+                          <button 
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingCheck(item);
+                            }}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              fontSize: '0.8rem',
+                              cursor: 'pointer',
+                              padding: '4px',
+                              opacity: 0.7
+                            }}
+                            title="수정"
+                          >
+                            ✏️
+                          </button>
+                          <button 
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(`"${item.title}" 준비물을 삭제하시겠습니까?`)) {
+                                handleDeleteChecklist(item.id);
+                              }
+                            }}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              fontSize: '0.9rem',
+                              color: 'var(--danger)',
+                              cursor: 'pointer',
+                              padding: '4px',
+                              opacity: 0.7
+                            }}
+                            title="삭제"
+                          >
+                            ✕
+                          </button>
+                        </div>
                       </div>
                     ));
                   })()}
@@ -3304,6 +3372,61 @@ function App() {
               <div style={{ display: 'flex', gap: '8px', marginTop: '24px' }}>
                 <button type="button" className="btn-secondary-sm" style={{ padding: '12px', fontSize: '0.95rem', margin: 0 }} onClick={() => setShowEditMetaModal(false)}>취소</button>
                 <button type="submit" className="submit-btn" style={{ flex: 1, padding: '12px', fontSize: '0.95rem' }}>저장 완료</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Checklist Item Modal */}
+      {editingCheck && (
+        <div className="modal-overlay" style={{ zIndex: 1100 }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>✏️ 준비물 수정</h3>
+              <button className="close-btn" onClick={() => setEditingCheck(null)}>×</button>
+            </div>
+            <form onSubmit={handleEditChecklist}>
+              <div className="form-group">
+                <label>준비물 품목</label>
+                <input 
+                  type="text" 
+                  required 
+                  placeholder="예: 방수 팩, 유모차" 
+                  className="form-control" 
+                  value={editingCheck.title} 
+                  onChange={e => setEditingCheck({ ...editingCheck, title: e.target.value })} 
+                />
+              </div>
+              <div className="form-group">
+                <label>담당자</label>
+                <select 
+                  className="form-control" 
+                  value={editingCheck.assignee || ''} 
+                  onChange={e => setEditingCheck({ ...editingCheck, assignee: e.target.value })}
+                >
+                  <option value="">미지정</option>
+                  {plan.members.map((m, idx) => (
+                    <option key={idx} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>분류</label>
+                <select 
+                  className="form-control" 
+                  value={editingCheck.category || '공통'} 
+                  onChange={e => setEditingCheck({ ...editingCheck, category: e.target.value })}
+                >
+                  <option value="공통">공통 준비물</option>
+                  <option value="개인">개인 준비물</option>
+                  <option value="예약">예약 관련 (티켓 등)</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '24px' }}>
+                <button type="button" className="btn-secondary-sm" style={{ padding: '12px', fontSize: '0.95rem', margin: 0 }} onClick={() => setEditingCheck(null)}>취소</button>
+                <button type="submit" className="submit-btn" style={{ flex: 1, padding: '12px', fontSize: '0.95rem' }}>수정 완료</button>
               </div>
             </form>
           </div>
