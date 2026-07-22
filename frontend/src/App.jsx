@@ -1881,7 +1881,19 @@ function App() {
       {view === 'detail' && plan && (
         <>
           {/* Header */}
-          <header className="app-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', gap: '8px' }}>
+          <header className="app-header" style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            padding: '12px 16px', 
+            gap: '8px',
+            position: 'sticky',
+            top: 0,
+            zIndex: 999,
+            backgroundColor: 'var(--bg-app, #ffffff)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+            borderBottom: '1px solid var(--border)'
+          }}>
             <button className="back-btn" onClick={() => setView('home')} style={{ fontSize: '1.25rem', padding: '6px', margin: 0, display: 'flex', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer' }} title="홈으로 이동">🏠</button>
             <div className="header-tabs" style={{ display: 'flex', flex: 1, justifyContent: 'center', gap: '4px', overflowX: 'auto', scrollbarWidth: 'none' }}>
               <button className={`tab-btn ${activeTab === 'itinerary' ? 'active' : ''}`} style={{ padding: '8px 12px', fontSize: '0.92rem', minWidth: '65px', margin: 0 }} onClick={() => setActiveTab('itinerary')}>일정</button>
