@@ -2279,7 +2279,7 @@ function App() {
                                     className="comments-toggle"
                                     style={{ marginTop: 0, padding: '4px 8px', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', textDecoration: 'none' }}
                                   >
-                                    <span>🗺️</span><span>보기</span>
+                                    <span>{place.address ? '🚩' : '🗺️'}</span><span>보기</span>
                                   </a>
 
                                   {/* Comments Toggle Button */}
@@ -3877,15 +3877,19 @@ function ZoomableImage({ src, onClose }) {
       ref={containerRef}
       style={{ 
         position: 'relative', 
-        maxWidth: '90vw', 
-        maxHeight: '90vh', 
+        width: '100vw', 
+        height: '100vh', 
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center',
         overflow: 'hidden',
         cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in'
       }}
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -3912,10 +3916,10 @@ function ZoomableImage({ src, onClose }) {
       {scale > 1 && (
         <div style={{
           position: 'absolute',
-          bottom: '12px',
+          bottom: '24px',
           backgroundColor: 'rgba(0,0,0,0.7)',
           color: '#fff',
-          padding: '4px 10px',
+          padding: '6px 14px',
           borderRadius: '20px',
           fontSize: '0.75rem',
           pointerEvents: 'none',
@@ -3929,14 +3933,14 @@ function ZoomableImage({ src, onClose }) {
         onClick={onClose}
         style={{
           position: 'absolute',
-          top: '16px',
-          right: '16px',
+          top: '24px',
+          right: '24px',
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           border: 'none',
           color: '#fff',
-          fontSize: '24px',
-          width: '36px',
-          height: '36px',
+          fontSize: '28px',
+          width: '44px',
+          height: '44px',
           borderRadius: '50%',
           display: 'flex',
           alignItems: 'center',
