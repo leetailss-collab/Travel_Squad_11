@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import solarLunar from 'solarlunar';
+import KoreanLunarCalendar from 'korean-lunar-calendar';
 
 // Korean Holiday Name Mapping
 const HOLIDAY_NAMES_KO = {
@@ -314,14 +314,16 @@ const getAnniversariesForYear = (year, anniversariesList, viewerName) => {
 
     if (ann.isLunar) {
       try {
-        const result = solarLunar.lunar2solar(year, ann.month, ann.day);
-        if (result && result.cYear && result.cMonth && result.cDay) {
-          const monthStr = String(result.cMonth).padStart(2, '0');
-          const dayStr = String(result.cDay).padStart(2, '0');
+        const calendar = new KoreanLunarCalendar();
+        calendar.setLunarDate(year, ann.month, ann.day, false);
+        const result = calendar.getSolarCalendar();
+        if (result && result.year && result.month && result.day) {
+          const monthStr = String(result.month).padStart(2, '0');
+          const dayStr = String(result.day).padStart(2, '0');
           return {
             id: ann.id || `ann-${ann.name}-${year}`,
             title: `${formattedName}${titleSuffix} (음력)`,
-            dateStr: `${result.cYear}-${monthStr}-${dayStr}`,
+            dateStr: `${result.year}-${monthStr}-${dayStr}`,
             isAnniversary: true,
             isEvent: false,
             name: formattedName,
