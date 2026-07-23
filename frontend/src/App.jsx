@@ -3742,49 +3742,212 @@ function App() {
         <div 
           className="modal-overlay" 
           onClick={() => setLightboxImage(null)}
-          style={{ zIndex: 1200, backgroundColor: 'rgba(0, 0, 0, 0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          style={{ zIndex: 1200, backgroundColor: 'rgba(0, 0, 0, 0.9)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
         >
-          <div 
-            style={{ 
-              position: 'relative', 
-              maxWidth: '90vw', 
-              maxHeight: '90vh', 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center' 
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img 
-              src={lightboxImage} 
-              alt="Enlarged view" 
-              style={{ 
-                maxWidth: '100%', 
-                maxHeight: '85vh', 
-                objectFit: 'contain', 
-                borderRadius: '8px', 
-                boxShadow: '0 4px 20px rgba(0,0,0,0.5)' 
-              }} 
-            />
-            <button 
-              onClick={() => setLightboxImage(null)}
-              style={{
-                position: 'absolute',
-                top: '-40px',
-                right: '0',
-                backgroundColor: 'transparent',
-                border: 'none',
-                color: '#fff',
-                fontSize: '32px',
-                cursor: 'pointer',
-                outline: 'none'
-              }}
-            >
-              ×
-            </button>
-          </div>
+          <ZoomableImage src={lightboxImage} onClose={() => setLightboxImage(null)} />
         </div>
       )}
+    </div>
+  );
+}
+
+// Zoomable Image Component for Lightbox (Mouse Wheel Zoom & Pinch-to-Zoom with Touch Drag Support)
+function ZoomableImage({ src, onClose }) {
+  const [scale, setScale] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  
+  const scaleRef = useRef(scale);
+  scaleRef.current = scale;
+  const positionRef = useRef(position);
+  positionRef.current = position;
+  const isDraggingRef = useRef(isDragging);
+  isDraggingRef.current = isDragging;
+
+  const dragStartRef = useRef({ x: 0, y: 0 });
+  const touchStartDistRef = useRef(0);
+  const lastScaleRef = useRef(1);
+  const lastTouchRef = useRef({ x: 0, y: 0 });
+  const containerRef = useRef(null);
+
+  // Reset zoom on src change
+  useEffect(() => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+  }, [src]);
+
+  const getTouchDistance = (touches) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  // Handle high-performance wheel and touch events with { passive: false } manually
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e) => {
+      e.preventDefault();
+      const zoomFactor = 0.25;
+      const currentScale = scaleRef.current;
+      const newScale = e.deltaY < 0 ? Math.min(currentScale + zoomFactor, 6) : Math.max(currentScale - zoomFactor, 1);
+      
+      setScale(newScale);
+      if (newScale === 1) {
+        setPosition({ x: 0, y: 0 });
+      }
+    };
+
+    const handleTouchMoveEvent = (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const dist = getTouchDistance(e.touches);
+        const startDist = touchStartDistRef.current;
+        if (startDist > 0) {
+          const factor = dist / startDist;
+          const newScale = Math.max(1, Math.min(lastScaleRef.current * factor, 6));
+          setScale(newScale);
+          if (newScale === 1) {
+            setPosition({ x: 0, y: 0 });
+          }
+        }
+      } else if (e.touches.length === 1 && isDraggingRef.current && scaleRef.current > 1) {
+        const touch = e.touches[0];
+        const dx = touch.clientX - lastTouchRef.current.x;
+        const dy = touch.clientY - lastTouchRef.current.y;
+        setPosition(prev => ({
+          x: prev.x + dx,
+          y: prev.y + dy
+        }));
+        lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
+      }
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    container.addEventListener('touchmove', handleTouchMoveEvent, { passive: false });
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+      container.removeEventListener('touchmove', handleTouchMoveEvent);
+    };
+  }, []);
+
+  const handleMouseDown = (e) => {
+    if (scaleRef.current <= 1) return;
+    setIsDragging(true);
+    dragStartRef.current = { x: e.clientX - positionRef.current.x, y: e.clientY - positionRef.current.y };
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDraggingRef.current) return;
+    setPosition({
+      x: e.clientX - dragStartRef.current.x,
+      y: e.clientY - dragStartRef.current.y
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 2) {
+      touchStartDistRef.current = getTouchDistance(e.touches);
+      lastScaleRef.current = scaleRef.current;
+    } else if (e.touches.length === 1) {
+      setIsDragging(true);
+      const touch = e.touches[0];
+      lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (e.touches.length === 0) {
+      setIsDragging(false);
+      touchStartDistRef.current = 0;
+    } else if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
+      setIsDragging(true);
+    }
+  };
+
+  return (
+    <div 
+      ref={containerRef}
+      style={{ 
+        position: 'relative', 
+        maxWidth: '90vw', 
+        maxHeight: '90vh', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        overflow: 'hidden',
+        cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in'
+      }}
+      onClick={(e) => e.stopPropagation()}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      <img 
+        src={src} 
+        alt="Enlarged view" 
+        style={{ 
+          maxWidth: '100%', 
+          maxHeight: '85vh', 
+          objectFit: 'contain', 
+          borderRadius: '8px', 
+          boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+          transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+          transition: isDragging ? 'none' : 'transform 0.1s ease-out',
+          userSelect: 'none',
+          pointerEvents: 'none'
+        }} 
+      />
+      
+      {scale > 1 && (
+        <div style={{
+          position: 'absolute',
+          bottom: '12px',
+          backgroundColor: 'rgba(0,0,0,0.7)',
+          color: '#fff',
+          padding: '4px 10px',
+          borderRadius: '20px',
+          fontSize: '0.75rem',
+          pointerEvents: 'none',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+        }}>
+          🔍 {scale.toFixed(1)}x 확대 중 (드래그하여 이동)
+        </div>
+      )}
+      
+      <button 
+        onClick={onClose}
+        style={{
+          position: 'absolute',
+          top: '16px',
+          right: '16px',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          border: 'none',
+          color: '#fff',
+          fontSize: '24px',
+          width: '36px',
+          height: '36px',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          outline: 'none',
+          zIndex: 10
+        }}
+      >
+        ×
+      </button>
     </div>
   );
 }
