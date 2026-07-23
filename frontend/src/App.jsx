@@ -2549,19 +2549,30 @@ function App() {
                               <div className="route-recommend-box" style={{ 
                                 display: 'flex', 
                                 alignItems: 'center', 
-                                margin: '1px 0 1px 42px', 
+                                margin: '6px 0', 
                                 gap: '8px',
                                 position: 'relative' 
                               }}>
                                 <div style={{ 
                                   position: 'absolute', 
-                                  left: '-54px', 
-                                  top: '-10px', 
-                                  bottom: '-6px', 
-                                  width: '2px', 
-                                  borderLeft: '2px dashed var(--primary)', 
-                                  opacity: 0.3 
-                                }}></div>
+                                  left: '-17px', 
+                                  top: '50%',
+                                  transform: 'translateY(-50%)',
+                                  width: '12px',
+                                  height: '12px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  color: 'var(--primary)',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 'bold',
+                                  backgroundColor: 'var(--bg-card)',
+                                  borderRadius: '50%',
+                                  border: '1px solid var(--border)',
+                                  zIndex: 2
+                                }}>
+                                  ↓
+                                </div>
                                 
                                 <div style={{
                                   display: 'inline-flex',
