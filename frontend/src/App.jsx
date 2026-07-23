@@ -2857,16 +2857,10 @@ function App() {
                             </div>
                             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', gap: '8px', alignItems: 'center', marginTop: '2px', flexWrap: 'wrap' }}>
                               <span>{isPlanManager ? '👑 여행 총괄 관리자' : '참여자'}</span>
-                              {userObj?.birth && (
-                                <>
-                                  <span style={{ opacity: 0.5 }}>|</span>
-                                  <span>🎂 실제생일: {userObj.birth}{userObj.isLunar ? '(음)' : ''}</span>
-                                </>
-                              )}
                               {(userObj?.passportBirth || userObj?.birth) && (
                                 <>
                                   <span style={{ opacity: 0.5 }}>|</span>
-                                  <span>✈️ 여권생일: {userObj.passportBirth || userObj.birth}</span>
+                                  <span>🎂 생년월일: {userObj.passportBirth || userObj.birth}</span>
                                 </>
                               )}
                             </div>
