@@ -2063,7 +2063,17 @@ function App() {
 
                 {/* 2차 Day 필터 바 */}
                 {plan.itinerary.length > 0 && (
-                  <div className="sub-filter-bar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '12px 4px 16px 4px', scrollbarWidth: 'none' }}>
+                  <div className="sub-filter-bar" style={{ 
+                    display: 'flex', 
+                    gap: '8px', 
+                    overflowX: 'auto', 
+                    padding: '12px 4px 16px 4px', 
+                    scrollbarWidth: 'none',
+                    position: 'sticky',
+                    top: '58px',
+                    zIndex: 90,
+                    backgroundColor: 'var(--bg-app)'
+                  }}>
                     <button 
                       className={`filter-chip ${selectedDayFilter === 'all' ? 'active' : ''}`}
                       onClick={() => setSelectedDayFilter('all')}
