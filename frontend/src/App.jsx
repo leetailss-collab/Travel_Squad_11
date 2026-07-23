@@ -64,7 +64,7 @@ const detectTripCurrency = (title = '') => {
 
 // Pre-registered Family Users
 const FAM_USERS = [
-  { name: "이정우", pin: "570413", birth: "1957.04.13", engName: "LEE JUNG WOO", role: "user", isLunar: true },
+  { name: "이정우", pin: "570413", birth: "1957.04.11", passportBirth: "1957.04.13", engName: "LEE JUNG WOO", role: "user", isLunar: true },
   { name: "홍영숙", pin: "630124", birth: "1963.01.24", engName: "HONG YOUNGSOOK", role: "user", isLunar: true },
   { name: "이진수", pin: "850119", birth: "1985.01.19", engName: "LEE JINSOO", role: "user", isLunar: false },
   { name: "이아름", pin: "880803", birth: "1988.08.03", engName: "LEE AHREUM", role: "user", isLunar: false },
@@ -2855,12 +2855,18 @@ function App() {
                               {userObj?.engName && <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginLeft: '6px', fontWeight: 'normal' }}>{userObj.engName}</span>}
                               {age !== null && <span style={{ fontSize: '0.85rem', fontWeight: 'normal', color: 'var(--text-muted)', marginLeft: '6px' }}>(만 {age}세)</span>}
                             </div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', gap: '8px', alignItems: 'center', marginTop: '2px' }}>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', gap: '8px', alignItems: 'center', marginTop: '2px', flexWrap: 'wrap' }}>
                               <span>{isPlanManager ? '👑 여행 총괄 관리자' : '참여자'}</span>
                               {userObj?.birth && (
                                 <>
                                   <span style={{ opacity: 0.5 }}>|</span>
-                                  <span>🎂 {userObj.birth}</span>
+                                  <span>🎂 실제생일: {userObj.birth}{userObj.isLunar ? '(음)' : ''}</span>
+                                </>
+                              )}
+                              {(userObj?.passportBirth || userObj?.birth) && (
+                                <>
+                                  <span style={{ opacity: 0.5 }}>|</span>
+                                  <span>✈️ 여권생일: {userObj.passportBirth || userObj.birth}</span>
                                 </>
                               )}
                             </div>
