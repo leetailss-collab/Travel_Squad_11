@@ -786,36 +786,7 @@ function App() {
       const response = await fetch('/api/anniversaries');
       if (response.ok) {
         const dbAnns = await response.json();
-        
-        // Generate virtual birthdays from FAM_USERS configuration (the single source of truth!)
-        const virtualBirthdays = FAM_USERS.map(user => {
-          const parts = user.birth.split('.').map(Number);
-          const y = parts[0];
-          const m = parts[1];
-          const d = parts[2];
-          const isElder = y < 1970;
-          return {
-            id: `virtual-birthday-${user.name}`,
-            name: isElder ? `${user.name}생신` : `${user.name}생일`,
-            year: y,
-            month: m,
-            day: d,
-            isLunar: user.isLunar || false,
-            type: 'birthday'
-          };
-        });
-
-        // Filter out database birthdays that correspond to family members in FAM_USERS to prevent duplication
-        const memberNames = FAM_USERS.map(u => u.name);
-        const filteredDbAnns = dbAnns.filter(ann => {
-          if (ann.type === 'birthday') {
-            const cleanName = ann.name.replace(/생일|생신/g, '').trim();
-            if (memberNames.includes(cleanName)) return false;
-          }
-          return true;
-        });
-
-        setAnniversaries([...filteredDbAnns, ...virtualBirthdays]);
+        setAnniversaries(dbAnns);
       }
     } catch (err) {
       console.warn("Failed to fetch anniversaries:", err);
@@ -1803,7 +1774,36 @@ function App() {
               }
 
               const getCellEvents = (dateStr) => {
-                const yearAnniversaries = getAnniversariesForYear(year, anniversaries, currentUser?.name);
+                // Generate virtual birthdays from FAM_USERS configuration (the single source of truth!)
+                const virtualBirthdays = FAM_USERS.map(user => {
+                  const parts = user.birth.split('.').map(Number);
+                  const y = parts[0];
+                  const m = parts[1];
+                  const d = parts[2];
+                  const isElder = y < 1970;
+                  return {
+                    id: `virtual-birthday-${user.name}`,
+                    name: isElder ? `${user.name}생신` : `${user.name}생일`,
+                    year: y,
+                    month: m,
+                    day: d,
+                    isLunar: user.isLunar || false,
+                    type: 'birthday'
+                  };
+                });
+
+                // Filter out database birthdays that correspond to family members in FAM_USERS to prevent duplication
+                const memberNames = FAM_USERS.map(u => u.name);
+                const filteredDbAnns = (anniversaries || []).filter(ann => {
+                  if (ann.type === 'birthday') {
+                    const cleanName = ann.name.replace(/생일|생신/g, '').trim();
+                    if (memberNames.includes(cleanName)) return false;
+                  }
+                  return true;
+                });
+
+                const combinedAnniversaries = [...filteredDbAnns, ...virtualBirthdays];
+                const yearAnniversaries = getAnniversariesForYear(year, combinedAnniversaries, currentUser?.name);
                 const cellAnniversaries = yearAnniversaries.filter(a => a.dateStr === dateStr);
 
                 const normalEvents = plans.filter(p => {
