@@ -2279,7 +2279,7 @@ function App() {
                                     className="comments-toggle"
                                     style={{ marginTop: 0, padding: '4px 8px', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', textDecoration: 'none' }}
                                   >
-                                    <span>{place.address ? '🚩' : '🗺️'}</span><span>보기</span>
+                                    <span>🗺️</span><span>{place.address ? '보기' : '찾기'}</span>
                                   </a>
 
                                   {/* Comments Toggle Button */}
@@ -2288,7 +2288,7 @@ function App() {
                                     onClick={() => toggleCommentsDrawer(place.id)}
                                     style={{ marginTop: 0 }}
                                   >
-                                    💬 {place.comments ? place.comments.length : 0}개 보기
+                                    💬 {place.comments ? place.comments.length : 0}개 댓글
                                   </div>
 
                                   {/* Reservation Badge */}
@@ -3010,7 +3010,7 @@ function App() {
                     <textarea placeholder="예: 바다 구경 및 망고주스 마시기" className="form-control" value={editingPlace.description || ''} onChange={e => setEditingPlace({ ...editingPlace, description: e.target.value })}></textarea>
                   </div>
                   <div className="form-group">
-                    <label>📸 사진 첨부 (클릭하여 파일 선택 / Ctrl+V 붙여넣기 / 드래그앤드롭)</label>
+                    <label>📸 이미지 첨부</label>
                     <div 
                       className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
                       onClick={() => editImgInputRef.current?.click()}
