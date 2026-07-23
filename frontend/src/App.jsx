@@ -2343,7 +2343,7 @@ function App() {
                         ) : (
                           dayItem.places.map((place, idx) => (
                             <React.Fragment key={place.id}>
-                              <div className="timeline-item" style={{ marginBottom: '8px' }}>
+                              <div className="timeline-item" style={{ marginBottom: '4px' }}>
                                 <div className="timeline-dot"></div>
                               <div 
                                 className="timeline-content"
@@ -2549,15 +2549,15 @@ function App() {
                               <div className="route-recommend-box" style={{ 
                                 display: 'flex', 
                                 alignItems: 'center', 
-                                margin: '2px 0 2px 42px', 
+                                margin: '1px 0 1px 42px', 
                                 gap: '8px',
                                 position: 'relative' 
                               }}>
                                 <div style={{ 
                                   position: 'absolute', 
-                                  left: '-26px', 
-                                  top: '-18px', 
-                                  bottom: '-10px', 
+                                  left: '-54px', 
+                                  top: '-10px', 
+                                  bottom: '-6px', 
                                   width: '2px', 
                                   borderLeft: '2px dashed var(--primary)', 
                                   opacity: 0.3 
