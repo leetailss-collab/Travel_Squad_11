@@ -145,19 +145,170 @@ const DEFAULT_MOCK_PLANS = [
   }
 ];
 
-const getAnniversariesForYear = (year, anniversariesList) => {
+const getFamilyRelationName = (viewerName, targetName) => {
+  if (!viewerName) return targetName;
+  if (viewerName === targetName) return '나';
+
+  const relations = {
+    '이정우': {
+      '이서구': '아버지',
+      '방예선': '어머니',
+      '홍영숙': '아내',
+      '이진수': '큰아들',
+      '이아름': '큰며느리',
+      '이현수': '둘째아들',
+      '양슬기': '작은며느리',
+      '이준성': '손자(준성)',
+      '이은성': '손자(은성)',
+      '이해성': '손자(해성)',
+      '이하성': '손자(하성)',
+      '이주성': '손자(주성)',
+      '박경희': '사돈어른'
+    },
+    '홍영숙': {
+      '박경희': '어머니',
+      '이정우': '남편',
+      '이서구': '시아버지',
+      '방예선': '시어머니',
+      '이진수': '큰아들',
+      '이아름': '큰며느리',
+      '이현수': '둘째아들',
+      '양슬기': '작은며느리',
+      '이준성': '손자(준성)',
+      '이은성': '손자(은성)',
+      '이해성': '손자(해성)',
+      '이하성': '손자(하성)',
+      '이주성': '손자(주성)'
+    },
+    '이진수': {
+      '이정우': '아버지',
+      '홍영숙': '어머니',
+      '이서구': '친할아버지',
+      '방예선': '친할머니',
+      '박경희': '외할머니',
+      '이아름': '아내',
+      '이현수': '동생(현수)',
+      '양슬기': '제수씨',
+      '이준성': '첫째아들(준성)',
+      '이은성': '둘째아들(은성)',
+      '이해성': '셋째아들(해성)',
+      '이하성': '조카(하성)',
+      '이주성': '조카(주성)'
+    },
+    '이아름': {
+      '이정우': '아버님',
+      '홍영숙': '어머님',
+      '이서구': '시할아버지',
+      '방예선': '시할머니',
+      '박경희': '시외할머니',
+      '이진수': '남편',
+      '이현수': '도련님',
+      '양슬기': '동서',
+      '이준성': '첫째아들(준성)',
+      '이은성': '둘째아들(은성)',
+      '이해성': '셋째아들(해성)',
+      '이하성': '조카(하성)',
+      '이주성': '조카(주성)'
+    },
+    '이현수': {
+      '이정우': '아버지',
+      '홍영숙': '어머니',
+      '이서구': '친할아버지',
+      '방예선': '친할머니',
+      '박경희': '외할머니',
+      '이진수': '형(진수)',
+      '이아름': '형수님',
+      '양슬기': '아내',
+      '이준성': '조카(준성)',
+      '이은성': '조카(은성)',
+      '이해성': '조카(해성)',
+      '이하성': '첫째아들(하성)',
+      '이주성': '둘째아들(주성)'
+    },
+    '양슬기': {
+      '이정우': '아버님',
+      '홍영숙': '어머님',
+      '이서구': '시할아버지',
+      '방예선': '시할머니',
+      '박경희': '시외할머니',
+      '이진수': '아주버님',
+      '이아름': '형님',
+      '이현수': '남편',
+      '이준성': '조카(준성)',
+      '이은성': '조카(은성)',
+      '이해성': '조카(해성)',
+      '이하성': '첫째아들(하성)',
+      '이주성': '둘째아들(주성)'
+    },
+    '이준성': {
+      '이정우': '친할아버지', '홍영숙': '친할머니',
+      '이서구': '증조할아버지', '방예선': '증조할머니', '박경희': '증외할머니',
+      '이진수': '아빠', '이아름': '엄마',
+      '이현수': '삼촌', '양슬기': '숙모',
+      '이은성': '남동생(은성)', '이해성': '남동생(해성)',
+      '이하성': '사촌동생(하성)', '이주성': '사촌동생(주성)'
+    },
+    '이은성': {
+      '이정우': '친할아버지', '홍영숙': '친할머니',
+      '이서구': '증조할아버지', '방예선': '증조할머니', '박경희': '증외할머니',
+      '이진수': '아빠', '이아름': '엄마',
+      '이현수': '삼촌', '양슬기': '숙모',
+      '이준성': '형(준성)', '이해성': '남동생(해성)',
+      '이하성': '사촌동생(하성)', '이주성': '사촌동생(주성)'
+    },
+    '이해성': {
+      '이정우': '친할아버지', '홍영숙': '친할머니',
+      '이서구': '증조할아버지', '방예선': '증조할머니', '박경희': '증외할머니',
+      '이진수': '아빠', '이아름': '엄마',
+      '이현수': '삼촌', '양슬기': '숙모',
+      '이준성': '형(준성)', '이은성': '형(은성)',
+      '이하성': '사촌동생(하성)', '이주성': '사촌동생(주성)'
+    },
+    '이하성': {
+      '이정우': '친할아버지', '홍영숙': '친할머니',
+      '이서구': '증조할아버지', '방예선': '증조할머니', '박경희': '증외할머니',
+      '이진수': '큰아빠', '이아름': '큰엄마',
+      '이현수': '아빠', '양슬기': '엄마',
+      '이준성': '사촌형(준성)', '이은성': '사촌형(은성)', '이해성': '사촌형(해성)',
+      '이주성': '남동생(주성)'
+    },
+    '이주성': {
+      '이정우': '친할아버지', '홍영숙': '친할머니',
+      '이서구': '증조할아버지', '방예선': '증조할머니', '박경희': '증외할머니',
+      '이진수': '큰아빠', '이아름': '큰엄마',
+      '이현수': '아빠', '양슬기': '엄마',
+      '이준성': '사촌형(준성)', '이은성': '사촌형(은성)', '이해성': '사촌형(해성)',
+      '이하성': '형(하성)'
+    }
+  };
+
+  return relations[viewerName]?.[targetName] || targetName;
+};
+
+const getAnniversariesForYear = (year, anniversariesList, viewerName) => {
   if (!anniversariesList || anniversariesList.length === 0) return [];
   return anniversariesList.map(ann => {
-    const baseYear = Number(ann.year) || year;
-    const diff = year - baseYear;
+    const baseYear = Number(ann.year);
+    const hasYear = baseYear && baseYear > 0;
+    const diff = hasYear ? (year - baseYear) : null;
+    
     let titleSuffix = '';
-    if (diff > 0) {
+    if (diff !== null && diff > 0) {
       if (ann.type === 'birthday') {
-        titleSuffix = ` (${diff}회)`;
-      } else if (ann.type === 'memorial' || ann.type === 'ritual') {
-        titleSuffix = ` (${diff}주기)`;
+        titleSuffix = ` (만 ${diff}세)`;
+      }
+    }
+
+    const cleanName = ann.name.replace(/생일|생신|기일/g, '').trim();
+    const relationName = getFamilyRelationName(viewerName, cleanName);
+    
+    let formattedName = ann.name;
+    if (relationName !== cleanName) {
+      if (relationName === '나') {
+        formattedName = '내 생일';
       } else {
-        titleSuffix = ` (${diff}주년)`;
+        const suffix = ann.name.includes('생신') ? '생신' : (ann.name.includes('생일') ? '생일' : (ann.name.includes('기일') ? '기일' : ''));
+        formattedName = suffix ? `${relationName} ${suffix}` : `${relationName} (${ann.name})`;
       }
     }
 
@@ -169,11 +320,11 @@ const getAnniversariesForYear = (year, anniversariesList) => {
           const dayStr = String(result.cDay).padStart(2, '0');
           return {
             id: ann.id || `ann-${ann.name}-${year}`,
-            title: `${ann.name}${titleSuffix} (음력)`,
+            title: `${formattedName}${titleSuffix} (음력)`,
             dateStr: `${result.cYear}-${monthStr}-${dayStr}`,
             isAnniversary: true,
             isEvent: false,
-            name: ann.name,
+            name: formattedName,
             year: baseYear,
             month: ann.month,
             day: ann.day,
@@ -191,11 +342,11 @@ const getAnniversariesForYear = (year, anniversariesList) => {
       const dayStr = String(ann.day).padStart(2, '0');
       return {
         id: ann.id || `ann-${ann.name}-${year}`,
-        title: `${ann.name}${titleSuffix}`,
+        title: `${formattedName}${titleSuffix}`,
         dateStr: `${year}-${monthStr}-${dayStr}`,
         isAnniversary: true,
         isEvent: false,
-        name: ann.name,
+        name: formattedName,
         year: baseYear,
         month: ann.month,
         day: ann.day,
@@ -1652,7 +1803,7 @@ function App() {
               }
 
               const getCellEvents = (dateStr) => {
-                const yearAnniversaries = getAnniversariesForYear(year, anniversaries);
+                const yearAnniversaries = getAnniversariesForYear(year, anniversaries, currentUser?.name);
                 const cellAnniversaries = yearAnniversaries.filter(a => a.dateStr === dateStr);
 
                 const normalEvents = plans.filter(p => {
