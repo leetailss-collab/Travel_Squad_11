@@ -2564,14 +2564,14 @@ function App() {
                                   alignItems: 'center',
                                   justifyContent: 'center',
                                   color: 'var(--primary)',
-                                  fontSize: '0.75rem',
+                                  fontSize: '0.55rem',
                                   fontWeight: 'bold',
                                   backgroundColor: 'var(--bg-card)',
                                   borderRadius: '50%',
                                   border: '1px solid var(--border)',
                                   zIndex: 2
                                 }}>
-                                  ↓
+                                  ▼
                                 </div>
                                 
                                 <div style={{
