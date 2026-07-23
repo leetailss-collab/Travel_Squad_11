@@ -64,17 +64,17 @@ const detectTripCurrency = (title = '') => {
 
 // Pre-registered Family Users
 const FAM_USERS = [
-  { name: "이정우", pin: "570413", birth: "1957.04.13", engName: "LEE JUNG WOO", role: "user" },
-  { name: "홍영숙", pin: "630124", birth: "1963.01.24", engName: "HONG YOUNGSOOK", role: "user" },
-  { name: "이진수", pin: "850119", birth: "1985.01.19", engName: "LEE JINSOO", role: "user" },
-  { name: "이아름", pin: "880803", birth: "1988.08.03", engName: "LEE AHREUM", role: "user" },
-  { name: "이현수", pin: "870707", birth: "1987.07.07", engName: "LEE HYUNSOO", role: "admin" },
-  { name: "양슬기", pin: "871214", birth: "1987.12.14", engName: "YANG SEULGI", role: "user" },
-  { name: "이준성", pin: "110324", birth: "2011.03.24", engName: "LEE JUNSEONG", role: "user" },
-  { name: "이은성", pin: "130813", birth: "2013.08.13", engName: "LEE EUNSEONG", role: "user" },
-  { name: "이해성", pin: "200220", birth: "2020.02.20", engName: "LEE HAESEONG", role: "user" },
-  { name: "이하성", pin: "210930", birth: "2021.09.30", engName: "LEE HASEONG", role: "user" },
-  { name: "이주성", pin: "231110", birth: "2023.11.10", engName: "LEE JUSEONG", role: "user" }
+  { name: "이정우", pin: "570413", birth: "1957.04.13", engName: "LEE JUNG WOO", role: "user", isLunar: true },
+  { name: "홍영숙", pin: "630124", birth: "1963.01.24", engName: "HONG YOUNGSOOK", role: "user", isLunar: true },
+  { name: "이진수", pin: "850119", birth: "1985.01.19", engName: "LEE JINSOO", role: "user", isLunar: false },
+  { name: "이아름", pin: "880803", birth: "1988.08.03", engName: "LEE AHREUM", role: "user", isLunar: false },
+  { name: "이현수", pin: "870707", birth: "1987.07.07", engName: "LEE HYUNSOO", role: "admin", isLunar: false },
+  { name: "양슬기", pin: "871214", birth: "1987.12.14", engName: "YANG SEULGI", role: "user", isLunar: false },
+  { name: "이준성", pin: "110324", birth: "2011.03.24", engName: "LEE JUNSEONG", role: "user", isLunar: false },
+  { name: "이은성", pin: "130813", birth: "2013.08.13", engName: "LEE EUNSEONG", role: "user", isLunar: false },
+  { name: "이해성", pin: "200220", birth: "2020.02.20", engName: "LEE HAESEONG", role: "user", isLunar: false },
+  { name: "이하성", pin: "210930", birth: "2021.09.30", engName: "LEE HASEONG", role: "user", isLunar: false },
+  { name: "이주성", pin: "231110", birth: "2023.11.10", engName: "LEE JUSEONG", role: "user", isLunar: false }
 ];
 
 // Calculate international (man) age based on 6-digit YYMMDD pin
@@ -154,7 +154,7 @@ const getAnniversariesForYear = (year, anniversariesList) => {
     if (diff > 0) {
       if (ann.type === 'birthday') {
         titleSuffix = ` (${diff}회)`;
-      } else if (ann.type === 'memorial') {
+      } else if (ann.type === 'memorial' || ann.type === 'ritual') {
         titleSuffix = ` (${diff}주기)`;
       } else {
         titleSuffix = ` (${diff}주년)`;
@@ -634,8 +634,37 @@ function App() {
     try {
       const response = await fetch('/api/anniversaries');
       if (response.ok) {
-        const data = await response.json();
-        setAnniversaries(data);
+        const dbAnns = await response.json();
+        
+        // Generate virtual birthdays from FAM_USERS configuration (the single source of truth!)
+        const virtualBirthdays = FAM_USERS.map(user => {
+          const parts = user.birth.split('.').map(Number);
+          const y = parts[0];
+          const m = parts[1];
+          const d = parts[2];
+          const isElder = y < 1970;
+          return {
+            id: `virtual-birthday-${user.name}`,
+            name: isElder ? `${user.name}생신` : `${user.name}생일`,
+            year: y,
+            month: m,
+            day: d,
+            isLunar: user.isLunar || false,
+            type: 'birthday'
+          };
+        });
+
+        // Filter out database birthdays that correspond to family members in FAM_USERS to prevent duplication
+        const memberNames = FAM_USERS.map(u => u.name);
+        const filteredDbAnns = dbAnns.filter(ann => {
+          if (ann.type === 'birthday') {
+            const cleanName = ann.name.replace(/생일|생신/g, '').trim();
+            if (memberNames.includes(cleanName)) return false;
+          }
+          return true;
+        });
+
+        setAnniversaries([...filteredDbAnns, ...virtualBirthdays]);
       }
     } catch (err) {
       console.warn("Failed to fetch anniversaries:", err);
@@ -1576,13 +1605,7 @@ function App() {
           </header>
 
           <main className="app-content">
-            <button 
-              className="submit-btn" 
-              style={{ marginBottom: '24px' }} 
-              onClick={() => setShowAddTripModal(true)}
-            >
-              + 새 여행 만들기
-            </button>
+
 
             {/* 1. Monthly Calendar */}
             {(() => {
@@ -1779,7 +1802,11 @@ function App() {
                             >
                               <span>
                                 <span className={`event-type-tag ${e.isAnniversary ? 'anniversary' : (e.isEvent ? 'event' : 'trip')}`} style={{ marginRight: '6px' }}>
-                                  {e.isAnniversary ? '기념일' : (e.isEvent ? '행사' : '여행')}
+                                  {e.isAnniversary ? (
+                                    e.type === 'birthday' ? (e.name.includes('생신') ? '생신' : '생일') :
+                                    e.type === 'memorial' ? '기일' :
+                                    e.type === 'ritual' ? '제사' : '기념일'
+                                  ) : (e.isEvent ? '행사' : '여행')}
                                 </span>
                                 {e.title}
                               </span>
@@ -3447,6 +3474,7 @@ function App() {
                 <select className="form-control" value={newAnniversary.type} onChange={e => setNewAnniversary({ ...newAnniversary, type: e.target.value })}>
                   <option value="birthday">생일 (생신)</option>
                   <option value="memorial">기일 (사망일)</option>
+                  <option value="ritual">제사 (차례)</option>
                   <option value="other">기타 기념일</option>
                 </select>
               </div>
@@ -3496,6 +3524,7 @@ function App() {
                 <select className="form-control" value={editingAnniversary.type || 'other'} onChange={e => setEditingAnniversary({ ...editingAnniversary, type: e.target.value })}>
                   <option value="birthday">생일 (생신)</option>
                   <option value="memorial">기일 (사망일)</option>
+                  <option value="ritual">제사 (차례)</option>
                   <option value="other">기타 기념일</option>
                 </select>
               </div>
