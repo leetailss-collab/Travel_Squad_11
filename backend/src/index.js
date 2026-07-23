@@ -15,30 +15,45 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Multer storage config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-  }
-});
-const upload = multer({ storage: storage });
+// Multer storage config using memory storage
+const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(uploadsDir));
 
 // Upload Images API
-app.post('/api/upload', upload.array('files'), (req, res) => {
+app.post('/api/upload', upload.array('files'), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: '업로드할 파일이 없습니다.' });
     }
-    const filePaths = req.files.map(file => `/uploads/${file.filename}`);
+
+    const filePaths = [];
+    for (const file of req.files) {
+      // 1. Try uploading to Firebase Storage (Cloud)
+      console.log(`Uploading file ${file.originalname} to Firebase Storage...`);
+      const cloudUrl = await dbService.uploadFileToStorage(file);
+      
+      if (cloudUrl) {
+        console.log(`Upload successful (Firebase): ${cloudUrl}`);
+        filePaths.push(cloudUrl);
+      } else {
+        // 2. Fall back to saving locally on disk (Offline fallback)
+        console.warn(`Firebase Storage upload failed. Saving locally on disk...`);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        const ext = path.extname(file.originalname);
+        const filename = `${file.fieldname}-${uniqueSuffix}${ext}`;
+        
+        const localFilePath = path.join(uploadsDir, filename);
+        fs.writeFileSync(localFilePath, file.buffer);
+        
+        const localUrl = `/uploads/${filename}`;
+        console.log(`Local fallback save successful: ${localUrl}`);
+        filePaths.push(localUrl);
+      }
+    }
+
     res.json({ urls: filePaths });
   } catch (err) {
     console.error("Upload error:", err);

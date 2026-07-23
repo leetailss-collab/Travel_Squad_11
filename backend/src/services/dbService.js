@@ -1,11 +1,16 @@
 const { initializeApp, cert, getApps } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
+const { getStorage } = require('firebase-admin/storage');
 const fs = require('fs');
 const path = require('path');
+
+let isFirebaseInitialized = false;
+let bucket = null;
 
 // Initialize Firebase Admin SDK
 const initializeFirebase = () => {
   if (getApps().length > 0) {
+    isFirebaseInitialized = true;
     return;
   }
   const serviceAccountPath = path.join(__dirname, '../../firebase-service-account.json');
@@ -13,17 +18,91 @@ const initializeFirebase = () => {
   if (fs.existsSync(serviceAccountPath)) {
     console.log("Initializing Firebase with local service account key...");
     const serviceAccount = require(serviceAccountPath);
+    const projectId = serviceAccount.project_id;
+    // Set the default bucket name dynamically (preferring .firebasestorage.app)
+    const bucketName = process.env.FIREBASE_STORAGE_BUCKET || `${projectId}.firebasestorage.app`;
+    
     initializeApp({
-      credential: cert(serviceAccount)
+      credential: cert(serviceAccount),
+      storageBucket: bucketName
     });
+    isFirebaseInitialized = true;
   } else {
     console.log("Local service account key not found. Using Application Default Credentials (GCP)...");
     initializeApp();
+    isFirebaseInitialized = true;
   }
 };
 
 initializeFirebase();
 const db = getFirestore();
+
+if (isFirebaseInitialized) {
+  try {
+    bucket = getStorage().bucket();
+  } catch (err) {
+    console.error("Failed to initialize default Firebase Storage bucket:", err);
+  }
+}
+
+// Helper function to upload a file buffer to Firebase Storage and get a signed URL
+const uploadFileToStorage = async (file) => {
+  if (!isFirebaseInitialized) {
+    console.warn("Firebase is not initialized. Skipping cloud storage upload.");
+    return null;
+  }
+
+  // Helper function to perform GCS upload and sign URL
+  const attemptUpload = async (targetBucket) => {
+    if (!targetBucket) return null;
+    try {
+      const destination = `uploads/${Date.now()}-${Math.round(Math.random() * 1e9)}-${file.originalname}`;
+      const fileRef = targetBucket.file(destination);
+      
+      // Save buffer
+      await fileRef.save(file.buffer, {
+        metadata: {
+          contentType: file.mimetype,
+        }
+      });
+      
+      // Get signed URL that is valid for a long time (e.g. 50 years)
+      const [url] = await fileRef.getSignedUrl({
+        action: 'read',
+        expires: '03-09-2076' // Year 2076 (approx 50 years)
+      });
+      return url;
+    } catch (err) {
+      console.error(`Upload attempt failed for bucket ${targetBucket.name || 'unknown'}:`, err.message);
+      return null;
+    }
+  };
+
+  // 1. Try default bucket (.firebasestorage.app)
+  let uploadUrl = await attemptUpload(bucket);
+  if (uploadUrl) return uploadUrl;
+
+  // 2. If it failed and we haven't tried the fallback bucket, try it (.appspot.com)
+  try {
+    const serviceAccountPath = path.join(__dirname, '../../firebase-service-account.json');
+    if (fs.existsSync(serviceAccountPath)) {
+      const serviceAccount = require(serviceAccountPath);
+      const altBucketName = `${serviceAccount.project_id}.appspot.com`;
+      console.log(`Attempting fallback bucket: ${altBucketName}`);
+      const altBucket = getStorage().bucket(altBucketName);
+      const altUrl = await attemptUpload(altBucket);
+      if (altUrl) {
+        // Cache this bucket as the working one for future uploads
+        bucket = altBucket;
+        return altUrl;
+      }
+    }
+  } catch (e) {
+    console.error("Alternative bucket upload fallback failed:", e);
+  }
+
+  return null;
+};
 
 // 1. Authenticate user
 const authenticateUser = async (username, pin) => {
@@ -368,5 +447,6 @@ module.exports = {
   deleteAnniversary,
   getTrash,
   restorePlan,
-  deletePlanPermanently
+  deletePlanPermanently,
+  uploadFileToStorage
 };
