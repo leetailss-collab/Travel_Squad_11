@@ -2555,23 +2555,23 @@ function App() {
                               }}>
                                 <div style={{ 
                                   position: 'absolute', 
-                                  left: '-17px', 
+                                  left: '-18px', 
                                   top: '50%',
                                   transform: 'translateY(-50%)',
-                                  width: '12px',
-                                  height: '12px',
+                                  width: '14px',
+                                  height: '14px',
                                   display: 'flex',
+                                  flexDirection: 'column',
                                   alignItems: 'center',
                                   justifyContent: 'center',
                                   color: 'var(--primary)',
-                                  fontSize: '0.55rem',
-                                  fontWeight: 'bold',
                                   backgroundColor: 'var(--bg-card)',
                                   borderRadius: '50%',
                                   border: '1px solid var(--border)',
                                   zIndex: 2
                                 }}>
-                                  ▼
+                                  <span style={{ fontSize: '0.42rem', lineHeight: 1, display: 'block', height: '4px' }}>▼</span>
+                                  <span style={{ fontSize: '0.42rem', lineHeight: 1, display: 'block', height: '4px', marginTop: '-1px' }}>▼</span>
                                 </div>
                                 
                                 <div style={{
