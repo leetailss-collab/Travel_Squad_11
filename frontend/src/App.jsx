@@ -2402,7 +2402,13 @@ function App() {
                                       {place.transportType === '자차' && '🚗 '}
                                       {place.transportType === '도보' && '🚶 '}
                                       {place.transportType === '기타' && '🚇 '}
-                                      {place.transportType} {place.transportDuration ? `${place.transportDuration}분` : ''} 이동
+                                      {place.transportType} {place.transportDuration ? (() => {
+                                        const num = Number(place.transportDuration);
+                                        if (isNaN(num) || num <= 0) return '';
+                                        const hours = Math.floor(num / 60);
+                                        const mins = num % 60;
+                                        return hours > 0 ? `${hours}시간 ${mins > 0 ? `${mins}분` : ''}`.trim() : `${mins}분`;
+                                      })() : ''} 이동
                                     </span>
                                   ) : (
                                     <span 
@@ -3094,15 +3100,16 @@ function App() {
                     )}
                   </div>
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <div className="form-group" style={{ flex: 1.5 }}>
+                    <div className="form-group" style={{ flex: 1 }}>
+                      <label>통화</label>
+                      <select className="form-control" value={editingPlace.currency || planCurrency} onChange={e => setEditingPlace({ ...editingPlace, currency: e.target.value })}>
+                        <option value={planCurrency}>{planCurrencyMeta.symbol} {planCurrencyMeta.name}</option>
+                        {planCurrency !== 'KRW' && <option value="KRW">₩ 원</option>}
+                      </select>
+                    </div>
+                    <div className="form-group" style={{ flex: 2 }}>
                       <label>예상 비용 (선택사항)</label>
-                      <div className="cost-input-row" style={{ display: 'flex', gap: '4px' }}>
-                        <select className="form-control currency-select" style={{ flex: 'none', width: 'auto', minWidth: '85px' }} value={editingPlace.currency || planCurrency} onChange={e => setEditingPlace({ ...editingPlace, currency: e.target.value })}>
-                          <option value={planCurrency}>{planCurrencyMeta.symbol} {planCurrencyMeta.name}</option>
-                          {planCurrency !== 'KRW' && <option value="KRW">₩ 원</option>}
-                        </select>
-                        <input type="number" min="0" placeholder="금액 입력" className="form-control" value={editingPlace.estimatedCost || ''} onChange={e => setEditingPlace({ ...editingPlace, estimatedCost: e.target.value })} />
-                      </div>
+                      <input type="number" min="0" placeholder="금액 입력" className="form-control" value={editingPlace.estimatedCost || ''} onChange={e => setEditingPlace({ ...editingPlace, estimatedCost: e.target.value })} />
                       {editingPlace.estimatedCost && <div className="cost-preview" style={{ fontSize: '0.72rem', marginTop: '4px' }}>{formatCostComparison(editingPlace.estimatedCost, editingPlace.currency || planCurrency)}</div>}
                     </div>
                     <div className="form-group" style={{ flex: 1 }}>
