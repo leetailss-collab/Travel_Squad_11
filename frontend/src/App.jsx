@@ -245,6 +245,7 @@ function App() {
   const pressTimerRef = useRef(null);
   const addImgInputRef = useRef(null);
   const editImgInputRef = useRef(null);
+  const editMapImgInputRef = useRef(null);
   const [newCheck, setNewCheck] = useState({ title: '', assignee: '', category: '공통' });
   const [editingCheck, setEditingCheck] = useState(null);
   const [newExpense, setNewExpense] = useState({ title: '', amount: '', payer: '', date: '', category: '기타' });
@@ -925,15 +926,22 @@ function App() {
   };
 
   // Add uploaded URLs to the corresponding active form state (newPlace or editingPlace)
-  const handleImageAttach = async (files, isEdit = false) => {
+  const handleImageAttach = async (files, isEdit = false, isMap = false) => {
     const urls = await uploadImages(files);
     if (urls.length === 0) return;
     
     if (isEdit) {
-      setEditingPlace(prev => ({
-        ...prev,
-        images: [...(prev.images || []), ...urls]
-      }));
+      if (isMap) {
+        setEditingPlace(prev => ({
+          ...prev,
+          mapImages: [...(prev.mapImages || []), ...urls]
+        }));
+      } else {
+        setEditingPlace(prev => ({
+          ...prev,
+          images: [...(prev.images || []), ...urls]
+        }));
+      }
     } else {
       setNewPlace(prev => ({
         ...prev,
@@ -943,7 +951,7 @@ function App() {
   };
 
   // Paste Event Handler (Ctrl+V)
-  const handlePasteImages = (e, isEdit = false) => {
+  const handlePasteImages = (e, isEdit = false, isMap = false) => {
     const items = e.clipboardData?.items;
     if (!items) return;
     
@@ -956,33 +964,40 @@ function App() {
     }
     if (filesToUpload.length > 0) {
       e.preventDefault();
-      handleImageAttach(filesToUpload, isEdit);
+      handleImageAttach(filesToUpload, isEdit, isMap);
     }
   };
 
   // Drop Event Handler
-  const handleDropImages = (e, isEdit = false) => {
+  const handleDropImages = (e, isEdit = false, isMap = false) => {
     e.preventDefault();
     const files = e.dataTransfer?.files;
     if (!files || files.length === 0) return;
     
     const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
     if (imageFiles.length > 0) {
-      handleImageAttach(imageFiles, isEdit);
+      handleImageAttach(imageFiles, isEdit, isMap);
     }
   };
 
   // Remove single image from temporary list
-  const handleRemoveImage = (index, isEdit = false) => {
+  const handleRemoveImage = (index, isEdit = false, isMap = false) => {
     if (isEdit) {
-      setEditingPlace(prev => ({
-        ...prev,
-        images: prev.images.filter((_, i) => i !== index)
-      }));
+      if (isMap) {
+        setEditingPlace(prev => ({
+          ...prev,
+          mapImages: (prev.mapImages || []).filter((_, i) => i !== index)
+        }));
+      } else {
+        setEditingPlace(prev => ({
+          ...prev,
+          images: (prev.images || []).filter((_, i) => i !== index)
+        }));
+      }
     } else {
       setNewPlace(prev => ({
         ...prev,
-        images: prev.images.filter((_, i) => i !== index)
+        images: (prev.images || []).filter((_, i) => i !== index)
       }));
     }
   };
@@ -1164,6 +1179,7 @@ function App() {
           tip: editingPlace.tip,
           payer: payerValue,
           images: editingPlace.images || [],
+          mapImages: editingPlace.mapImages || [],
           transportType: editingPlace.transportType || '',
           transportDuration: editingPlace.transportDuration || ''
         };
@@ -2207,6 +2223,39 @@ function App() {
                                   </div>
                                 )}
 
+                                {place.mapImages && place.mapImages.length > 0 && (
+                                  <div className="timeline-map-gallery" style={{ marginTop: '8px' }}>
+                                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                      <span>🗺️ 첨부된 이동 경로 지도</span>
+                                    </div>
+                                    <div className="timeline-images-gallery" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '4px 0', scrollbarWidth: 'thin' }}>
+                                      {place.mapImages.map((url, imgIdx) => (
+                                        <img
+                                          key={imgIdx}
+                                          src={url}
+                                          alt={`${place.name} map ${imgIdx}`}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setLightboxImage(url);
+                                          }}
+                                          style={{
+                                            width: '120px',
+                                            height: '90px',
+                                            objectFit: 'cover',
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            border: '1px solid var(--border)',
+                                            flexShrink: 0,
+                                            transition: 'transform 0.2s'
+                                          }}
+                                          onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                                          onMouseLeave={(e) => e.target.style.transform = 'scale(1.0)'}
+                                        />
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
                                 {(place.estimatedCost > 0 || place.cost > 0) && (
                                   <div className="timeline-cost">
                                     💴 {formatCostComparison(place.estimatedCost ?? place.cost, place.currency || (place.estimatedCost ? planCurrency : 'KRW'))}
@@ -2917,22 +2966,30 @@ function App() {
                 </div>
                 <form onSubmit={handleEditItinerary}>
                   <div className="form-group">
-                    <label>시간 (HH:MM)</label>
-                    <input type="time" required className="form-control" value={editingPlace.time} onChange={e => setEditingPlace({ ...editingPlace, time: e.target.value })} />
-                  </div>
-                  <div className="form-group">
-                    <label>체류 시간 (점유 시간)</label>
-                    <select className="form-control" value={editingPlace.duration} onChange={e => setEditingPlace({ ...editingPlace, duration: Number(e.target.value) })}>
-                      <option value={0}>설정 안 함 (0분)</option>
-                      <option value={30}>30분</option>
-                      <option value={60}>1시간</option>
-                      <option value={90}>1시간 30분</option>
-                      <option value={120}>2시간</option>
-                      <option value={150}>2시간 30분</option>
-                      <option value={180}>3시간</option>
-                      <option value={240}>4시간</option>
-                      <option value={300}>5시간</option>
+                    <label>카테고리</label>
+                    <select className="form-control" value={editingPlace.category} onChange={e => setEditingPlace({ ...editingPlace, category: e.target.value })}>
+                      {['관광', '식사', '쇼핑', '이동', '숙소', '기타'].map(category => <option key={category} value={category}>{category}</option>)}
                     </select>
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <div className="form-group" style={{ flex: 1 }}>
+                      <label>시간 (HH:MM)</label>
+                      <input type="time" required className="form-control" value={editingPlace.time} onChange={e => setEditingPlace({ ...editingPlace, time: e.target.value })} />
+                    </div>
+                    <div className="form-group" style={{ flex: 1 }}>
+                      <label>체류 시간 (점유 시간)</label>
+                      <select className="form-control" value={editingPlace.duration} onChange={e => setEditingPlace({ ...editingPlace, duration: Number(e.target.value) })}>
+                        <option value={0}>설정 안 함 (0분)</option>
+                        <option value={30}>30분</option>
+                        <option value={60}>1시간</option>
+                        <option value={90}>1시간 30분</option>
+                        <option value={120}>2시간</option>
+                        <option value={150}>2시간 30분</option>
+                        <option value={180}>3시간</option>
+                        <option value={240}>4시간</option>
+                        <option value={300}>5시간</option>
+                      </select>
+                    </div>
                   </div>
                   <div className="form-group">
                     <label>장소/일정 이름</label>
@@ -2943,74 +3000,17 @@ function App() {
                     <input type="text" placeholder="예: 제주 제주시 조천읍 함덕리" className="form-control" value={editingPlace.address || ''} onChange={e => setEditingPlace({ ...editingPlace, address: e.target.value })} />
                   </div>
                   <div className="form-group">
-                    <label>카테고리</label>
-                    <select className="form-control" value={editingPlace.category} onChange={e => setEditingPlace({ ...editingPlace, category: e.target.value })}>
-                      {['관광', '식사', '쇼핑', '이동', '숙소', '기타'].map(category => <option key={category} value={category}>{category}</option>)}
-                    </select>
-                  </div>
-                  <div className="form-group">
                     <label>메모/설명</label>
                     <textarea placeholder="예: 바다 구경 및 망고주스 마시기" className="form-control" value={editingPlace.description || ''} onChange={e => setEditingPlace({ ...editingPlace, description: e.target.value })}></textarea>
                   </div>
-                  <div className="form-group">
-                    <label>예상 비용 (선택사항)</label>
-                    <div className="cost-input-row">
-                      <select className="form-control currency-select" value={editingPlace.currency || planCurrency} onChange={e => setEditingPlace({ ...editingPlace, currency: e.target.value })}>
-                        <option value={planCurrency}>{planCurrencyMeta.symbol} {planCurrencyMeta.name}</option>
-                        {planCurrency !== 'KRW' && <option value="KRW">₩ 원</option>}
-                      </select>
-                      <input type="number" min="0" placeholder="금액 입력" className="form-control" value={editingPlace.estimatedCost || ''} onChange={e => setEditingPlace({ ...editingPlace, estimatedCost: e.target.value })} />
-                    </div>
-                    {editingPlace.estimatedCost && <div className="cost-preview">{formatCostComparison(editingPlace.estimatedCost, editingPlace.currency || planCurrency)}</div>}
-                  </div>
-                  <label className="reservation-check">
-                    <input type="checkbox" checked={editingPlace.needsReservation || false} onChange={e => setEditingPlace({ ...editingPlace, needsReservation: e.target.checked })} />
-                    🎫 사전 예약이 필요한 일정
-                  </label>
-                  {editingPlace.needsReservation && (
-                    <label className="reservation-check" style={{ marginTop: '8px', marginLeft: '16px' }}>
-                      <input type="checkbox" checked={editingPlace.isReservationCompleted || false} onChange={e => setEditingPlace({ ...editingPlace, isReservationCompleted: e.target.checked })} />
-                      ✅ 예약 완료함
-                    </label>
-                  )}
-                  <div style={{ display: 'flex', gap: '12px', marginTop: '12px', marginBottom: '12px' }}>
-                    <div className="form-group" style={{ flex: 1.5, marginBottom: 0 }}>
-                      <label>다음 장소 이동 수단</label>
-                      <select className="form-control" value={editingPlace.transportType || ''} onChange={e => setEditingPlace({ ...editingPlace, transportType: e.target.value })}>
-                        <option value="">설정 안 함</option>
-                        <option value="대중교통">🚌 대중교통</option>
-                        <option value="자차">🚗 자차</option>
-                        <option value="도보">🚶 도보</option>
-                        <option value="기타">🚇 기타</option>
-                      </select>
-                    </div>
-                    <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                      <label>소요 시간 (분)</label>
-                      <input type="number" min="0" placeholder="예: 15" className="form-control" value={editingPlace.transportDuration || ''} onChange={e => setEditingPlace({ ...editingPlace, transportDuration: e.target.value })} />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label>팁/메모</label>
-                    <textarea placeholder="예: 해질 무렵 방문, 온라인 예매 권장" className="form-control" value={editingPlace.tip || ''} onChange={e => setEditingPlace({ ...editingPlace, tip: e.target.value })}></textarea>
-                  </div>
-                  <div className="form-group">
-                    <label>결제자</label>
-                    <select className="form-control" value={editingPlace.payer || currentUser.name} onChange={e => setEditingPlace({ ...editingPlace, payer: e.target.value })}>
-                      <option value="미지정">미지정</option>
-                      {plan.members.map((m, idx) => (
-                        <option key={idx} value={m}>{m}</option>
-                      ))}
-                    </select>
-                  </div>
-
                   <div className="form-group">
                     <label>📸 사진 첨부 (클릭하여 파일 선택 / Ctrl+V 붙여넣기 / 드래그앤드롭)</label>
                     <div 
                       className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
                       onClick={() => editImgInputRef.current?.click()}
                       onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => handleDropImages(e, true)}
-                      onPaste={(e) => handlePasteImages(e, true)}
+                      onDrop={(e) => handleDropImages(e, true, false)}
+                      onPaste={(e) => handlePasteImages(e, true, false)}
                       tabIndex={0}
                       style={{
                         border: '2px dashed var(--border)',
@@ -3035,7 +3035,7 @@ function App() {
                       accept="image/*" 
                       onChange={(e) => {
                         if (e.target.files && e.target.files.length > 0) {
-                          handleImageAttach(e.target.files, true);
+                          handleImageAttach(e.target.files, true, false);
                         }
                       }} 
                     />
@@ -3051,7 +3051,7 @@ function App() {
                             <button 
                               type="button" 
                               className="remove-img-btn" 
-                              onClick={() => handleRemoveImage(index, true)}
+                              onClick={() => handleRemoveImage(index, true, false)}
                               style={{
                                 position: 'absolute',
                                 top: '-6px',
@@ -3059,15 +3059,145 @@ function App() {
                                 width: '18px',
                                 height: '18px',
                                 borderRadius: '50%',
-                                  backgroundColor: 'rgba(0,0,0,0.6)',
-                                  color: '#fff',
-                                  border: 'none',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  cursor: 'pointer',
-                                  fontSize: '11px',
-                                  padding: 0
+                                backgroundColor: 'rgba(0,0,0,0.6)',
+                                color: '#fff',
+                                border: 'none',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                padding: 0
+                              }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>💡 팁/주의사항</label>
+                    <textarea placeholder="예: 해질 무렵 방문, 온라인 예매 권장" className="form-control" value={editingPlace.tip || ''} onChange={e => setEditingPlace({ ...editingPlace, tip: e.target.value })}></textarea>
+                  </div>
+                  <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap' }}>
+                    <label className="reservation-check" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={editingPlace.needsReservation || false} onChange={e => setEditingPlace({ ...editingPlace, needsReservation: e.target.checked })} />
+                      🎫 사전 예약이 필요한 일정
+                    </label>
+                    {editingPlace.needsReservation && (
+                      <label className="reservation-check" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={editingPlace.isReservationCompleted || false} onChange={e => setEditingPlace({ ...editingPlace, isReservationCompleted: e.target.checked })} />
+                        ✅ 예약 완료함
+                      </label>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    <div className="form-group" style={{ flex: 1.5 }}>
+                      <label>예상 비용 (선택사항)</label>
+                      <div className="cost-input-row" style={{ display: 'flex', gap: '4px' }}>
+                        <select className="form-control currency-select" style={{ flex: 'none', width: 'auto', minWidth: '85px' }} value={editingPlace.currency || planCurrency} onChange={e => setEditingPlace({ ...editingPlace, currency: e.target.value })}>
+                          <option value={planCurrency}>{planCurrencyMeta.symbol} {planCurrencyMeta.name}</option>
+                          {planCurrency !== 'KRW' && <option value="KRW">₩ 원</option>}
+                        </select>
+                        <input type="number" min="0" placeholder="금액 입력" className="form-control" value={editingPlace.estimatedCost || ''} onChange={e => setEditingPlace({ ...editingPlace, estimatedCost: e.target.value })} />
+                      </div>
+                      {editingPlace.estimatedCost && <div className="cost-preview" style={{ fontSize: '0.72rem', marginTop: '4px' }}>{formatCostComparison(editingPlace.estimatedCost, editingPlace.currency || planCurrency)}</div>}
+                    </div>
+                    <div className="form-group" style={{ flex: 1 }}>
+                      <label>결제자</label>
+                      <select className="form-control" value={editingPlace.payer || currentUser.name} onChange={e => setEditingPlace({ ...editingPlace, payer: e.target.value })}>
+                        <option value="미지정">미지정</option>
+                        {plan.members.map((m, idx) => (
+                          <option key={idx} value={m}>{m}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '4px', marginBottom: '12px' }}>
+                    <div className="form-group" style={{ flex: 1.5, marginBottom: 0 }}>
+                      <label>다음 장소 이동 수단</label>
+                      <select className="form-control" value={editingPlace.transportType || ''} onChange={e => setEditingPlace({ ...editingPlace, transportType: e.target.value })}>
+                        <option value="">설정 안 함</option>
+                        <option value="대중교통">🚌 대중교통</option>
+                        <option value="자차">🚗 자차</option>
+                        <option value="도보">🚶 도보</option>
+                        <option value="기타">🚇 기타</option>
+                      </select>
+                    </div>
+                    <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                      <label>소요 시간 (분)</label>
+                      <input type="number" min="0" placeholder="예: 15" className="form-control" value={editingPlace.transportDuration || ''} onChange={e => setEditingPlace({ ...editingPlace, transportDuration: e.target.value })} />
+                    </div>
+                  </div>
+                  
+                  {/* 지도 첨부 기능 추가 */}
+                  <div className="form-group">
+                    <label>🗺️ 경로 지도 이미지 첨부 (지도 연동 대비 캡처 이미지)</label>
+                    <div 
+                      className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
+                      onClick={() => editMapImgInputRef.current?.click()}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => handleDropImages(e, true, true)}
+                      onPaste={(e) => handlePasteImages(e, true, true)}
+                      tabIndex={0}
+                      style={{
+                        border: '2px dashed var(--border)',
+                        borderRadius: '8px',
+                        padding: '16px',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        backgroundColor: 'var(--bg-muted, #f9f9f9)',
+                        transition: 'all 0.2s',
+                        outline: 'none',
+                        fontSize: '0.85rem',
+                        color: 'var(--text-muted)'
+                      }}
+                    >
+                      {uploading ? '⏳ 지도 업로드 중...' : '🗺️ 복사한 지도 이미지를 여기에 붙여넣거나 클릭해서 업로드'}
+                    </div>
+                    <input 
+                      type="file" 
+                      ref={editMapImgInputRef} 
+                      style={{ display: 'none' }} 
+                      multiple 
+                      accept="image/*" 
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          handleImageAttach(e.target.files, true, true);
+                        }
+                      }} 
+                    />
+                    {editingPlace.mapImages && editingPlace.mapImages.length > 0 && (
+                      <div className="image-preview-container" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
+                        {editingPlace.mapImages.map((url, index) => (
+                          <div key={index} className="image-preview-wrapper" style={{ position: 'relative', width: '80px', height: '60px' }}>
+                            <img 
+                              src={url} 
+                              alt="map preview" 
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border)' }} 
+                            />
+                            <button 
+                              type="button" 
+                              className="remove-img-btn" 
+                              onClick={() => handleRemoveImage(index, true, true)}
+                              style={{
+                                position: 'absolute',
+                                top: '-6px',
+                                right: '-6px',
+                                width: '18px',
+                                height: '18px',
+                                borderRadius: '50%',
+                                backgroundColor: 'rgba(0,0,0,0.6)',
+                                color: '#fff',
+                                border: 'none',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                padding: 0
                               }}
                             >
                               ×
