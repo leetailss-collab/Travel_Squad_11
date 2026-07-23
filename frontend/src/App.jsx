@@ -2770,7 +2770,7 @@ function App() {
                         </select>
                         <input type="number" min="0" placeholder="금액 입력" className="form-control" value={newPlace.estimatedCost} onChange={e => setNewPlace({ ...newPlace, estimatedCost: e.target.value })} />
                       </div>
-                      {newPlace.estimatedCost && <div className="cost-preview">{formatCostComparison(newPlace.estimatedCost, newPlace.currency || planCurrency)}</div>}
+                      {Number(newPlace.estimatedCost) > 0 && <div className="cost-preview">{formatCostComparison(newPlace.estimatedCost, newPlace.currency || planCurrency)}</div>}
                     </div>
                     <label className="reservation-check">
                       <input type="checkbox" checked={newPlace.needsReservation} onChange={e => setNewPlace({ ...newPlace, needsReservation: e.target.checked })} />
@@ -3110,7 +3110,7 @@ function App() {
                     <div className="form-group" style={{ flex: 2 }}>
                       <label>예상 비용 (선택사항)</label>
                       <input type="number" min="0" placeholder="금액 입력" className="form-control" value={editingPlace.estimatedCost || ''} onChange={e => setEditingPlace({ ...editingPlace, estimatedCost: e.target.value })} />
-                      {editingPlace.estimatedCost && <div className="cost-preview" style={{ fontSize: '0.72rem', marginTop: '4px' }}>{formatCostComparison(editingPlace.estimatedCost, editingPlace.currency || planCurrency)}</div>}
+                      {Number(editingPlace.estimatedCost) > 0 && <div className="cost-preview" style={{ fontSize: '0.72rem', marginTop: '4px' }}>{formatCostComparison(editingPlace.estimatedCost, editingPlace.currency || planCurrency)}</div>}
                     </div>
                     <div className="form-group" style={{ flex: 1 }}>
                       <label>결제자</label>
