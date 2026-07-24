@@ -2596,19 +2596,20 @@ function App() {
                                 {place.description && <div className="timeline-desc">{place.description}</div>}
                                 
                                 {place.images && place.images.length > 0 && (
-                                  place.images.length === 1 ? (
-                                    <div className="timeline-images-gallery" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '8px 0', scrollbarWidth: 'thin' }}>
+                                  <div className="timeline-images-gallery" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '8px 0', scrollbarWidth: 'thin' }}>
+                                    {place.images.map((imgUrl, imgIdx) => (
                                       <img
-                                        src={place.images[0]}
-                                        alt={`${place.name}`}
+                                        key={imgIdx}
+                                        src={imgUrl}
+                                        alt={`${place.name} ${imgIdx + 1}`}
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           setLightboxImagesList(place.images);
-                                          setLightboxActiveIndex(0);
+                                          setLightboxActiveIndex(imgIdx);
                                         }}
                                         style={{
-                                          width: '100px',
-                                          height: '100px',
+                                          width: '90px',
+                                          height: '90px',
                                           objectFit: 'cover',
                                           borderRadius: '8px',
                                           cursor: 'pointer',
@@ -2619,62 +2620,8 @@ function App() {
                                         onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
                                         onMouseLeave={(e) => e.target.style.transform = 'scale(1.0)'}
                                       />
-                                    </div>
-                                  ) : (
-                                    (() => {
-                                      const activeIdx = activeImageIndexes[place.id] || 0;
-                                      return (
-                                        <div 
-                                          className="card-image-slider" 
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setLightboxImagesList(place.images);
-                                            setLightboxActiveIndex(activeIdx);
-                                          }}
-                                        >
-                                          <img
-                                            src={place.images[activeIdx]}
-                                            alt={`${place.name} ${activeIdx}`}
-                                            className="slider-img"
-                                          />
-                                          <button
-                                            type="button"
-                                            className="slider-btn slider-btn-left"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              const newIdx = (activeIdx - 1 + place.images.length) % place.images.length;
-                                              setActiveImageIndexes({ ...activeImageIndexes, [place.id]: newIdx });
-                                            }}
-                                          >
-                                            ‹
-                                          </button>
-                                          <button
-                                            type="button"
-                                            className="slider-btn slider-btn-right"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              const newIdx = (activeIdx + 1) % place.images.length;
-                                              setActiveImageIndexes({ ...activeImageIndexes, [place.id]: newIdx });
-                                            }}
-                                          >
-                                            ›
-                                          </button>
-                                          <div className="slider-indicators">
-                                            {place.images.map((_, i) => (
-                                              <span
-                                                key={i}
-                                                className={`indicator-dot ${i === activeIdx ? 'active' : ''}`}
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  setActiveImageIndexes({ ...activeImageIndexes, [place.id]: i });
-                                                }}
-                                              />
-                                            ))}
-                                          </div>
-                                        </div>
-                                      );
-                                    })()
-                                  )
+                                    ))}
+                                  </div>
                                 )}
 
                                 {place.mapImages && place.mapImages.length > 0 && (
