@@ -13,10 +13,12 @@ const initializeFirebase = () => {
     isFirebaseInitialized = true;
     return;
   }
-  const serviceAccountPath = path.join(__dirname, '../../firebase-service-account.json');
+  const backendPath = path.join(__dirname, '../firebase-service-account.json');
+  const rootPath = path.join(__dirname, '../../firebase-service-account.json');
+  const serviceAccountPath = fs.existsSync(backendPath) ? backendPath : (fs.existsSync(rootPath) ? rootPath : null);
   
-  if (fs.existsSync(serviceAccountPath)) {
-    console.log("Initializing Firebase with local service account key...");
+  if (serviceAccountPath) {
+    console.log(`Initializing Firebase with service account key found at: ${serviceAccountPath}`);
     const serviceAccount = require(serviceAccountPath);
     const projectId = serviceAccount.project_id;
     // Set the default bucket name dynamically (preferring .firebasestorage.app)
@@ -84,8 +86,10 @@ const uploadFileToStorage = async (file) => {
 
   // 2. If it failed and we haven't tried the fallback bucket, try it (.appspot.com)
   try {
-    const serviceAccountPath = path.join(__dirname, '../../firebase-service-account.json');
-    if (fs.existsSync(serviceAccountPath)) {
+    const backendPath = path.join(__dirname, '../firebase-service-account.json');
+    const rootPath = path.join(__dirname, '../../firebase-service-account.json');
+    const serviceAccountPath = fs.existsSync(backendPath) ? backendPath : (fs.existsSync(rootPath) ? rootPath : null);
+    if (serviceAccountPath) {
       const serviceAccount = require(serviceAccountPath);
       const altBucketName = `${serviceAccount.project_id}.appspot.com`;
       console.log(`Attempting fallback bucket: ${altBucketName}`);
