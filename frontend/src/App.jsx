@@ -2550,15 +2550,16 @@ function App() {
                                     <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                       <span>🗺️ 첨부된 이동 경로 지도</span>
                                     </div>
-                                    {place.mapImages.length === 1 ? (
-                                      <div className="timeline-images-gallery" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '4px 0', scrollbarWidth: 'thin' }}>
+                                    <div className="timeline-images-gallery" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '4px 0', scrollbarWidth: 'thin' }}>
+                                      {place.mapImages.map((imgUrl, imgIdx) => (
                                         <img
-                                          src={place.mapImages[0]}
-                                          alt={`${place.name} map`}
+                                          key={imgIdx}
+                                          src={imgUrl}
+                                          alt={`${place.name} map ${imgIdx + 1}`}
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             setLightboxImagesList(place.mapImages);
-                                            setLightboxActiveIndex(0);
+                                            setLightboxActiveIndex(imgIdx);
                                           }}
                                           style={{
                                             width: '120px',
@@ -2573,65 +2574,8 @@ function App() {
                                           onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
                                           onMouseLeave={(e) => e.target.style.transform = 'scale(1.0)'}
                                         />
-                                      </div>
-                                    ) : (
-                                      (() => {
-                                        const activeIdx = activeMapImageIndexes[place.id] || 0;
-                                        return (
-                                          <div 
-                                            className="card-map-slider" 
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              setLightboxImagesList(place.mapImages);
-                                              setLightboxActiveIndex(activeIdx);
-                                            }}
-                                          >
-                                            <img
-                                              src={place.mapImages[activeIdx]}
-                                              alt={`${place.name} map ${activeIdx}`}
-                                              className="map-slider-img"
-                                            />
-                                            <button
-                                              type="button"
-                                              className="slider-btn slider-btn-left"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                const newIdx = (activeIdx - 1 + place.mapImages.length) % place.mapImages.length;
-                                                setActiveMapImageIndexes({ ...activeMapImageIndexes, [place.id]: newIdx });
-                                              }}
-                                              style={{ width: '28px', height: '28px', fontSize: '1rem' }}
-                                            >
-                                              ‹
-                                            </button>
-                                            <button
-                                              type="button"
-                                              className="slider-btn slider-btn-right"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                const newIdx = (activeIdx + 1) % place.mapImages.length;
-                                                setActiveMapImageIndexes({ ...activeMapImageIndexes, [place.id]: newIdx });
-                                              }}
-                                              style={{ width: '28px', height: '28px', fontSize: '1rem' }}
-                                            >
-                                              ›
-                                            </button>
-                                            <div className="slider-indicators" style={{ bottom: '8px', padding: '2px 6px' }}>
-                                              {place.mapImages.map((_, i) => (
-                                                <span
-                                                  key={i}
-                                                  className={`indicator-dot ${i === activeIdx ? 'active' : ''}`}
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setActiveMapImageIndexes({ ...activeMapImageIndexes, [place.id]: i });
-                                                  }}
-                                                  style={{ width: '5px', height: '5px' }}
-                                                />
-                                              ))}
-                                            </div>
-                                          </div>
-                                        );
-                                      })()
-                                    )}
+                                      ))}
+                                    </div>
                                   </div>
                                 )}
 
