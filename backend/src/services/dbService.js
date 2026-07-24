@@ -348,6 +348,64 @@ const addComment = async (planId, placeId, author, text) => {
   }
 };
 
+// 7b. Edit Comment inside a place in the itinerary
+const editComment = async (planId, placeId, commentId, newText) => {
+  try {
+    const planData = await getPlanById(planId);
+    if (!planData) return null;
+    
+    let foundComment = null;
+    for (const dayItem of planData.itinerary) {
+      const place = dayItem.places.find(p => p.id === placeId);
+      if (place && place.comments) {
+        foundComment = place.comments.find(c => c.id === Number(commentId));
+        if (foundComment) break;
+      }
+    }
+    
+    if (!foundComment) return null;
+    
+    foundComment.text = newText;
+    
+    const targetCollection = planData.isEvent ? 'events' : 'plans';
+    await db.collection(targetCollection).doc(String(planId)).set(planData);
+    return planData;
+  } catch (err) {
+    console.error(`Error editing comment ${commentId} in plan/event ${planId}, place ${placeId}:`, err);
+    throw err;
+  }
+};
+
+// 7c. Delete Comment inside a place in the itinerary
+const deleteComment = async (planId, placeId, commentId) => {
+  try {
+    const planData = await getPlanById(planId);
+    if (!planData) return null;
+    
+    let updated = false;
+    for (const dayItem of planData.itinerary) {
+      const place = dayItem.places.find(p => p.id === placeId);
+      if (place && place.comments) {
+        const initialLength = place.comments.length;
+        place.comments = place.comments.filter(c => c.id !== Number(commentId));
+        if (place.comments.length !== initialLength) {
+          updated = true;
+          break;
+        }
+      }
+    }
+    
+    if (!updated) return null;
+    
+    const targetCollection = planData.isEvent ? 'events' : 'plans';
+    await db.collection(targetCollection).doc(String(planId)).set(planData);
+    return planData;
+  } catch (err) {
+    console.error(`Error deleting comment ${commentId} in plan/event ${planId}, place ${placeId}:`, err);
+    throw err;
+  }
+};
+
 // 8. Add itinerary place (checks 'plans' and 'events')
 const addPlace = async (planId, day, date, places) => {
   try {
@@ -441,6 +499,8 @@ module.exports = {
   deletePlan,
   syncPlan,
   addComment,
+  editComment,
+  deleteComment,
   addPlace,
   getAnniversaries,
   saveAnniversary,

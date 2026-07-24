@@ -197,6 +197,47 @@ app.post('/api/plans/:id/places/:placeId/comments', async (req, res) => {
   }
 });
 
+// Edit Place Comment API
+app.put('/api/plans/:id/places/:placeId/comments/:commentId', async (req, res) => {
+  const planId = parseInt(req.params.id);
+  const placeId = parseInt(req.params.placeId);
+  const commentId = parseInt(req.params.commentId);
+  const { text } = req.body;
+
+  if (!text) {
+    return res.status(400).json({ message: "내용이 필요합니다." });
+  }
+
+  try {
+    const updatedPlan = await dbService.editComment(planId, placeId, commentId, text);
+    if (!updatedPlan) {
+      return res.status(404).json({ message: "여행 계획 또는 댓글을 찾을 수 없습니다." });
+    }
+    res.json(updatedPlan);
+  } catch (err) {
+    console.error("Edit comment error:", err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+// Delete Place Comment API
+app.delete('/api/plans/:id/places/:placeId/comments/:commentId', async (req, res) => {
+  const planId = parseInt(req.params.id);
+  const placeId = parseInt(req.params.placeId);
+  const commentId = parseInt(req.params.commentId);
+
+  try {
+    const updatedPlan = await dbService.deleteComment(planId, placeId, commentId);
+    if (!updatedPlan) {
+      return res.status(404).json({ message: "여행 계획 또는 댓글을 찾을 수 없습니다." });
+    }
+    res.json(updatedPlan);
+  } catch (err) {
+    console.error("Delete comment error:", err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
 // Add itinerary place helper
 app.post('/api/plans/:id/itinerary', async (req, res) => {
   const planId = parseInt(req.params.id);
