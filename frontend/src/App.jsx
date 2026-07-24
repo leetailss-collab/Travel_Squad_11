@@ -393,6 +393,7 @@ function App() {
   });
 
   const [editingPlace, setEditingPlace] = useState(null); // Place object currently being edited
+  const [openMenuPlaceId, setOpenMenuPlaceId] = useState(null); // Place ID of active kebab menu
   const [uploading, setUploading] = useState(false);
   const [lightboxImagesList, setLightboxImagesList] = useState([]); // Array of image URLs
   const [lightboxActiveIndex, setLightboxActiveIndex] = useState(0); // Current active image index in lightbox
@@ -441,6 +442,12 @@ function App() {
   const [selectedDayFilter, setSelectedDayFilter] = useState('all');
   const [selectedChecklistFilter, setSelectedChecklistFilter] = useState('all');
   const [selectedExpenseFilter, setSelectedExpenseFilter] = useState('all');
+
+  useEffect(() => {
+    const handleClickOutside = () => setOpenMenuPlaceId(null);
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, []);
 
   const openConfirm = (title, message, onConfirm) => {
     setConfirmModal({
@@ -2435,17 +2442,6 @@ function App() {
                                 <div className="timeline-dot"></div>
                               <div 
                                 className="timeline-content"
-                                onMouseDown={(e) => handleStartPress(e, place)}
-                                onMouseUp={(e) => handleCancelPress(e)}
-                                onMouseLeave={(e) => handleCancelPress(e)}
-                                onTouchStart={(e) => handleStartPress(e, place)}
-                                onTouchEnd={(e) => handleCancelPress(e)}
-                                onTouchMove={(e) => handleCancelPress(e)}
-                                onDoubleClick={(e) => {
-                                  e.stopPropagation();
-                                  setEditingPlace({ ...place, duration: place.duration || 0 });
-                                }}
-                                title="더블클릭 또는 길게 눌러 일정 수정"
                               >
                                 <div className="timeline-time">
                                   {place.time}
@@ -2457,9 +2453,145 @@ function App() {
                                     </span>
                                   )}
                                 </div>
-                                <div className="timeline-title-row">
-                                  <div className="timeline-place">{place.name}</div>
-                                  {place.category && <span className={`category-badge category-${place.category}`}>{place.category}</span>}
+                                <div className="timeline-title-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                                    <div className="timeline-place">{place.name}</div>
+                                    {place.category && <span className={`category-badge category-${place.category}`}>{place.category}</span>}
+                                  </div>
+
+                                  {/* Kebab More Menu Button (⋮) */}
+                                  <div className="place-menu-container" style={{ position: 'relative' }}>
+                                    <button
+                                      type="button"
+                                      className="place-menu-btn"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setOpenMenuPlaceId(openMenuPlaceId === place.id ? null : place.id);
+                                      }}
+                                      style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        fontSize: '1.2rem',
+                                        fontWeight: 'bold',
+                                        cursor: 'pointer',
+                                        padding: '2px 8px',
+                                        color: 'var(--text-muted)',
+                                        borderRadius: '4px',
+                                        lineHeight: 1
+                                      }}
+                                      title="일정 옵션 메뉴 (수정 / 복사 / 삭제)"
+                                    >
+                                      ⋮
+                                    </button>
+
+                                    {openMenuPlaceId === place.id && (
+                                      <div
+                                        className="place-menu-dropdown"
+                                        onClick={(e) => e.stopPropagation()}
+                                        style={{
+                                          position: 'absolute',
+                                          right: 0,
+                                          top: '100%',
+                                          marginTop: '4px',
+                                          background: 'var(--bg-card)',
+                                          border: '1px solid var(--border)',
+                                          borderRadius: '8px',
+                                          boxShadow: 'var(--shadow-md)',
+                                          zIndex: 100,
+                                          minWidth: '130px',
+                                          overflow: 'hidden'
+                                        }}
+                                      >
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setOpenMenuPlaceId(null);
+                                            setEditingPlace({ ...place, duration: place.duration || 0 });
+                                          }}
+                                          style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            width: '100%',
+                                            padding: '10px 14px',
+                                            background: 'none',
+                                            border: 'none',
+                                            fontSize: '0.82rem',
+                                            color: 'var(--text)',
+                                            cursor: 'pointer',
+                                            textAlign: 'left'
+                                          }}
+                                        >
+                                          ✏️ 일정 수정
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setOpenMenuPlaceId(null);
+                                            setNewPlace({
+                                              day: dayItem.day,
+                                              time: place.time,
+                                              duration: place.duration || 60,
+                                              name: `${place.name} (복사)`,
+                                              address: place.address || '',
+                                              category: place.category || '관광',
+                                              description: place.description || '',
+                                              tip: place.tip || '',
+                                              needsReservation: place.needsReservation || false,
+                                              isReservationCompleted: place.isReservationCompleted || false,
+                                              estimatedCost: place.estimatedCost || place.cost || 0,
+                                              currency: place.currency || planCurrency,
+                                              payer: place.payer || '미지정',
+                                              transportType: place.transportType || '',
+                                              transportDuration: place.transportDuration || '',
+                                              images: place.images ? [...place.images] : [],
+                                              mapImages: place.mapImages ? [...place.mapImages] : []
+                                            });
+                                            setShowAddPlaceModal(true);
+                                          }}
+                                          style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            width: '100%',
+                                            padding: '10px 14px',
+                                            background: 'none',
+                                            border: 'none',
+                                            fontSize: '0.82rem',
+                                            color: 'var(--text)',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                            borderTop: '1px solid var(--border)'
+                                          }}
+                                        >
+                                          📋 일정 복사
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setOpenMenuPlaceId(null);
+                                            handleDeletePlace(dayItem.day, place.id);
+                                          }}
+                                          style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            width: '100%',
+                                            padding: '10px 14px',
+                                            background: 'none',
+                                            border: 'none',
+                                            fontSize: '0.82rem',
+                                            color: '#ef4444',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                            borderTop: '1px solid var(--border)'
+                                          }}
+                                        >
+                                          🗑️ 일정 삭제
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                                 {place.description && <div className="timeline-desc">{place.description}</div>}
                                 
@@ -3815,7 +3947,31 @@ function App() {
                 </div> {/* Close modal-body */}
                   <div className="modal-footer">
                     <button type="button" className="btn-secondary-sm" onClick={() => setEditingPlace(null)} style={{ margin: 0, padding: '12px' }}>취소</button>
-                    <button type="button" className="delete-btn-danger" onClick={() => handleDeletePlace(editingPlace.id)} style={{ width: 'auto', marginTop: 0, padding: '12px 16px' }}>일정 삭제</button>
+                    <button type="button" className="btn-secondary-sm" onClick={() => {
+                      const copyTarget = { ...editingPlace };
+                      setEditingPlace(null);
+                      setNewPlace({
+                        day: copyTarget.day || 1,
+                        time: copyTarget.time || '',
+                        duration: copyTarget.duration || 60,
+                        name: `${copyTarget.name || ''} (복사)`,
+                        address: copyTarget.address || '',
+                        category: copyTarget.category || '관광',
+                        description: copyTarget.description || '',
+                        tip: copyTarget.tip || '',
+                        needsReservation: copyTarget.needsReservation || false,
+                        isReservationCompleted: copyTarget.isReservationCompleted || false,
+                        estimatedCost: copyTarget.estimatedCost || copyTarget.cost || 0,
+                        currency: copyTarget.currency || planCurrency,
+                        payer: copyTarget.payer || '미지정',
+                        transportType: copyTarget.transportType || '',
+                        transportDuration: copyTarget.transportDuration || '',
+                        images: copyTarget.images ? [...copyTarget.images] : [],
+                        mapImages: copyTarget.mapImages ? [...copyTarget.mapImages] : []
+                      });
+                      setShowAddPlaceModal(true);
+                    }} style={{ margin: 0, padding: '12px 14px', background: 'var(--bg-main)', border: '1px solid var(--border)', color: 'var(--text)' }}>📋 복사하여 신규 추가</button>
+                    <button type="button" className="delete-btn-danger" onClick={() => handleDeletePlace(editingPlace.id)} style={{ width: 'auto', marginTop: 0, padding: '12px 16px' }}>삭제</button>
                     <button type="submit" className="submit-btn" style={{ flex: 1, margin: 0, padding: '12px' }}>수정 완료</button>
                   </div>
                 </form>
