@@ -61,6 +61,60 @@ app.post('/api/upload', upload.array('files'), async (req, res) => {
   }
 });
 
+// Naver Geocoding Proxy API
+app.get('/api/geocoding', (req, res) => {
+  const { query } = req.query;
+  if (!query) {
+    return res.status(400).json({ message: 'Query parameter is required' });
+  }
+
+  const clientId = process.env.NAVER_CLIENT_ID;
+  const clientSecret = process.env.NAVER_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) {
+    return res.status(500).json({ message: 'Naver API keys are not configured on server' });
+  }
+
+  const https = require('https');
+  const options = {
+    hostname: 'naveropenapi.apigw.ntruss.com',
+    path: `/map-geocode/v2/geocode?query=${encodeURIComponent(query)}`,
+    method: 'GET',
+    headers: {
+      'X-NCP-APIGW-API-KEY-ID': clientId,
+      'X-NCP-APIGW-API-KEY': clientSecret
+    }
+  };
+
+  const apiReq = https.request(options, (apiRes) => {
+    let data = '';
+    apiRes.on('data', (chunk) => { data += chunk; });
+    apiRes.on('end', () => {
+      try {
+        const json = JSON.parse(data);
+        if (json.addresses && json.addresses.length > 0) {
+          const addr = json.addresses[0];
+          return res.json({
+            lat: parseFloat(addr.y),
+            lng: parseFloat(addr.x),
+            address: addr.roadAddress || addr.jibunAddress || addr.englishAddress
+          });
+        }
+        return res.json({ lat: null, lng: null });
+      } catch (e) {
+        return res.status(500).json({ message: 'Error parsing geocoding response' });
+      }
+    });
+  });
+
+  apiReq.on('error', (err) => {
+    console.error('Naver Geocoding request error:', err);
+    return res.status(500).json({ message: 'Geocoding request failed' });
+  });
+
+  apiReq.end();
+});
+
 // Authentication API
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;

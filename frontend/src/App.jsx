@@ -2896,16 +2896,30 @@ function App() {
                                       if (planCurrency === 'KRW') {
                                         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                                         
-                                        // Geocoding helper using free Nominatim service
+                                        // Official Naver Geocoding Helper with Nominatim fallback
                                         const fetchCoords = async (query) => {
                                           try {
+                                            // 1. Try Official Naver Geocoding API via Backend Proxy
+                                            const nRes = await fetch(`/api/geocoding?query=${encodeURIComponent(query)}`);
+                                            if (nRes.ok) {
+                                              const nData = await nRes.json();
+                                              if (nData && nData.lat && nData.lng) {
+                                                return { lat: nData.lat, lng: nData.lng };
+                                              }
+                                            }
+                                          } catch (e) {
+                                            console.warn('Backend Naver Geocoding proxy error, trying fallback:', e);
+                                          }
+                                          
+                                          try {
+                                            // 2. Fallback to OpenStreetMap Nominatim
                                             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=kr`);
                                             const data = await res.json();
                                             if (data && data.length > 0) {
                                               return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
                                             }
                                           } catch (err) {
-                                            console.error('Geocoding error:', err);
+                                            console.error('Geocoding fallback error:', err);
                                           }
                                           return null;
                                         };
