@@ -2936,11 +2936,12 @@ function App() {
                                         ]);
 
                                         const appType = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'public');
+                                        const naverWebMode = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'transit');
 
                                         if (sCoords && dCoords) {
                                           if (isMobile) {
                                             const appUrl = `nmap://route/${appType}?slat=${sCoords.lat}&slng=${sCoords.lng}&sname=${encodeURIComponent(sname)}&dlat=${dCoords.lat}&dlng=${dCoords.lng}&dname=${encodeURIComponent(dname)}&appname=travelsquad`;
-                                            const webFallback = `https://map.naver.com/index.nhn?slng=${sCoords.lng}&slat=${sCoords.lat}&stext=${encodeURIComponent(sname)}&elng=${dCoords.lng}&elat=${dCoords.lat}&etext=${encodeURIComponent(dname)}&menu=route`;
+                                            const webFallback = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(sname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(dname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
                                             
                                             const start = Date.now();
                                             window.location.href = appUrl;
@@ -2950,7 +2951,7 @@ function App() {
                                               }
                                             }, 1000);
                                           } else {
-                                            const pcUrl = `https://map.naver.com/index.nhn?slng=${sCoords.lng}&slat=${sCoords.lat}&stext=${encodeURIComponent(sname)}&elng=${dCoords.lng}&elat=${dCoords.lat}&etext=${encodeURIComponent(dname)}&menu=route`;
+                                            const pcUrl = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(sname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(dname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
                                             window.open(pcUrl, '_blank');
                                           }
                                         } else {
