@@ -2882,39 +2882,79 @@ function App() {
 
                                   {/* Maps link */}
                                   <a
-                                    href={planCurrency === 'KRW'
-                                      ? `https://map.naver.com/p/directions/-/-/-/${place.transportType === '자차' ? 'car' : (place.transportType === '도보' ? 'walk' : 'transit')}?stext=${encodeURIComponent(place.address || place.name)}&etext=${encodeURIComponent(dayItem.places[idx+1].address || dayItem.places[idx+1].name)}&menu=route`
-                                      : `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(place.address || place.name)}&destination=${encodeURIComponent(dayItem.places[idx+1].address || dayItem.places[idx+1].name)}&travelmode=${place.transportType === '자차' ? 'driving' : (place.transportType === '도보' ? 'walking' : 'transit')}`
-                                    }
+                                    href={`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(place.address || place.name)}&destination=${encodeURIComponent(dayItem.places[idx+1].address || dayItem.places[idx+1].name)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    onClick={(e) => {
+                                    onClick={async (e) => {
                                       e.stopPropagation();
+                                      e.preventDefault();
                                       
                                       const sname = place.address || place.name;
                                       const dname = dayItem.places[idx+1].address || dayItem.places[idx+1].name;
+                                      const transportType = place.transportType;
                                       
                                       if (planCurrency === 'KRW') {
                                         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                                        if (isMobile) {
-                                          e.preventDefault();
-                                          const appType = place.transportType === '자차' ? 'car' : (place.transportType === '도보' ? 'walk' : 'public');
-                                          // Try opening Naver Map App directly via Scheme
-                                          const appUrl = `nmap://route/${appType}?sname=${encodeURIComponent(sname)}&dname=${encodeURIComponent(dname)}&appname=travelsquad`;
-                                          
-                                          // Fallback to modern V5 directions query web URL
-                                          const naverMode = place.transportType === '자차' ? 'car' : (place.transportType === '도보' ? 'walk' : 'transit');
-                                          const webFallback = `https://map.naver.com/p/directions/-/-/-/${naverMode}?stext=${encodeURIComponent(sname)}&etext=${encodeURIComponent(dname)}&menu=route`;
-                                          
-                                          const start = Date.now();
-                                          window.location.href = appUrl;
-                                          
-                                          setTimeout(() => {
-                                            if (Date.now() - start < 1500) {
-                                              window.open(webFallback, '_blank');
+                                        
+                                        // Geocoding helper using free Nominatim service
+                                        const fetchCoords = async (query) => {
+                                          try {
+                                            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=kr`);
+                                            const data = await res.json();
+                                            if (data && data.length > 0) {
+                                              return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
                                             }
-                                          }, 1000);
+                                          } catch (err) {
+                                            console.error('Geocoding error:', err);
+                                          }
+                                          return null;
+                                        };
+
+                                        // Fetch coordinates for departure & destination in parallel
+                                        const [sCoords, dCoords] = await Promise.all([
+                                          fetchCoords(sname),
+                                          fetchCoords(dname)
+                                        ]);
+
+                                        const appType = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'public');
+
+                                        if (sCoords && dCoords) {
+                                          if (isMobile) {
+                                            const appUrl = `nmap://route/${appType}?slat=${sCoords.lat}&slng=${sCoords.lng}&sname=${encodeURIComponent(sname)}&dlat=${dCoords.lat}&dlng=${dCoords.lng}&dname=${encodeURIComponent(dname)}&appname=travelsquad`;
+                                            const webFallback = `https://map.naver.com/index.nhn?slng=${sCoords.lng}&slat=${sCoords.lat}&stext=${encodeURIComponent(sname)}&elng=${dCoords.lng}&elat=${dCoords.lat}&etext=${encodeURIComponent(dname)}&menu=route`;
+                                            
+                                            const start = Date.now();
+                                            window.location.href = appUrl;
+                                            setTimeout(() => {
+                                              if (Date.now() - start < 1500) {
+                                                window.open(webFallback, '_blank');
+                                              }
+                                            }, 1000);
+                                          } else {
+                                            const pcUrl = `https://map.naver.com/index.nhn?slng=${sCoords.lng}&slat=${sCoords.lat}&stext=${encodeURIComponent(sname)}&elng=${dCoords.lng}&elat=${dCoords.lat}&etext=${encodeURIComponent(dname)}&menu=route`;
+                                            window.open(pcUrl, '_blank');
+                                          }
+                                        } else {
+                                          // Fallback if geocoding yields no coordinates
+                                          if (isMobile) {
+                                            const appUrl = `nmap://route/${appType}?sname=${encodeURIComponent(sname)}&dname=${encodeURIComponent(dname)}&appname=travelsquad`;
+                                            const webFallback = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(sname)}&destination=${encodeURIComponent(dname)}`;
+                                            const start = Date.now();
+                                            window.location.href = appUrl;
+                                            setTimeout(() => {
+                                              if (Date.now() - start < 1500) {
+                                                window.open(webFallback, '_blank');
+                                              }
+                                            }, 1000);
+                                          } else {
+                                            const googleUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(sname)}&destination=${encodeURIComponent(dname)}&travelmode=${transportType === '자차' ? 'driving' : (transportType === '도보' ? 'walking' : 'transit')}`;
+                                            window.open(googleUrl, '_blank');
+                                          }
                                         }
+                                      } else {
+                                        // Overseas travel
+                                        const googleUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(sname)}&destination=${encodeURIComponent(dname)}&travelmode=${transportType === '자차' ? 'driving' : (transportType === '도보' ? 'walking' : 'transit')}`;
+                                        window.open(googleUrl, '_blank');
                                       }
                                     }}
                                     style={{
