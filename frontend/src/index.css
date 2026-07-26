@@ -508,6 +508,24 @@ body {
 }
 
 @media (max-width: 480px) {
+  .app-header {
+    padding: 10px 12px;
+  }
+  .logo {
+    font-size: 1.05rem;
+    gap: 4px;
+  }
+  .user-profile-trigger {
+    padding: 3px 8px !important;
+    gap: 4px !important;
+  }
+  .user-welcome {
+    font-size: 0.8rem !important;
+  }
+  .logout-btn {
+    padding: 4px 8px !important;
+    font-size: 0.76rem !important;
+  }
   .fab {
     right: 20px;
   }
