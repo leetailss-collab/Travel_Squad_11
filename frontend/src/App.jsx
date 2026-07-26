@@ -962,7 +962,27 @@ function App() {
   useEffect(() => {
     const savedUser = localStorage.getItem('family_travel_user');
     if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
+      const parsedUser = JSON.parse(savedUser);
+      setCurrentUser(parsedUser);
+
+      // Proactive silent profile sync to Firestore (so offline profile images sync immediately when backend is up)
+      if (parsedUser.name && (parsedUser.profileImage || parsedUser.nickname)) {
+        fetch('/api/auth/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: parsedUser.name,
+            nickname: parsedUser.nickname,
+            profileImage: parsedUser.profileImage
+          })
+        }).then(res => {
+          if (res.ok) {
+            console.log("Silent profile sync succeeded on mount");
+          }
+        }).catch(err => {
+          console.warn("Silent profile sync failed (offline):", err);
+        });
+      }
     }
 
     const restoreState = async () => {
@@ -3186,8 +3206,8 @@ function App() {
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'space-between', 
-            padding: '12px 16px', 
-            gap: '8px',
+            padding: '10px 12px', 
+            gap: '4px',
             position: 'sticky',
             top: 0,
             zIndex: 999,
@@ -3196,32 +3216,32 @@ function App() {
             borderBottom: '1px solid var(--border)'
           }}>
             <button className="back-btn" onClick={() => setView('home')} style={{ fontSize: '1.25rem', padding: '6px', margin: 0, display: 'flex', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer' }} title="홈으로 이동">🏠</button>
-            <div className="header-tabs" style={{ display: 'flex', flex: 1, justifyContent: 'center', gap: '6px', overflowX: 'auto', scrollbarWidth: 'none' }}>
-              <button className={`tab-btn ${activeTab === 'itinerary' ? 'active' : ''}`} style={{ padding: '8px 10px', fontSize: '0.88rem', margin: 0, display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => setActiveTab('itinerary')}>
-                <span>📅</span><span>일정</span>
+            <div className="header-tabs" style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', gap: '5px', overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch', padding: '4px 0' }}>
+              <button className={`tab-btn ${activeTab === 'itinerary' ? 'active' : ''}`} style={{ flex: 'none', flexShrink: 0, padding: '6px 10px', fontSize: '0.8rem', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => setActiveTab('itinerary')}>
+                일정
               </button>
-              <button className={`tab-btn ${activeTab === 'checklist' ? 'active' : ''}`} style={{ padding: '8px 10px', fontSize: '0.88rem', margin: 0, display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => setActiveTab('checklist')}>
-                <span>🎒</span><span>준비물</span>
+              <button className={`tab-btn ${activeTab === 'checklist' ? 'active' : ''}`} style={{ flex: 'none', flexShrink: 0, padding: '6px 10px', fontSize: '0.8rem', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => setActiveTab('checklist')}>
+                준비물
               </button>
-              <button className={`tab-btn ${activeTab === 'expense' ? 'active' : ''}`} style={{ padding: '8px 10px', fontSize: '0.88rem', margin: 0, display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => setActiveTab('expense')}>
-                <span>💰</span><span>경비</span>
+              <button className={`tab-btn ${activeTab === 'expense' ? 'active' : ''}`} style={{ flex: 'none', flexShrink: 0, padding: '6px 10px', fontSize: '0.8rem', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => setActiveTab('expense')}>
+                경비
               </button>
-              <button className={`tab-btn ${activeTab === 'members' ? 'active' : ''}`} style={{ padding: '8px 10px', fontSize: '0.88rem', margin: 0, display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => {
+              <button className={`tab-btn ${activeTab === 'members' ? 'active' : ''}`} style={{ flex: 'none', flexShrink: 0, padding: '6px 10px', fontSize: '0.8rem', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => {
                 setActiveTab('members');
                 // Reset sub-filters on changing tabs
                 setSelectedDayFilter('all');
                 setSelectedChecklistFilter('all');
                 setSelectedExpenseFilter('all');
               }}>
-                <span>👥</span><span>가족</span>
+                가족
               </button>
-              <button className={`tab-btn ${activeTab === 'places' ? 'active' : ''}`} style={{ padding: '8px 10px', fontSize: '0.88rem', margin: 0, display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => {
+              <button className={`tab-btn ${activeTab === 'places' ? 'active' : ''}`} style={{ flex: 'none', flexShrink: 0, padding: '6px 10px', fontSize: '0.8rem', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => {
                 setActiveTab('places');
                 setSelectedDayFilter('all');
                 setSelectedChecklistFilter('all');
                 setSelectedExpenseFilter('all');
               }}>
-                <span>📍</span><span>장소</span>
+                장소
               </button>
             </div>
             <button 
