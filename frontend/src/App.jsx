@@ -366,6 +366,15 @@ function App() {
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [loginError, setLoginError] = useState('');
 
+  // Profile State
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileForm, setProfileForm] = useState({ nickname: '', profileImage: null, password: '' });
+  const [profileUpdating, setProfileUpdating] = useState(false);
+  const [profileError, setProfileError] = useState('');
+  const [usersMap, setUsersMap] = useState({});
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifModal, setShowNotifModal] = useState(false);
+
   // General App State
   const [view, setView] = useState('home'); // 'home' | 'detail'
   const [plans, setPlans] = useState([]);
@@ -394,6 +403,14 @@ function App() {
 
   const [editingPlace, setEditingPlace] = useState(null); // Place object currently being edited
   const [openMenuPlaceId, setOpenMenuPlaceId] = useState(null); // Place ID of active kebab menu
+  const [selectedDetailPlace, setSelectedDetailPlace] = useState(null); // Currently open detail place modal
+  const [alternativeForm, setAlternativeForm] = useState(null); // Alternative place form state: { mode, placeId, alt }
+  const [newSavedPlace, setNewSavedPlace] = useState({ name: '', category: '관광', address: '', description: '', tip: '', url: '' });
+  const [editingSavedPlace, setEditingSavedPlace] = useState(null);
+  const [showAddSavedPlaceModal, setShowAddSavedPlaceModal] = useState(false);
+  const [leafletLoaded, setLeafletLoaded] = useState(false);
+  const mapRef = useRef(null);
+  const mapInstanceRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [lightboxImagesList, setLightboxImagesList] = useState([]); // Array of image URLs
   const [lightboxActiveIndex, setLightboxActiveIndex] = useState(0); // Current active image index in lightbox
@@ -448,6 +465,92 @@ function App() {
     window.addEventListener('click', handleClickOutside);
     return () => window.removeEventListener('click', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !window.L) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+      link.crossOrigin = '';
+      document.head.appendChild(link);
+
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+      script.crossOrigin = '';
+      script.onload = () => {
+        setLeafletLoaded(true);
+      };
+      document.body.appendChild(script);
+    } else if (window.L) {
+      setLeafletLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'places' && mapRef.current && window.L && leafletLoaded) {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+
+      const savedPlaces = plan?.savedPlaces || [];
+      let center = [33.4996, 126.5312]; // Default Jeju
+      let zoom = 10;
+
+      const validPlaces = savedPlaces.filter(p => p.lat && p.lng);
+      if (validPlaces.length > 0) {
+        center = [validPlaces[0].lat, validPlaces[0].lng];
+        zoom = 12;
+      } else if (plan && plan.title) {
+        if (plan.title.includes('서울')) {
+          center = [37.5665, 126.9780];
+        } else if (plan.title.includes('부산')) {
+          center = [35.1796, 129.0756];
+        } else if (plan.title.includes('도쿄')) {
+          center = [35.6762, 139.6503];
+        } else if (plan.title.includes('오사카')) {
+          center = [34.6937, 135.5023];
+        } else if (plan.title.includes('후쿠오카')) {
+          center = [33.5902, 130.4017];
+        }
+      }
+
+      try {
+        const map = window.L.map(mapRef.current).setView(center, zoom);
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        validPlaces.forEach(p => {
+          const popupContent = `
+            <div style="font-family: sans-serif; font-size: 13px; line-height: 1.4; padding: 4px;">
+              <h4 style="margin: 0 0 4px 0; color: var(--primary, #6366f1); font-size: 14px;">${p.name}</h4>
+              <span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #eee; font-weight: bold; display: inline-block; margin-bottom: 6px;">${p.category}</span>
+              <p style="margin: 0; color: #555; font-size: 11px;">${p.address || '주소 정보가 없습니다.'}</p>
+              ${p.description ? `<p style="margin: 4px 0 0 0; font-style: italic; color: #777; font-size: 11px; border-top: 1px solid #eee; padding-top: 4px;">${p.description}</p>` : ''}
+              ${p.url ? `<a href="${p.url}" target="_blank" style="display: block; margin-top: 8px; text-decoration: none; color: #fff; background: var(--primary, #6366f1); font-size: 11px; font-weight: bold; text-align: center; padding: 4px; border-radius: 4px;">지도에서 열기</a>` : ''}
+            </div>
+          `;
+          window.L.marker([p.lat, p.lng])
+            .addTo(map)
+            .bindPopup(popupContent);
+        });
+
+        mapInstanceRef.current = map;
+      } catch (err) {
+        console.error("Leaflet initialization failed:", err);
+      }
+    }
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [activeTab, plan?.savedPlaces, leafletLoaded]);
 
   const openConfirm = (title, message, onConfirm) => {
     setConfirmModal({
@@ -533,7 +636,43 @@ function App() {
 
   // Body scroll lock effect when any modal is open
   useEffect(() => {
-    const isModalOpen = showModal || showAddTripModal || showAddEventModal || showEditMembersModal || showAddAnniversaryModal || editingPlace || editingAnniversary || confirmModal.isOpen || showTrashModal || showEditMetaModal;
+    const isModalOpen = Boolean(
+      showModal || 
+      showAddTripModal || 
+      showAddEventModal || 
+      showEditMembersModal || 
+      showAddAnniversaryModal || 
+      editingPlace || 
+      editingAnniversary || 
+      confirmModal.isOpen || 
+      showTrashModal || 
+      showEditMetaModal || 
+      selectedDetailPlace || 
+      showProfileModal || 
+      (lightboxImagesList && lightboxImagesList.length > 0) ||
+      showAddSavedPlaceModal ||
+      editingSavedPlace ||
+      showNotifModal
+    );
+    console.log("=== Scroll Lock Debug ===", {
+      isModalOpen,
+      showModal,
+      showAddTripModal,
+      showAddEventModal,
+      showEditMembersModal,
+      showAddAnniversaryModal,
+      editingPlace: !!editingPlace,
+      editingAnniversary: !!editingAnniversary,
+      confirmModalIsOpen: confirmModal?.isOpen,
+      showTrashModal,
+      showEditMetaModal,
+      selectedDetailPlace: !!selectedDetailPlace,
+      showProfileModal,
+      lightboxOpen: lightboxImagesList && lightboxImagesList.length > 0,
+      showAddSavedPlaceModal,
+      editingSavedPlace: !!editingSavedPlace,
+      showNotifModal
+    });
     if (isModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -542,11 +681,33 @@ function App() {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [showModal, showAddTripModal, showAddEventModal, showEditMembersModal, showAddAnniversaryModal, editingPlace, editingAnniversary, confirmModal.isOpen, showTrashModal, showEditMetaModal]);
+  }, [
+    showModal, showAddTripModal, showAddEventModal, showEditMembersModal, showAddAnniversaryModal, 
+    editingPlace, editingAnniversary, confirmModal.isOpen, showTrashModal, showEditMetaModal, 
+    selectedDetailPlace, showProfileModal, lightboxImagesList, showAddSavedPlaceModal, editingSavedPlace,
+    showNotifModal
+  ]);
 
   // Modal Back Button Handling (For Mobile Browser Back Gesture/Button)
   useEffect(() => {
-    const isModalOpen = showModal || showAddTripModal || showAddEventModal || showEditMembersModal || showAddAnniversaryModal || !!editingPlace || !!editingAnniversary || confirmModal.isOpen || showTrashModal || showEditMetaModal;
+    const isModalOpen = Boolean(
+      showModal || 
+      showAddTripModal || 
+      showAddEventModal || 
+      showEditMembersModal || 
+      showAddAnniversaryModal || 
+      editingPlace || 
+      editingAnniversary || 
+      confirmModal.isOpen || 
+      showTrashModal || 
+      showEditMetaModal || 
+      selectedDetailPlace || 
+      showProfileModal || 
+      (lightboxImagesList && lightboxImagesList.length > 0) ||
+      showAddSavedPlaceModal ||
+      editingSavedPlace ||
+      showNotifModal
+    );
 
     const handlePopState = (event) => {
       if (isModalOpen) {
@@ -560,6 +721,12 @@ function App() {
         setShowTrashModal(false);
         setShowEditMetaModal(false);
         closeConfirm();
+        setSelectedDetailPlace(null);
+        setShowProfileModal(false);
+        setLightboxImagesList([]);
+        setShowAddSavedPlaceModal(false);
+        setEditingSavedPlace(null);
+        setShowNotifModal(false);
       }
     };
 
@@ -571,7 +738,225 @@ function App() {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [showModal, showAddTripModal, showAddEventModal, showEditMembersModal, showAddAnniversaryModal, editingPlace, editingAnniversary]);
+  }, [
+    showModal, showAddTripModal, showAddEventModal, showEditMembersModal, showAddAnniversaryModal, 
+    editingPlace, editingAnniversary, confirmModal.isOpen, showTrashModal, showEditMetaModal, 
+    selectedDetailPlace, showProfileModal, lightboxImagesList, showAddSavedPlaceModal, editingSavedPlace,
+    showNotifModal
+  ]);
+
+  // Fetch and build users profile mapping with offline fallback
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const defaultMapping = {};
+      FAM_USERS.forEach(u => {
+        defaultMapping[u.name] = {
+          nickname: u.name,
+          profileImage: null
+        };
+      });
+
+      // Merge local currentUser into defaults first
+      if (currentUser) {
+        defaultMapping[currentUser.name] = {
+          nickname: currentUser.nickname || currentUser.name,
+          profileImage: currentUser.profileImage || null
+        };
+      }
+
+      try {
+        const res = await fetch('/api/auth/users');
+        if (res.ok) {
+          const data = await res.json();
+          const mapping = {};
+          data.forEach(u => {
+            mapping[u.name] = {
+              nickname: u.nickname || u.name,
+              profileImage: u.profileImage || null
+            };
+          });
+          // Merge local currentUser over fetched data to preserve latest local updates
+          if (currentUser) {
+            mapping[currentUser.name] = {
+              nickname: currentUser.nickname || currentUser.name,
+              profileImage: currentUser.profileImage || null
+            };
+          }
+          setUsersMap({ ...defaultMapping, ...mapping });
+        } else {
+          setUsersMap(defaultMapping);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch users map, using offline defaults:", err);
+        setUsersMap(defaultMapping);
+      }
+    };
+
+    if (currentUser) {
+      fetchUsers();
+    } else {
+      setUsersMap({});
+    }
+  }, [currentUser]);
+
+  // Fetch and sync notifications
+  const fetchNotifications = async () => {
+    try {
+      const res = await fetch('/api/notifications');
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data);
+      }
+    } catch (err) {
+      console.warn("Failed to fetch notifications:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 10000); // Poll every 10 seconds
+      return () => clearInterval(interval);
+    } else {
+      setNotifications([]);
+    }
+  }, [currentUser]);
+
+  // Trigger a new notification
+  const triggerNotification = async (type, targetId, targetName, tab, targetPlanId, targetPlanTitle) => {
+    const pId = targetPlanId || plan?.id;
+    const pTitle = targetPlanTitle || plan?.title || '';
+    if (!pId) return;
+
+    let message = '';
+    const actorName = currentUser.nickname || currentUser.name;
+    if (type === 'place_add') {
+      message = `${actorName}님이 [일정]에 '${targetName}'을(를) 추가했습니다.`;
+    } else if (type === 'place_edit') {
+      message = `${actorName}님이 [일정]의 '${targetName}'을(를) 수정했습니다.`;
+    } else if (type === 'comment_add') {
+      message = `${actorName}님이 '${targetName}'에 댓글을 남겼습니다.`;
+    } else if (type === 'checklist_add') {
+      message = `${actorName}님이 [준비물]에 '${targetName}'을(를) 추가했습니다.`;
+    } else if (type === 'expense_add') {
+      message = `${actorName}님이 [경비]에 '${targetName}' 내역을 추가했습니다.`;
+    } else if (type === 'trip_create') {
+      message = `${actorName}님이 새로운 여행 계획 '${pTitle}'을(를) 생성했습니다.`;
+    }
+
+    try {
+      const response = await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId: pId,
+          planTitle: pTitle,
+          actor: currentUser.name,
+          type,
+          targetId: String(targetId),
+          targetName,
+          tab,
+          message,
+          createdAt: Date.now(),
+          readBy: [currentUser.name]
+        })
+      });
+      if (response.ok) {
+        fetchNotifications();
+      }
+    } catch (err) {
+      console.warn("Failed to create notification:", err);
+    }
+  };
+
+  // Jump to notification target
+  const handleNotificationClick = async (notif) => {
+    // 1. Mark as read
+    try {
+      await fetch(`/api/notifications/${notif.id}/read`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: currentUser.name })
+      });
+      setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, readBy: [...(n.readBy || []), currentUser.name] } : n));
+    } catch (err) {
+      console.warn("Failed to mark notification as read on server:", err);
+    }
+
+    setShowNotifModal(false);
+
+    // 2. Navigate to target
+    const targetPlanId = Number(notif.planId);
+    let targetPlan = plans.find(p => Number(p.id) === targetPlanId);
+    
+    if (!targetPlan) {
+      try {
+        const res = await fetch(`/api/plans/${targetPlanId}`);
+        if (res.ok) {
+          targetPlan = await res.json();
+        }
+      } catch (err) {
+        console.warn("Failed to fetch target plan:", err);
+      }
+    }
+
+    if (!targetPlan) {
+      alert("해당 여행 계획을 찾을 수 없거나 이미 삭제되었습니다.");
+      return;
+    }
+
+    setPlan(targetPlan);
+    setSelectedPlanId(targetPlanId);
+    setView('detail');
+
+    const targetTab = notif.tab || 'itinerary';
+    setActiveTab(targetTab);
+
+    if (targetTab === 'itinerary') {
+      let matchedPlace = null;
+      let matchedDay = 1;
+
+      for (const dayItem of targetPlan.itinerary) {
+        const foundPlace = dayItem.places.find(p => String(p.id) === String(notif.targetId));
+        if (foundPlace) {
+          matchedPlace = foundPlace;
+          matchedDay = dayItem.day;
+          break;
+        }
+      }
+
+      if (matchedPlace) {
+        setSelectedDayFilter(String(matchedDay));
+        setTimeout(() => {
+          setSelectedDetailPlace(matchedPlace);
+        }, 150);
+      }
+    } else if (targetTab === 'checklist') {
+      setTimeout(() => {
+        const element = document.getElementById(`checklist-item-${notif.targetId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.style.transition = 'background-color 0.5s';
+          element.style.backgroundColor = 'var(--primary-light)';
+          setTimeout(() => {
+            element.style.backgroundColor = '';
+          }, 2000);
+        }
+      }, 300);
+    } else if (targetTab === 'expense') {
+      setTimeout(() => {
+        const element = document.getElementById(`expense-item-${notif.targetId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.style.transition = 'background-color 0.5s';
+          element.style.backgroundColor = 'var(--primary-light)';
+          setTimeout(() => {
+            element.style.backgroundColor = '';
+          }, 2000);
+        }
+      }, 300);
+    }
+  };
 
   // Load User, Plans and restore state on mount
   useEffect(() => {
@@ -893,6 +1278,147 @@ function App() {
     setCurrentUser(null);
     localStorage.removeItem('family_travel_user');
     setView('home');
+  };
+
+  // Profile update handler
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setProfileError('');
+    setProfileUpdating(true);
+
+    try {
+      const response = await fetch('/api/auth/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: currentUser.name,
+          nickname: profileForm.nickname,
+          profileImage: profileForm.profileImage,
+          password: profileForm.password
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentUser(data.user);
+        localStorage.setItem('family_travel_user', JSON.stringify(data.user));
+        setUsersMap(prev => ({
+          ...prev,
+          [data.user.name]: {
+            nickname: data.user.nickname,
+            profileImage: data.user.profileImage
+          }
+        }));
+        setShowProfileModal(false);
+      } else {
+        const errData = await response.json();
+        setProfileError(errData.message || '프로필 수정에 실패했습니다.');
+      }
+    } catch (err) {
+      console.warn("Offline profile update fallback:");
+      const updatedUser = {
+        ...currentUser,
+        nickname: profileForm.nickname || currentUser.name,
+        profileImage: profileForm.profileImage || currentUser.profileImage
+      };
+      setCurrentUser(updatedUser);
+      localStorage.setItem('family_travel_user', JSON.stringify(updatedUser));
+      setUsersMap(prev => ({
+        ...prev,
+        [updatedUser.name]: {
+          nickname: updatedUser.nickname,
+          profileImage: updatedUser.profileImage
+        }
+      }));
+      setShowProfileModal(false);
+    } finally {
+      setProfileUpdating(false);
+    }
+  };
+
+  // Helper to handle profile image file upload with compression and base64 fallback
+  const handleProfileImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setProfileUpdating(true);
+    setProfileError('');
+
+    // Browser-side image resizing and compression
+    const compressImage = (inputFile) => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(inputFile);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_SIZE = 150; // Resize to max 150x150 for profile avatar
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > MAX_SIZE) {
+                height *= MAX_SIZE / width;
+                width = MAX_SIZE;
+              }
+            } else {
+              if (height > MAX_SIZE) {
+                width *= MAX_SIZE / height;
+                height = MAX_SIZE;
+              }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            const base64Str = canvas.toDataURL('image/jpeg', 0.75); // 75% quality JPEG
+            canvas.toBlob((blob) => {
+              resolve({ blob, base64: base64Str });
+            }, 'image/jpeg', 0.75);
+          };
+        };
+      });
+    };
+
+    try {
+      const { blob, base64 } = await compressImage(file);
+
+      // Create FormData with compressed blob
+      const formData = new FormData();
+      formData.append('files', blob, 'profile.jpg');
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.urls && data.urls.length > 0) {
+          setProfileForm(prev => ({ ...prev, profileImage: data.urls[0] }));
+        } else {
+          // Empty URLs, fallback to compressed base64
+          setProfileForm(prev => ({ ...prev, profileImage: base64 }));
+        }
+      } else {
+        console.warn("Upload endpoint returned error code, falling back to base64.");
+        setProfileForm(prev => ({ ...prev, profileImage: base64 }));
+      }
+    } catch (err) {
+      console.error("Profile image upload failed, falling back to base64:", err);
+      // Fallback: convert original file to base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileForm(prev => ({ ...prev, profileImage: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setProfileUpdating(false);
+    }
   };
 
   const saveUpdatedPlan = (updatedPlan) => {
@@ -1308,6 +1834,7 @@ function App() {
     }
 
     saveUpdatedPlan(updatedPlan);
+    triggerNotification('place_add', placeId, newPlaceObj.name, 'itinerary');
     setNewPlace({
       day: 1, time: '', name: '', address: '', description: '', category: '관광', estimatedCost: '',
       currency: plan.currency || 'KRW', needsReservation: false, isReservationCompleted: false, tip: '', payer: '', duration: 60, images: [],
@@ -1402,6 +1929,7 @@ function App() {
 
     if (found) {
       saveUpdatedPlan(updatedPlan);
+      triggerNotification('place_edit', editingPlace.id, editingPlace.name, 'itinerary');
     }
     setEditingPlace(null);
   };
@@ -1450,7 +1978,328 @@ function App() {
     }
     if (found) {
       saveUpdatedPlan(updatedPlan);
+      if (selectedDetailPlace && selectedDetailPlace.id === placeId) {
+        setSelectedDetailPlace({ ...selectedDetailPlace, isReservationCompleted: !selectedDetailPlace.isReservationCompleted });
+      }
     }
+  };
+
+  // Add Saved Place (Places Tab)
+  const handleAddSavedPlace = async (e) => {
+    e.preventDefault();
+    if (!newSavedPlace.name) return;
+
+    const updatedPlan = { ...plan };
+    if (!updatedPlan.savedPlaces) {
+      updatedPlan.savedPlaces = [];
+    }
+
+    let lat = null;
+    let lng = null;
+    if (newSavedPlace.address && newSavedPlace.address.trim() !== '') {
+      try {
+        const response = await fetch(`/api/geocoding?query=${encodeURIComponent(newSavedPlace.address)}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.lat && data.lng) {
+            lat = parseFloat(data.lat);
+            lng = parseFloat(data.lng);
+          }
+        }
+      } catch (err) {
+        console.warn("Geocoding failed:", err);
+      }
+    }
+
+    const newObj = {
+      id: `sp-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
+      name: newSavedPlace.name,
+      category: newSavedPlace.category,
+      address: newSavedPlace.address,
+      description: newSavedPlace.description,
+      tip: newSavedPlace.tip,
+      url: newSavedPlace.url || (planCurrency === 'KRW'
+        ? `https://map.naver.com/p/search/${encodeURIComponent(newSavedPlace.address || newSavedPlace.name)}`
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(newSavedPlace.address || newSavedPlace.name)}`),
+      lat,
+      lng
+    };
+
+    updatedPlan.savedPlaces.push(newObj);
+    saveUpdatedPlan(updatedPlan);
+    setShowAddSavedPlaceModal(false);
+    setNewSavedPlace({ name: '', category: '관광', address: '', description: '', tip: '', url: '' });
+  };
+
+  // Edit Saved Place (Places Tab)
+  const handleEditSavedPlace = async (e) => {
+    e.preventDefault();
+    if (!editingSavedPlace || !editingSavedPlace.name) return;
+
+    const updatedPlan = { ...plan };
+    const idx = updatedPlan.savedPlaces.findIndex(sp => sp.id === editingSavedPlace.id);
+    if (idx === -1) return;
+
+    let lat = editingSavedPlace.lat;
+    let lng = editingSavedPlace.lng;
+    const oldAddr = plan.savedPlaces[idx].address;
+
+    if (editingSavedPlace.address !== oldAddr && editingSavedPlace.address && editingSavedPlace.address.trim() !== '') {
+      try {
+        const response = await fetch(`/api/geocoding?query=${encodeURIComponent(editingSavedPlace.address)}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.lat && data.lng) {
+            lat = parseFloat(data.lat);
+            lng = parseFloat(data.lng);
+          } else {
+            lat = null;
+            lng = null;
+          }
+        }
+      } catch (err) {
+        console.warn("Geocoding failed:", err);
+      }
+    }
+
+    const updatedObj = {
+      ...editingSavedPlace,
+      lat,
+      lng,
+      url: editingSavedPlace.url || (planCurrency === 'KRW'
+        ? `https://map.naver.com/p/search/${encodeURIComponent(editingSavedPlace.address || editingSavedPlace.name)}`
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(editingSavedPlace.address || editingSavedPlace.name)}`)
+    };
+
+    updatedPlan.savedPlaces[idx] = updatedObj;
+    saveUpdatedPlan(updatedPlan);
+    setEditingSavedPlace(null);
+  };
+
+  // Delete Saved Place (Places Tab)
+  const handleDeleteSavedPlace = (spId) => {
+    openConfirm("🗑️ 장소 삭제", "정말로 이 후보 장소를 삭제하시겠습니까?", () => {
+      const updatedPlan = { ...plan };
+      updatedPlan.savedPlaces = (updatedPlan.savedPlaces || []).filter(sp => sp.id !== spId);
+      saveUpdatedPlan(updatedPlan);
+    });
+  };
+
+  // Save Alternative (Schedule Detail Modal)
+  const handleSaveAlternative = (e) => {
+    e.preventDefault();
+    if (!alternativeForm) return;
+
+    const { mode, placeId, alt } = alternativeForm;
+    if (!alt.name) return;
+
+    const updatedPlan = { ...plan };
+    let foundPlace = null;
+    for (const dayItem of updatedPlan.itinerary) {
+      const p = dayItem.places.find(item => item.id === placeId);
+      if (p) {
+        foundPlace = p;
+        break;
+      }
+    }
+
+    if (!foundPlace) return;
+
+    if (!foundPlace.alternatives) {
+      foundPlace.alternatives = [];
+    }
+
+    if (mode === 'add') {
+      const newAltObj = {
+        id: `alt-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
+        name: alt.name,
+        category: alt.category,
+        address: alt.address,
+        description: alt.description,
+        tip: alt.tip,
+        estimatedCost: alt.estimatedCost ? Number(alt.estimatedCost) : 0,
+        currency: alt.currency || planCurrency,
+        payer: alt.payer || '미지정',
+        needsReservation: alt.needsReservation || false,
+        isReservationCompleted: alt.isReservationCompleted || false,
+        images: [],
+        mapImages: []
+      };
+      foundPlace.alternatives.push(newAltObj);
+    } else if (mode === 'edit') {
+      const altIdx = foundPlace.alternatives.findIndex(item => item.id === alt.id);
+      if (altIdx !== -1) {
+        foundPlace.alternatives[altIdx] = {
+          ...foundPlace.alternatives[altIdx],
+          name: alt.name,
+          category: alt.category,
+          address: alt.address,
+          description: alt.description,
+          tip: alt.tip,
+          estimatedCost: alt.estimatedCost ? Number(alt.estimatedCost) : 0,
+          currency: alt.currency || planCurrency,
+          payer: alt.payer || '미지정',
+          needsReservation: alt.needsReservation || false,
+          isReservationCompleted: alt.isReservationCompleted || false
+        };
+      }
+    }
+
+    saveUpdatedPlan(updatedPlan);
+    
+    // Refresh modal place state
+    setSelectedDetailPlace({ ...foundPlace });
+    setAlternativeForm(null);
+  };
+
+  // Delete Alternative (Schedule Detail Modal)
+  const handleDeleteAlternative = (placeId, altId) => {
+    openConfirm("🗑️ 대안 일정 삭제", "정말로 이 대안 후보 일정을 삭제하시겠습니까?", () => {
+      const updatedPlan = { ...plan };
+      let foundPlace = null;
+      for (const dayItem of updatedPlan.itinerary) {
+        const p = dayItem.places.find(item => item.id === placeId);
+        if (p) {
+          foundPlace = p;
+          break;
+        }
+      }
+
+      if (foundPlace && foundPlace.alternatives) {
+        foundPlace.alternatives = foundPlace.alternatives.filter(a => a.id !== altId);
+        saveUpdatedPlan(updatedPlan);
+        setSelectedDetailPlace({ ...foundPlace });
+      }
+    });
+  };
+
+  // Import Saved Place as Alternative (Schedule Detail Modal)
+  const handleImportFromSavedPlaces = (placeId, savedPlaceObj) => {
+    const updatedPlan = { ...plan };
+    let foundPlace = null;
+    for (const dayItem of updatedPlan.itinerary) {
+      const p = dayItem.places.find(item => item.id === placeId);
+      if (p) {
+        foundPlace = p;
+        break;
+      }
+    }
+
+    if (!foundPlace) return;
+    if (!foundPlace.alternatives) {
+      foundPlace.alternatives = [];
+    }
+
+    if (foundPlace.alternatives.some(a => a.name === savedPlaceObj.name && a.address === savedPlaceObj.address)) {
+      alert("이미 대안 리스트에 동일한 이름/주소의 장소가 존재합니다.");
+      return;
+    }
+
+    const newAltObj = {
+      id: `alt-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
+      name: savedPlaceObj.name,
+      category: savedPlaceObj.category,
+      address: savedPlaceObj.address,
+      description: savedPlaceObj.description,
+      tip: savedPlaceObj.tip,
+      estimatedCost: 0,
+      currency: planCurrency,
+      payer: '미지정',
+      needsReservation: false,
+      isReservationCompleted: false,
+      images: [],
+      mapImages: []
+    };
+
+    foundPlace.alternatives.push(newAltObj);
+    saveUpdatedPlan(updatedPlan);
+    setSelectedDetailPlace({ ...foundPlace });
+  };
+
+  // Swap Main Place with Alternative (Schedule Detail Modal)
+  const handleSwapPlaceWithAlternative = (placeId, altId) => {
+    const updatedPlan = { ...plan };
+    let foundDayItem = null;
+    let foundPlaceIndex = -1;
+    let foundPlace = null;
+
+    for (const dayItem of updatedPlan.itinerary) {
+      const idx = dayItem.places.findIndex(p => p.id === placeId);
+      if (idx !== -1) {
+        foundDayItem = dayItem;
+        foundPlaceIndex = idx;
+        foundPlace = dayItem.places[idx];
+        break;
+      }
+    }
+
+    if (!foundPlace || foundPlaceIndex === -1) return;
+    if (!foundPlace.alternatives) return;
+
+    const altIndex = foundPlace.alternatives.findIndex(a => a.id === altId);
+    if (altIndex === -1) return;
+
+    const selectedAlt = foundPlace.alternatives[altIndex];
+
+    const oldMainData = {
+      name: foundPlace.name,
+      category: foundPlace.category,
+      address: foundPlace.address,
+      description: foundPlace.description,
+      tip: foundPlace.tip,
+      estimatedCost: foundPlace.estimatedCost || foundPlace.cost || 0,
+      currency: foundPlace.currency || planCurrency,
+      payer: foundPlace.payer || '미지정',
+      needsReservation: foundPlace.needsReservation || false,
+      isReservationCompleted: foundPlace.isReservationCompleted || false,
+      images: foundPlace.images ? [...foundPlace.images] : [],
+      mapImages: foundPlace.mapImages ? [...foundPlace.mapImages] : [],
+      transportType: foundPlace.transportType || '',
+      transportDuration: foundPlace.transportDuration || ''
+    };
+
+    const newMainPlace = {
+      ...foundPlace,
+      name: selectedAlt.name,
+      category: selectedAlt.category,
+      address: selectedAlt.address,
+      description: selectedAlt.description,
+      tip: selectedAlt.tip,
+      estimatedCost: selectedAlt.estimatedCost || 0,
+      currency: selectedAlt.currency || planCurrency,
+      payer: selectedAlt.payer || '미지정',
+      needsReservation: selectedAlt.needsReservation || false,
+      isReservationCompleted: selectedAlt.isReservationCompleted || false,
+      images: selectedAlt.images ? [...selectedAlt.images] : [],
+      mapImages: selectedAlt.mapImages ? [...selectedAlt.mapImages] : [],
+      transportType: selectedAlt.transportType || '',
+      transportDuration: selectedAlt.transportDuration || ''
+    };
+
+    const newAlt = {
+      id: selectedAlt.id,
+      name: oldMainData.name,
+      category: oldMainData.category,
+      address: oldMainData.address,
+      description: oldMainData.description,
+      tip: oldMainData.tip,
+      estimatedCost: oldMainData.estimatedCost,
+      currency: oldMainData.currency,
+      payer: oldMainData.payer,
+      needsReservation: oldMainData.needsReservation,
+      isReservationCompleted: oldMainData.isReservationCompleted,
+      images: oldMainData.images,
+      mapImages: oldMainData.mapImages
+    };
+
+    const updatedAlts = [...foundPlace.alternatives];
+    updatedAlts[altIndex] = newAlt;
+    newMainPlace.alternatives = updatedAlts;
+
+    foundDayItem.places[foundPlaceIndex] = newMainPlace;
+
+    saveUpdatedPlan(updatedPlan);
+    setSelectedDetailPlace(newMainPlace); // Refresh Detail Modal
   };
 
   // Anniversary Handlers
@@ -1546,6 +2395,11 @@ function App() {
       targetPlace.comments.push(newComment);
       
       saveUpdatedPlan(updatedPlan);
+      triggerNotification('comment_add', placeId, targetPlace.name, 'itinerary');
+      
+      if (selectedDetailPlace && selectedDetailPlace.id === placeId) {
+        setSelectedDetailPlace({ ...targetPlace });
+      }
       
       // Clear input
       setCommentInputs({ ...commentInputs, [placeId]: '' });
@@ -1570,17 +2424,26 @@ function App() {
     // Optimistically update local state first
     const updatedPlan = { ...plan };
     let foundComment = null;
+    let foundPlace = null;
     for (const dayItem of updatedPlan.itinerary) {
       const pItem = dayItem.places.find(p => p.id === placeId);
       if (pItem && pItem.comments) {
         foundComment = pItem.comments.find(c => c.id === commentId);
-        if (foundComment) break;
+        if (foundComment) {
+          foundPlace = pItem;
+          break;
+        }
       }
     }
 
-    if (foundComment) {
+    if (foundComment && foundPlace) {
       foundComment.text = newText;
       saveUpdatedPlan(updatedPlan);
+      
+      if (selectedDetailPlace && selectedDetailPlace.id === placeId) {
+        setSelectedDetailPlace({ ...foundPlace });
+      }
+      
       setEditingCommentId(null);
       setEditingCommentText('');
 
@@ -1604,20 +2467,26 @@ function App() {
     // Optimistically update local state first
     const updatedPlan = { ...plan };
     let updated = false;
+    let targetPlace = null;
     for (const dayItem of updatedPlan.itinerary) {
       const pItem = dayItem.places.find(p => p.id === placeId);
       if (pItem && pItem.comments) {
         const initialLen = pItem.comments.length;
         pItem.comments = pItem.comments.filter(c => c.id !== commentId);
         if (pItem.comments.length !== initialLen) {
+          targetPlace = pItem;
           updated = true;
           break;
         }
       }
     }
 
-    if (updated) {
+    if (updated && targetPlace) {
       saveUpdatedPlan(updatedPlan);
+      
+      if (selectedDetailPlace && selectedDetailPlace.id === placeId) {
+        setSelectedDetailPlace({ ...targetPlace });
+      }
 
       // Send to server
       try {
@@ -1654,6 +2523,7 @@ function App() {
     updatedPlan.checklists.push(newItem);
     
     saveUpdatedPlan(updatedPlan);
+    triggerNotification('checklist_add', newItem.id, newItem.title, 'checklist');
     setNewCheck({ title: '', assignee: '', category: '공통' });
     setShowModal(false);
   };
@@ -1701,6 +2571,7 @@ function App() {
     updatedPlan.expenses.push(newItem);
 
     saveUpdatedPlan(updatedPlan);
+    triggerNotification('expense_add', newItem.id, newItem.title, 'expense');
     setNewExpense({ title: '', amount: '', payer: '', date: '', category: '기타' });
     setShowModal(false);
   };
@@ -1805,6 +2676,8 @@ function App() {
     );
   }
 
+  const unreadCount = notifications.filter(n => !n.readBy || !n.readBy.includes(currentUser.name)).length;
+
   return (
     <div className="app-container">
       
@@ -1818,8 +2691,74 @@ function App() {
               <span>📋</span> 일정 보드
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="user-welcome">👋 <b>{currentUser.name}</b>님</span>
-              <button className="logout-btn" onClick={handleLogout}>로그아웃</button>
+              <div 
+                className="user-profile-trigger" 
+                onClick={() => {
+                  setProfileForm({
+                    nickname: currentUser.nickname || currentUser.name,
+                    profileImage: currentUser.profileImage || null,
+                    password: ''
+                  });
+                  setShowProfileModal(true);
+                }}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '4px 10px', borderRadius: '20px', background: 'var(--primary-light)', transition: 'background-color 0.2s', border: '1px solid var(--border)' }}
+              >
+                {currentUser.profileImage ? (
+                  <img 
+                    src={currentUser.profileImage} 
+                    alt="profile" 
+                    style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--primary)' }}
+                  />
+                ) : (
+                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                    {(currentUser.nickname || currentUser.name).slice(0, 1)}
+                  </div>
+                )}
+                <span className="user-welcome" style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text)', margin: 0 }}>
+                  {currentUser.nickname || currentUser.name}님
+                </span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>⚙️</span>
+              </div>
+              <button 
+                onClick={() => setShowNotifModal(true)}
+                style={{ 
+                  background: 'none', 
+                  border: 'none', 
+                  fontSize: '1.2rem', 
+                  cursor: 'pointer', 
+                  position: 'relative',
+                  padding: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--text)',
+                  marginRight: '4px'
+                }}
+                title="알림 센터"
+              >
+                🔔
+                {unreadCount > 0 && (
+                  <span style={{ 
+                    position: 'absolute', 
+                    top: '2px', 
+                    right: '2px', 
+                    background: 'var(--danger)', 
+                    color: '#fff', 
+                    fontSize: '0.62rem', 
+                    borderRadius: '50%', 
+                    width: '15px', 
+                    height: '15px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    fontWeight: 'bold',
+                    boxShadow: '0 0 0 2px var(--bg-card)'
+                  }}>
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              <button className="logout-btn" onClick={handleLogout} style={{ margin: 0, padding: '6px 12px', fontSize: '0.82rem' }}>로그아웃</button>
             </div>
           </header>
 
@@ -2167,9 +3106,18 @@ function App() {
                   <h3>{p.title}</h3>
                   <div className="trip-card-footer">
                     <div className="avatar-group" style={{ margin: 0 }}>
-                      {p.members.map((m, idx) => (
-                        <div key={idx} className="avatar">{m[0]}</div>
-                      ))}
+                      {p.members.map((m, idx) => {
+                        const mInfo = usersMap[m] || { nickname: m, profileImage: null };
+                        return (
+                          <div key={idx} className="avatar" title={mInfo.nickname} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            {mInfo.profileImage ? (
+                              <img src={mInfo.profileImage} alt={mInfo.nickname} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              mInfo.nickname.slice(0, 1)
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                     <span className="go-arrow">더 보기 ➔</span>
                   </div>
@@ -2203,9 +3151,18 @@ function App() {
                   <h3>{p.title}</h3>
                   <div className="trip-card-footer">
                     <div className="avatar-group" style={{ margin: 0 }}>
-                      {p.members.map((m, idx) => (
-                        <div key={idx} className="avatar">{m[0]}</div>
-                      ))}
+                      {p.members.map((m, idx) => {
+                        const mInfo = usersMap[m] || { nickname: m, profileImage: null };
+                        return (
+                          <div key={idx} className="avatar" title={mInfo.nickname} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            {mInfo.profileImage ? (
+                              <img src={mInfo.profileImage} alt={mInfo.nickname} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              mInfo.nickname.slice(0, 1)
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                     <span className="go-arrow">기록 보기 ➔</span>
                   </div>
@@ -2258,8 +3215,56 @@ function App() {
               }}>
                 <span>👥</span><span>가족</span>
               </button>
+              <button className={`tab-btn ${activeTab === 'places' ? 'active' : ''}`} style={{ padding: '8px 10px', fontSize: '0.88rem', margin: 0, display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => {
+                setActiveTab('places');
+                setSelectedDayFilter('all');
+                setSelectedChecklistFilter('all');
+                setSelectedExpenseFilter('all');
+              }}>
+                <span>📍</span><span>장소</span>
+              </button>
             </div>
-            <div style={{ width: '32px' }}></div>
+            <button 
+              onClick={() => setShowNotifModal(true)}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                fontSize: '1.2rem', 
+                cursor: 'pointer', 
+                position: 'relative',
+                padding: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--text)',
+                width: '32px',
+                height: '32px',
+                margin: 0
+              }}
+              title="알림 센터"
+            >
+              🔔
+              {unreadCount > 0 && (
+                <span style={{ 
+                  position: 'absolute', 
+                  top: '2px', 
+                  right: '2px', 
+                  background: 'var(--danger)', 
+                  color: '#fff', 
+                  fontSize: '0.62rem', 
+                  borderRadius: '50%', 
+                  width: '15px', 
+                  height: '15px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  fontWeight: 'bold',
+                  boxShadow: '0 0 0 2px var(--bg-card)'
+                }}>
+                  {unreadCount}
+                </span>
+              )}
+            </button>
           </header>
 
           {/* Main Content Area */}
@@ -2442,6 +3447,8 @@ function App() {
                                 <div className="timeline-dot"></div>
                               <div 
                                 className="timeline-content"
+                                onClick={() => setSelectedDetailPlace(place)}
+                                style={{ cursor: 'pointer', position: 'relative' }}
                               >
                                 <div className="timeline-time">
                                   {place.time}
@@ -2453,150 +3460,21 @@ function App() {
                                     </span>
                                   )}
                                 </div>
-                                <div className="timeline-title-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                                    <div className="timeline-place">{place.name}</div>
-                                    {place.category && <span className={`category-badge category-${place.category}`}>{place.category}</span>}
-                                  </div>
 
-                                  {/* Kebab More Menu Button (⋮) */}
-                                  <div className="place-menu-container" style={{ position: 'relative' }}>
-                                    <button
-                                      type="button"
-                                      className="place-menu-btn"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setOpenMenuPlaceId(openMenuPlaceId === place.id ? null : place.id);
-                                      }}
-                                      style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        fontSize: '1.2rem',
-                                        fontWeight: 'bold',
-                                        cursor: 'pointer',
-                                        padding: '2px 8px',
-                                        color: 'var(--text-muted)',
-                                        borderRadius: '4px',
-                                        lineHeight: 1
-                                      }}
-                                      title="일정 옵션 메뉴 (수정 / 복사 / 삭제)"
-                                    >
-                                      ⋮
-                                    </button>
-
-                                    {openMenuPlaceId === place.id && (
-                                      <div
-                                        className="place-menu-dropdown"
-                                        onClick={(e) => e.stopPropagation()}
-                                        style={{
-                                          position: 'absolute',
-                                          right: 0,
-                                          top: '100%',
-                                          marginTop: '4px',
-                                          background: 'var(--bg-card)',
-                                          border: '1px solid var(--border)',
-                                          borderRadius: '8px',
-                                          boxShadow: 'var(--shadow-md)',
-                                          zIndex: 100,
-                                          minWidth: '130px',
-                                          overflow: 'hidden'
-                                        }}
-                                      >
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            setOpenMenuPlaceId(null);
-                                            setEditingPlace({ ...place, duration: place.duration || 0 });
-                                          }}
-                                          style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            width: '100%',
-                                            padding: '10px 14px',
-                                            background: 'none',
-                                            border: 'none',
-                                            fontSize: '0.82rem',
-                                            color: 'var(--text)',
-                                            cursor: 'pointer',
-                                            textAlign: 'left'
-                                          }}
-                                        >
-                                          ✏️ 일정 수정
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            setOpenMenuPlaceId(null);
-                                            setNewPlace({
-                                              day: dayItem.day,
-                                              time: place.time,
-                                              duration: place.duration || 60,
-                                              name: `${place.name} (복사)`,
-                                              address: place.address || '',
-                                              category: place.category || '관광',
-                                              description: place.description || '',
-                                              tip: place.tip || '',
-                                              needsReservation: place.needsReservation || false,
-                                              isReservationCompleted: place.isReservationCompleted || false,
-                                              estimatedCost: place.estimatedCost || place.cost || 0,
-                                              currency: place.currency || planCurrency,
-                                              payer: place.payer || '미지정',
-                                              transportType: place.transportType || '',
-                                              transportDuration: place.transportDuration || '',
-                                              images: place.images ? [...place.images] : [],
-                                              mapImages: place.mapImages ? [...place.mapImages] : []
-                                            });
-                                            setShowAddPlaceModal(true);
-                                          }}
-                                          style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            width: '100%',
-                                            padding: '10px 14px',
-                                            background: 'none',
-                                            border: 'none',
-                                            fontSize: '0.82rem',
-                                            color: 'var(--text)',
-                                            cursor: 'pointer',
-                                            textAlign: 'left',
-                                            borderTop: '1px solid var(--border)'
-                                          }}
-                                        >
-                                          📋 일정 복사
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            setOpenMenuPlaceId(null);
-                                            handleDeletePlace(dayItem.day, place.id);
-                                          }}
-                                          style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            width: '100%',
-                                            padding: '10px 14px',
-                                            background: 'none',
-                                            border: 'none',
-                                            fontSize: '0.82rem',
-                                            color: '#ef4444',
-                                            cursor: 'pointer',
-                                            textAlign: 'left',
-                                            borderTop: '1px solid var(--border)'
-                                          }}
-                                        >
-                                          🗑️ 일정 삭제
-                                        </button>
-                                      </div>
-                                    )}
-                                  </div>
+                                <div className="timeline-title-row" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                                  <div className="timeline-place" style={{ margin: 0, fontSize: '1rem', fontWeight: 'bold' }}>{place.name}</div>
+                                  {place.category && <span className={`category-badge category-${place.category}`} style={{ padding: '2px 6px', fontSize: '0.75rem' }}>{place.category}</span>}
                                 </div>
-                                {place.description && <div className="timeline-desc">{place.description}</div>}
-                                
+
+                                {place.description && (
+                                  <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '4px', whiteSpace: 'pre-wrap', lineHeight: '1.4' }}>
+                                    {place.description}
+                                  </div>
+                                )}
+
+                                {/* Image Gallery Preview */}
                                 {place.images && place.images.length > 0 && (
-                                  <div className="timeline-images-gallery" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '8px 0', scrollbarWidth: 'thin' }}>
+                                  <div className="timeline-images-gallery" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '6px 0', scrollbarWidth: 'thin' }} onClick={e => e.stopPropagation()}>
                                     {place.images.map((imgUrl, imgIdx) => (
                                       <img
                                         key={imgIdx}
@@ -2608,70 +3486,32 @@ function App() {
                                           setLightboxActiveIndex(imgIdx);
                                         }}
                                         style={{
-                                          width: '90px',
-                                          height: '90px',
+                                          width: '70px',
+                                          height: '70px',
                                           objectFit: 'cover',
-                                          borderRadius: '8px',
+                                          borderRadius: '6px',
                                           cursor: 'pointer',
                                           border: '1px solid var(--border)',
-                                          flexShrink: 0,
-                                          transition: 'transform 0.2s'
+                                          flexShrink: 0
                                         }}
-                                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                                        onMouseLeave={(e) => e.target.style.transform = 'scale(1.0)'}
                                       />
                                     ))}
                                   </div>
                                 )}
 
-                                {place.mapImages && place.mapImages.length > 0 && (
-                                  <div className="timeline-map-gallery" style={{ marginTop: '8px' }}>
-                                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                      <span>🗺️ 첨부된 이동 경로 지도</span>
-                                    </div>
-                                    <div className="timeline-images-gallery" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '4px 0', scrollbarWidth: 'thin' }}>
-                                      {place.mapImages.map((imgUrl, imgIdx) => (
-                                        <img
-                                          key={imgIdx}
-                                          src={imgUrl}
-                                          alt={`${place.name} map ${imgIdx + 1}`}
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setLightboxImagesList(place.mapImages);
-                                            setLightboxActiveIndex(imgIdx);
-                                          }}
-                                          style={{
-                                            width: '120px',
-                                            height: '90px',
-                                            objectFit: 'cover',
-                                            borderRadius: '8px',
-                                            cursor: 'pointer',
-                                            border: '1px solid var(--border)',
-                                            flexShrink: 0,
-                                            transition: 'transform 0.2s'
-                                          }}
-                                          onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                                          onMouseLeave={(e) => e.target.style.transform = 'scale(1.0)'}
-                                        />
-                                      ))}
-                                    </div>
+                                {/* Tip / Precautions */}
+                                {place.tip && (
+                                  <div style={{ fontSize: '0.8rem', color: '#b45309', background: '#fffbeb', border: '1px solid #fef3c7', padding: '6px 10px', borderRadius: '6px', marginTop: '6px', whiteSpace: 'pre-wrap' }}>
+                                    💡 {place.tip}
                                   </div>
                                 )}
 
-                                {(place.estimatedCost > 0 || place.cost > 0) && (
-                                  <div className="timeline-cost">
-                                    💴 {formatCostComparison(place.estimatedCost ?? place.cost, place.currency || (place.estimatedCost ? planCurrency : 'KRW'))}
-                                    {place.payer && <span> · {place.payer} 결제</span>}
-                                  </div>
-                                )}
-                                {place.tip && <div className="timeline-tip">💡 {place.tip}</div>}
-                                
-                                {/* Unified Action Buttons Row */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
-                                  {/* Map Icon Link */}
+                                {/* Action Buttons and Indicators Row */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }} onClick={e => e.stopPropagation()}>
+                                  {/* Map Search / View */}
                                   <a
                                     href={planCurrency === 'KRW'
-                                      ? (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+                                      ? (new RegExp('iPhone|iPad|iPod|Android', 'i').test(navigator.userAgent)
                                           ? `https://m.map.naver.com/search2/search.naver?query=${encodeURIComponent(place.address || place.name)}`
                                           : `https://map.naver.com/p/search/${encodeURIComponent(place.address || place.name)}`)
                                       : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address || place.name)}`
@@ -2680,37 +3520,35 @@ function App() {
                                     rel="noopener noreferrer"
                                     onClick={(e) => e.stopPropagation()}
                                     title={place.address ? `지도 보기: ${place.address}` : '지도 검색'}
-                                    className="comments-toggle"
-                                    style={{ marginTop: 0, padding: '4px 8px', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', textDecoration: 'none' }}
+                                    style={{ 
+                                      fontSize: '0.75rem', 
+                                      display: 'inline-flex', 
+                                      alignItems: 'center', 
+                                      gap: '4px', 
+                                      textDecoration: 'none', 
+                                      color: 'var(--primary)', 
+                                      background: 'var(--primary-light)', 
+                                      padding: '4px 8px', 
+                                      borderRadius: '6px',
+                                      fontWeight: 'bold'
+                                    }}
                                   >
-                                    <span>🗺️</span><span>{place.address ? '보기' : '찾기'}</span>
+                                    🗺️{place.address ? '보기' : '찾기'}
                                   </a>
 
-                                  {/* Comments Toggle Button */}
-                                  <div 
-                                    className="comments-toggle" 
-                                    onClick={() => toggleCommentsDrawer(place.id)}
-                                    style={{ marginTop: 0 }}
-                                  >
-                                    💬 {place.comments ? place.comments.length : 0}개 댓글
-                                  </div>
-
-                                  {/* Reservation Badge */}
+                                  {/* Reservation badge toggle */}
                                   {place.needsReservation && (
                                     place.isReservationCompleted ? (
                                       <div 
-                                        className="reservation-completed" 
-                                        onClick={(e) => handleToggleReservationComplete(e, place.id)}
+                                        onClick={(e) => { e.stopPropagation(); handleToggleReservationComplete(e, place.id); }}
                                         title="클릭하여 예약 필요로 상태 전환"
                                         style={{ 
-                                          marginTop: 0, 
                                           padding: '4px 8px', 
                                           borderRadius: '6px', 
                                           color: '#047857', 
                                           backgroundColor: '#d1fae5', 
                                           fontSize: '0.75rem', 
                                           fontWeight: 700, 
-                                          display: 'inline-block',
                                           cursor: 'pointer'
                                         }}
                                       >
@@ -2718,113 +3556,35 @@ function App() {
                                       </div>
                                     ) : (
                                       <div 
-                                        className="reservation-required" 
-                                        onClick={(e) => handleToggleReservationComplete(e, place.id)}
+                                        onClick={(e) => { e.stopPropagation(); handleToggleReservationComplete(e, place.id); }}
                                         title="클릭하여 예약 완료로 상태 전환"
-                                        style={{ marginTop: 0, padding: '4px 8px', cursor: 'pointer' }}
+                                        style={{ 
+                                          padding: '4px 8px', 
+                                          borderRadius: '6px', 
+                                          color: '#b91c1c', 
+                                          backgroundColor: '#fee2e2', 
+                                          fontSize: '0.75rem', 
+                                          fontWeight: 700, 
+                                          cursor: 'pointer'
+                                        }}
                                       >
                                         🎫 예약 필요
                                       </div>
                                     )
                                   )}
-                                </div>
 
-                                {/* Comments Drawer */}
-                                {toggledComments[place.id] && (
-                                  <div className="comments-drawer">
-                                    <div className="comments-list">
-                                      {(!place.comments || place.comments.length === 0) ? (
-                                        <div className="empty-comments">첫 댓글을 달아 가족과 소통해 보세요!</div>
-                                      ) : (
-                                        place.comments.map((comment) => {
-                                          const canManage = comment.author === currentUser.name || currentUser.role === 'admin';
-                                          const isEditing = editingCommentId === comment.id;
-                                          return (
-                                            <div key={comment.id} className={`comment-bubble ${comment.author === currentUser.name ? 'my-comment' : ''}`}>
-                                              <div className="comment-meta">
-                                                <span className="comment-author">{comment.author}</span>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                  <span className="comment-time">{comment.time}</span>
-                                                  {canManage && !isEditing && (
-                                                    <div className="comment-actions">
-                                                      <button 
-                                                        type="button" 
-                                                        className="comment-action-btn"
-                                                        onClick={() => {
-                                                          setEditingCommentId(comment.id);
-                                                          setEditingCommentText(comment.text);
-                                                        }}
-                                                      >
-                                                        수정
-                                                      </button>
-                                                      <button 
-                                                        type="button" 
-                                                        className="comment-action-btn delete"
-                                                        onClick={() => handleDeleteComment(place.id, comment.id)}
-                                                      >
-                                                        삭제
-                                                      </button>
-                                                    </div>
-                                                  )}
-                                                </div>
-                                              </div>
-                                              {isEditing ? (
-                                                <div className="comment-edit-box">
-                                                  <input 
-                                                    type="text" 
-                                                    className="comment-edit-input" 
-                                                    value={editingCommentText} 
-                                                    onChange={e => setEditingCommentText(e.target.value)}
-                                                    onKeyDown={e => {
-                                                      if (e.key === 'Enter') handleUpdateComment(place.id, comment.id, editingCommentText);
-                                                    }}
-                                                    autoFocus
-                                                  />
-                                                  <div className="comment-edit-actions">
-                                                    <button 
-                                                      type="button" 
-                                                      className="btn-cancel-sm" 
-                                                      onClick={() => {
-                                                        setEditingCommentId(null);
-                                                        setEditingCommentText('');
-                                                      }}
-                                                      style={{ padding: '4px 8px', fontSize: '0.75rem', margin: 0 }}
-                                                    >
-                                                      취소
-                                                    </button>
-                                                    <button 
-                                                      type="button" 
-                                                      className="btn-save-sm" 
-                                                      onClick={() => handleUpdateComment(place.id, comment.id, editingCommentText)}
-                                                      style={{ padding: '4px 8px', fontSize: '0.75rem', margin: 0 }}
-                                                    >
-                                                      저장
-                                                    </button>
-                                                  </div>
-                                                </div>
-                                              ) : (
-                                                <div className="comment-text">{comment.text}</div>
-                                              )}
-                                            </div>
-                                          );
-                                        })
-                                      )}
-                                    </div>
-                                    <div className="comment-input-box">
-                                      <input 
-                                        type="text" 
-                                        placeholder="가족들과 이야기 나누기..." 
-                                        className="form-control comment-input"
-                                        value={commentInputs[place.id] || ''}
-                                        onChange={e => setCommentInputs({ ...commentInputs, [place.id]: e.target.value })}
-                                        onKeyDown={e => {
-                                          if (e.key === 'Enter') handleAddComment(place.id);
-                                        }}
-                                      />
-                                      <button className="comment-send-btn" onClick={() => handleAddComment(place.id)}>전송</button>
-                                    </div>
-                                  </div>
-                                )}
+                                  {/* Comments count */}
+                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                    💬 {place.comments ? place.comments.length : 0}
+                                  </span>
+
+                                  {/* Alternatives count indicator */}
+                                  {place.alternatives && place.alternatives.length > 0 && (
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 'bold' }}>
+                                      🔀 대안 {place.alternatives.length}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                             {idx < dayItem.places.length - 1 && !(
@@ -3070,7 +3830,7 @@ function App() {
                     }
 
                     return filtered.map((item) => (
-                      <div key={item.id} className="checklist-item" onClick={() => handleToggleCheck(item.id)}>
+                      <div key={item.id} id={`checklist-item-${item.id}`} className="checklist-item" onClick={() => handleToggleCheck(item.id)}>
                         <div className={`checkbox-custom ${item.checked ? 'checked' : ''}`}></div>
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px' }}>
                           <div className={`checklist-text ${item.checked ? 'checked' : ''}`}>{item.title}</div>
@@ -3180,7 +3940,7 @@ function App() {
                           <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px 0' }}>등록된 경비 내역이 없습니다.</div>
                         ) : (
                           filteredExpenses.map((item) => (
-                            <div key={item.id} className="expense-item">
+                            <div key={item.id} id={`expense-item-${item.id}`} className="expense-item">
                               <div className="expense-info">
                                 <h4 style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                                   {item.title} 
@@ -3235,10 +3995,19 @@ function App() {
                       const age = userObj ? calculateManAge(userObj.pin) : null;
                       return (
                         <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0' }}>
-                          <div className="avatar" style={{ margin: 0, width: '40px', height: '40px', fontSize: '1.1rem' }}>{m[0]}</div>
+                          <div 
+                            className="avatar" 
+                            style={{ margin: 0, width: '40px', height: '40px', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}
+                          >
+                            {usersMap[m]?.profileImage ? (
+                              <img src={usersMap[m].profileImage} alt={usersMap[m].nickname} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              (usersMap[m]?.nickname || m).slice(0, 1)
+                            )}
+                          </div>
                           <div>
                             <div style={{ fontWeight: '600' }}>
-                              {m} 
+                              {usersMap[m]?.nickname || m} {usersMap[m]?.nickname && usersMap[m].nickname !== m && <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>({m})</span>}
                               {userObj?.engName && <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginLeft: '6px', fontWeight: 'normal' }}>{userObj.engName}</span>}
                               {age !== null && <span style={{ fontSize: '0.85rem', fontWeight: 'normal', color: 'var(--text-muted)', marginLeft: '6px' }}>(만 {age}세)</span>}
                             </div>
@@ -3259,11 +4028,137 @@ function App() {
                 </div>
               </div>
             )}
+
+            {/* 5. PLACES TAB */}
+            {activeTab === 'places' && (
+              <div className="card" style={{ padding: '20px 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h3 className="card-title" style={{ margin: 0 }}>📍 장소 보관함</h3>
+                  <button 
+                    className="submit-btn" 
+                    style={{ width: 'auto', margin: 0, padding: '8px 16px', fontSize: '0.85rem' }}
+                    onClick={() => {
+                      setNewSavedPlace({ name: '', category: '관광', address: '', description: '', tip: '', url: '' });
+                      setShowAddSavedPlaceModal(true);
+                    }}
+                  >
+                    ➕ 새 장소 추가
+                  </button>
+                </div>
+
+                {/* Map Container */}
+                <div 
+                  ref={mapRef} 
+                  className="places-map" 
+                  style={{ 
+                    height: '300px', 
+                    borderRadius: '12px', 
+                    border: '1px solid var(--border)', 
+                    marginBottom: '20px',
+                    zIndex: 5,
+                    position: 'relative',
+                    backgroundColor: 'var(--bg-app, #f5f5f5)'
+                  }}
+                >
+                  {!leafletLoaded && (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)' }}>
+                      지도 로딩 중...
+                    </div>
+                  )}
+                  {leafletLoaded && (!plan.savedPlaces || plan.savedPlaces.filter(p => p.lat && p.lng).length === 0) && (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', position: 'absolute', width: '100%', pointerEvents: 'none', zIndex: 1000 }}>
+                      주소가 등록된 장소가 없습니다.
+                    </div>
+                  )}
+                </div>
+
+                {/* Saved Places List */}
+                <div className="saved-places-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px' }}>
+                  {(!plan.savedPlaces || plan.savedPlaces.length === 0) ? (
+                    <div className="empty-state" style={{ gridColumn: '1 / -1', padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      저장된 장소가 없습니다. 가고 싶은 후보 장소들을 등록해 보세요!
+                    </div>
+                  ) : (
+                    plan.savedPlaces.map(sp => (
+                      <div key={sp.id} className="saved-place-card" style={{
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '12px',
+                        padding: '14px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        position: 'relative',
+                        boxShadow: 'var(--shadow-sm)'
+                      }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                            <span className={`category-badge category-${sp.category}`}>{sp.category}</span>
+                            <strong style={{ fontSize: '0.95rem', color: 'var(--text)' }}>{sp.name}</strong>
+                          </div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span>📍</span> <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '200px' }} title={sp.address}>{sp.address || '주소 없음'}</span>
+                          </div>
+                          {sp.description && (
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text)', marginBottom: '8px', background: 'var(--bg-app)', padding: '6px 8px', borderRadius: '6px', whiteSpace: 'pre-wrap' }}>
+                              {sp.description}
+                            </div>
+                          )}
+                          {sp.tip && (
+                            <div style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '500', whiteSpace: 'pre-wrap' }}>
+                              💡 {sp.tip}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '12px', borderTop: '1px solid var(--border)', paddingTop: '10px' }}>
+                          {sp.url && (
+                            <a href={sp.url} target="_blank" rel="noopener noreferrer" className="btn-secondary-sm" style={{ flex: 1, textAlign: 'center', textDecoration: 'none', padding: '6px 0', fontSize: '0.75rem', display: 'inline-block' }}>
+                              🔗 지도검색
+                            </a>
+                          )}
+                          <button 
+                            type="button" 
+                            className="btn-secondary-sm" 
+                            style={{ padding: '6px 12px', fontSize: '0.75rem', width: 'auto', margin: 0 }}
+                            onClick={() => {
+                              setEditingSavedPlace(sp);
+                            }}
+                          >
+                            ✏️ 수정
+                          </button>
+                          <button 
+                            type="button" 
+                            className="delete-btn-danger" 
+                            style={{ padding: '6px 12px', fontSize: '0.75rem', width: 'auto', marginTop: 0, marginLeft: 'auto' }}
+                            onClick={() => handleDeleteSavedPlace(sp.id)}
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </main>
 
           {/* Floating Action Button inside Details */}
           {activeTab !== 'members' && (
-            <button className="fab" onClick={() => setShowModal(true)}>+</button>
+            <button 
+              className="fab" 
+              onClick={() => {
+                if (activeTab === 'places') {
+                  setNewSavedPlace({ name: '', category: '관광', address: '', description: '', tip: '', url: '' });
+                  setShowAddSavedPlaceModal(true);
+                } else {
+                  setShowModal(true);
+                }
+              }}
+            >
+              +
+            </button>
           )}
 
           {/* Bottom Navigation removed and merged to Header */}
@@ -3307,18 +4202,20 @@ function App() {
                           <input type="time" required className="form-control" value={newPlace.time} onChange={e => setNewPlace({ ...newPlace, time: e.target.value })} />
                         </div>
                         <div className="form-group" style={{ flex: 1 }}>
-                          <label>체류 시간 (점유 시간)</label>
-                          <select className="form-control" value={newPlace.duration} onChange={e => setNewPlace({ ...newPlace, duration: Number(e.target.value) })}>
-                            <option value={0}>설정 안 함 (0분)</option>
-                            <option value={30}>30분</option>
-                            <option value={60}>1시간</option>
-                            <option value={90}>1시간 30분</option>
-                            <option value={120}>2시간</option>
-                            <option value={150}>2시간 30분</option>
-                            <option value={180}>3시간</option>
-                            <option value={240}>4시간</option>
-                            <option value={300}>5시간</option>
-                          </select>
+                          <label>체류 시간 (분 단위)</label>
+                          <input 
+                            type="number" 
+                            min="0"
+                            placeholder="예: 90" 
+                            className="form-control" 
+                            value={newPlace.duration || ''} 
+                            onChange={e => setNewPlace({ ...newPlace, duration: e.target.value === '' ? 0 : Number(e.target.value) })} 
+                          />
+                          {newPlace.duration > 0 && (
+                            <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600', display: 'block', marginTop: '4px' }}>
+                              🕒 {Math.floor(newPlace.duration / 60) > 0 ? `${Math.floor(newPlace.duration / 60)}시간 ` : ''}{newPlace.duration % 60}분 체류
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -3657,19 +4554,21 @@ function App() {
                         <label>시간 (HH:MM)</label>
                         <input type="time" required className="form-control" value={editingPlace.time} onChange={e => setEditingPlace({ ...editingPlace, time: e.target.value })} />
                       </div>
-                      <div className="form-group" style={{ flex: 1 }}>
-                        <label>체류 시간 (점유 시간)</label>
-                        <select className="form-control" value={editingPlace.duration} onChange={e => setEditingPlace({ ...editingPlace, duration: Number(e.target.value) })}>
-                          <option value={0}>설정 안 함 (0분)</option>
-                          <option value={30}>30분</option>
-                          <option value={60}>1시간</option>
-                          <option value={90}>1시간 30분</option>
-                          <option value={120}>2시간</option>
-                          <option value={150}>2시간 30분</option>
-                          <option value={180}>3시간</option>
-                          <option value={240}>4시간</option>
-                          <option value={300}>5시간</option>
-                        </select>
+                       <div className="form-group" style={{ flex: 1 }}>
+                        <label>체류 시간 (분 단위)</label>
+                        <input 
+                          type="number" 
+                          min="0"
+                          placeholder="예: 90" 
+                          className="form-control" 
+                          value={editingPlace.duration || ''} 
+                          onChange={e => setEditingPlace({ ...editingPlace, duration: e.target.value === '' ? 0 : Number(e.target.value) })} 
+                        />
+                        {editingPlace.duration > 0 && (
+                          <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600', display: 'block', marginTop: '4px' }}>
+                            🕒 {Math.floor(editingPlace.duration / 60) > 0 ? `${Math.floor(editingPlace.duration / 60)}시간 ` : ''}{editingPlace.duration % 60}분 체류
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="form-group">
@@ -3892,8 +4791,8 @@ function App() {
                     )}
                   </div> {/* Close form-group of map images */}
                 </div> {/* Close modal-body */}
-                  <div className="modal-footer">
-                    <button type="button" className="btn-secondary-sm" onClick={() => setEditingPlace(null)} style={{ margin: 0, padding: '12px' }}>취소</button>
+                  <div className="modal-footer" style={{ display: 'flex', gap: '8px', padding: '12px 16px' }}>
+                    <button type="button" className="btn-secondary-sm" onClick={() => setEditingPlace(null)} style={{ flex: 2, margin: 0, padding: '12px' }}>취소</button>
                     <button type="button" className="btn-secondary-sm" onClick={() => {
                       const copyTarget = { ...editingPlace };
                       setEditingPlace(null);
@@ -3916,15 +4815,651 @@ function App() {
                         images: copyTarget.images ? [...copyTarget.images] : [],
                         mapImages: copyTarget.mapImages ? [...copyTarget.mapImages] : []
                       });
-                      setShowAddPlaceModal(true);
-                    }} style={{ margin: 0, padding: '12px 14px', background: 'var(--bg-main)', border: '1px solid var(--border)', color: 'var(--text)' }}>📋 복사하여 신규 추가</button>
-                    <button type="button" className="delete-btn-danger" onClick={() => handleDeletePlace(editingPlace.id)} style={{ width: 'auto', marginTop: 0, padding: '12px 16px' }}>삭제</button>
-                    <button type="submit" className="submit-btn" style={{ flex: 1, margin: 0, padding: '12px' }}>수정 완료</button>
+                      setShowModal(true);
+                    }} style={{ flex: 1, margin: 0, padding: '12px 4px', background: 'var(--bg-main)', border: '1px solid var(--border)', color: 'var(--text)', whiteSpace: 'nowrap' }}>📋 복사</button>
+                    <button type="button" className="delete-btn-danger" onClick={() => handleDeletePlace(editingPlace.id)} style={{ flex: 1, width: 'auto', marginTop: 0, padding: '12px 4px' }}>삭제</button>
+                    <button type="submit" className="submit-btn" style={{ flex: 3, margin: 0, padding: '12px' }}>수정 완료</button>
                   </div>
                 </form>
               </div>
             </div>
-          )}
+      )}
+
+      {/* 2.4 SCHEDULE DETAIL MODAL */}
+      {selectedDetailPlace && (
+        <div className="modal-overlay" onClick={() => setSelectedDetailPlace(null)} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1100 }}>
+          <div className="detail-modal-content" onClick={(e) => e.stopPropagation()}>
+            
+            {/* Sticky Fixed Header */}
+            <div className="detail-modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span className={`category-badge category-${selectedDetailPlace.category}`}>{selectedDetailPlace.category}</span>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700 }}>{selectedDetailPlace.name}</h3>
+              </div>
+              <button className="close-btn" onClick={() => setSelectedDetailPlace(null)} style={{ fontSize: '1.8rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', color: 'var(--text-muted)' }}>×</button>
+            </div>
+
+            {/* Scrollable Body (Vertical Column) */}
+            <div className="detail-modal-body">
+              
+              {/* Time & Duration */}
+              <div style={{ fontSize: '0.92rem', fontWeight: 'bold', color: 'var(--primary)' }}>
+                🕒 {selectedDetailPlace.time} {selectedDetailPlace.duration > 0 && " (" + Math.floor(selectedDetailPlace.duration / 60) + "시간 " + (selectedDetailPlace.duration % 60) + "분 체류)"}
+              </div>
+
+              {/* Description */}
+              {selectedDetailPlace.description && (
+                <div className="detail-field">
+                  <h4 style={{ margin: '0 0 6px 0', fontSize: '0.88rem', color: 'var(--text-muted)' }}>📝 메모 / 설명</h4>
+                  <div style={{ fontSize: '0.9rem', color: 'var(--text)', whiteSpace: 'pre-wrap', lineHeight: '1.5', background: 'var(--bg-app)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                    {selectedDetailPlace.description}
+                  </div>
+                </div>
+              )}
+
+              {/* Tip / Cautions */}
+              {selectedDetailPlace.tip && (
+                <div className="detail-field" style={{ background: '#fffbeb', border: '1px solid #fef3c7', padding: '12px', borderRadius: '8px' }}>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '0.88rem', color: '#b45309', display: 'flex', alignItems: 'center', gap: '4px' }}>💡 팁 / 주의사항</h4>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#78350f', whiteSpace: 'pre-wrap', lineHeight: '1.4' }}>{selectedDetailPlace.tip}</p>
+                </div>
+              )}
+
+              {/* Cost info */}
+              {(selectedDetailPlace.estimatedCost > 0 || selectedDetailPlace.cost > 0) && (
+                <div className="detail-field" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 600 }}>
+                  <span>💴 예상 경비:</span>
+                  <span style={{ color: 'var(--primary)' }}>
+                    {formatCostComparison(selectedDetailPlace.estimatedCost ?? selectedDetailPlace.cost, selectedDetailPlace.currency || planCurrency)}
+                  </span>
+                  {selectedDetailPlace.payer && (
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>
+                      ({selectedDetailPlace.payer} 결제)
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Photos Gallery */}
+              {selectedDetailPlace.images && selectedDetailPlace.images.length > 0 && (
+                <div className="detail-field">
+                  <h4 style={{ margin: '0 0 6px 0', fontSize: '0.88rem', color: 'var(--text-muted)' }}>🖼️ 현장 사진</h4>
+                  <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '6px' }}>
+                    {selectedDetailPlace.images.map((img, idx) => (
+                      <img 
+                        key={idx} 
+                        src={img} 
+                        alt="detail" 
+                        style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border)', cursor: 'pointer' }}
+                        onClick={() => {
+                          setLightboxImagesList(selectedDetailPlace.images);
+                          setLightboxActiveIndex(idx);
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Map Gallery */}
+              {selectedDetailPlace.mapImages && selectedDetailPlace.mapImages.length > 0 && (
+                <div className="detail-field">
+                  <h4 style={{ margin: '0 0 6px 0', fontSize: '0.88rem', color: 'var(--text-muted)' }}>🗺️ 첨부 지도</h4>
+                  <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '6px' }}>
+                    {selectedDetailPlace.mapImages.map((mapImg, idx) => (
+                      <img 
+                        key={idx} 
+                        src={mapImg} 
+                        alt="map" 
+                        style={{ width: '120px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border)', cursor: 'pointer' }}
+                        onClick={() => {
+                          setLightboxImagesList(selectedDetailPlace.mapImages);
+                          setLightboxActiveIndex(idx);
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons Row */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', paddingBottom: '8px', borderBottom: '1px solid var(--border)' }}>
+                <a
+                  href={planCurrency === 'KRW'
+                    ? (new RegExp('iPhone|iPad|iPod|Android', 'i').test(navigator.userAgent)
+                        ? `https://m.map.naver.com/search2/search.naver?query=${encodeURIComponent(selectedDetailPlace.address || selectedDetailPlace.name)}`
+                        : `https://map.naver.com/p/search/${encodeURIComponent(selectedDetailPlace.address || selectedDetailPlace.name)}`)
+                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedDetailPlace.address || selectedDetailPlace.name)}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary-sm"
+                  style={{ padding: '8px 12px', fontSize: '0.8rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                >
+                  🗺️{selectedDetailPlace.address ? '보기' : '찾기'}
+                </a>
+
+                {selectedDetailPlace.needsReservation && (
+                  <button 
+                    type="button"
+                    className="btn-secondary-sm"
+                    style={{ 
+                      padding: '8px 12px', 
+                      fontSize: '0.8rem', 
+                      backgroundColor: selectedDetailPlace.isReservationCompleted ? '#d1fae5' : '#fee2e2',
+                      color: selectedDetailPlace.isReservationCompleted ? '#065f46' : '#991b1b',
+                      border: 'none',
+                      fontWeight: 'bold'
+                    }}
+                    onClick={(e) => handleToggleReservationComplete(e, selectedDetailPlace.id)}
+                  >
+                    {selectedDetailPlace.isReservationCompleted ? '✅ 예약 완료' : '🎫 예약 필요'}
+                  </button>
+                )}
+
+                <button 
+                  type="button" 
+                  className="btn-secondary-sm" 
+                  style={{ padding: '8px 12px', fontSize: '0.8rem' }}
+                  onClick={() => {
+                    setEditingPlace({ ...selectedDetailPlace, duration: selectedDetailPlace.duration || 0 });
+                    setSelectedDetailPlace(null);
+                  }}
+                >
+                  ✏️ 수정
+                </button>
+                <button 
+                  type="button" 
+                  className="btn-secondary-sm" 
+                  style={{ padding: '8px 12px', fontSize: '0.8rem' }}
+                  onClick={() => {
+                    setNewPlace({
+                      day: selectedDetailPlace.day || 1,
+                      time: selectedDetailPlace.time,
+                      duration: selectedDetailPlace.duration || 60,
+                      name: `${selectedDetailPlace.name} (복사)`,
+                      address: selectedDetailPlace.address || '',
+                      category: selectedDetailPlace.category || '관광',
+                      description: selectedDetailPlace.description || '',
+                      tip: selectedDetailPlace.tip || '',
+                      needsReservation: selectedDetailPlace.needsReservation || false,
+                      isReservationCompleted: selectedDetailPlace.isReservationCompleted || false,
+                      estimatedCost: selectedDetailPlace.estimatedCost || selectedDetailPlace.cost || 0,
+                      currency: selectedDetailPlace.currency || planCurrency,
+                      payer: selectedDetailPlace.payer || '미지정',
+                      transportType: selectedDetailPlace.transportType || '',
+                      transportDuration: selectedDetailPlace.transportDuration || '',
+                      images: selectedDetailPlace.images ? [...selectedDetailPlace.images] : [],
+                      mapImages: selectedDetailPlace.mapImages ? [...selectedDetailPlace.mapImages] : []
+                    });
+                    setSelectedDetailPlace(null);
+                    setShowModal(true);
+                  }}
+                >
+                  📋 복사
+                </button>
+                <button 
+                  type="button" 
+                  className="delete-btn-danger" 
+                  style={{ padding: '8px 12px', fontSize: '0.8rem', width: 'auto', marginTop: 0 }}
+                  onClick={() => {
+                    handleDeletePlace(selectedDetailPlace.id);
+                    setSelectedDetailPlace(null);
+                  }}
+                >
+                  🗑️ 삭제
+                </button>
+              </div>
+
+              {/* Alternatives Section */}
+              <div className="alternatives-section" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    🔀 대안 일정 후보 ({selectedDetailPlace.alternatives ? selectedDetailPlace.alternatives.length : 0})
+                  </h4>
+                  
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button 
+                      type="button" 
+                      className="btn-secondary-sm" 
+                      style={{ padding: '4px 8px', fontSize: '0.75rem', margin: 0 }}
+                      onClick={() => {
+                        setAlternativeForm({
+                          mode: 'add',
+                          placeId: selectedDetailPlace.id,
+                          alt: { name: '', category: '식사', address: '', description: '', tip: '', estimatedCost: '', currency: planCurrency, payer: '미지정' }
+                        });
+                      }}
+                    >
+                      ➕ 직접 추가
+                    </button>
+                    {plan.savedPlaces && plan.savedPlaces.length > 0 && (
+                      <div style={{ position: 'relative', display: 'inline-block' }}>
+                        <button 
+                          type="button" 
+                          className="btn-secondary-sm" 
+                          style={{ padding: '4px 8px', fontSize: '0.75rem', margin: 0 }}
+                          onClick={() => {
+                            const val = document.getElementById(`sp-dropdown-${selectedDetailPlace.id}`);
+                            if (val) val.style.display = val.style.display === 'block' ? 'none' : 'block';
+                          }}
+                        >
+                          📂 보관함 로드
+                        </button>
+                        <div 
+                          id={`sp-dropdown-${selectedDetailPlace.id}`}
+                          style={{ 
+                            display: 'none', 
+                            position: 'absolute', 
+                            right: 0, 
+                            top: '100%', 
+                            marginTop: '4px', 
+                            background: '#fff', 
+                            border: '1px solid var(--border)', 
+                            borderRadius: '8px', 
+                            boxShadow: 'var(--shadow-md)', 
+                            zIndex: 1000, 
+                            minWidth: '220px', 
+                            maxHeight: '200px', 
+                            overflowY: 'auto' 
+                          }}
+                        >
+                          {plan.savedPlaces.map(sp => (
+                            <button
+                              key={sp.id}
+                              type="button"
+                              onClick={() => {
+                                handleImportFromSavedPlaces(selectedDetailPlace.id, sp);
+                                document.getElementById(`sp-dropdown-${selectedDetailPlace.id}`).style.display = 'none';
+                              }}
+                              style={{ 
+                                display: 'block', 
+                                width: '100%', 
+                                padding: '8px 12px', 
+                                textAlign: 'left', 
+                                background: 'none', 
+                                border: 'none', 
+                                borderBottom: '1px solid #f0f0f0', 
+                                fontSize: '0.78rem', 
+                                cursor: 'pointer' 
+                              }}
+                              onMouseEnter={e => e.target.style.background = '#f9f9f9'}
+                              onMouseLeave={e => e.target.style.background = 'none'}
+                            >
+                              <strong>[{sp.category}]</strong> {sp.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {!selectedDetailPlace.alternatives || selectedDetailPlace.alternatives.length === 0 ? (
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '16px 0', border: '1px dashed var(--border)', borderRadius: '8px' }}>
+                      대기 시간이나 상황 변동을 대비해 대안 장소를 등록해 두세요!
+                    </div>
+                  ) : (
+                    selectedDetailPlace.alternatives.map(alt => (
+                      <div key={alt.id} style={{
+                        border: '1px solid var(--border)',
+                        borderRadius: '8px',
+                        padding: '10px',
+                        backgroundColor: 'var(--bg-app)',
+                        fontSize: '0.82rem'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                          <div>
+                            <span className={`category-badge category-${alt.category}`} style={{ padding: '2px 4px', fontSize: '0.7rem' }}>{alt.category}</span>
+                            <strong style={{ marginLeft: '6px' }}>{alt.name}</strong>
+                          </div>
+                          
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button 
+                              type="button" 
+                              className="btn-secondary-sm"
+                              style={{ padding: '2px 6px', fontSize: '0.7rem', color: 'var(--primary)', fontWeight: 'bold' }}
+                              onClick={() => handleSwapPlaceWithAlternative(selectedDetailPlace.id, alt.id)}
+                            >
+                              🔄 교체
+                            </button>
+                            <button 
+                              type="button" 
+                              className="btn-secondary-sm"
+                              style={{ padding: '2px 6px', fontSize: '0.7rem' }}
+                              onClick={() => {
+                                setAlternativeForm({
+                                  mode: 'edit',
+                                  placeId: selectedDetailPlace.id,
+                                  alt: { ...alt }
+                                });
+                              }}
+                            >
+                              ✏️
+                            </button>
+                            <button 
+                              type="button" 
+                              className="delete-btn-danger"
+                              style={{ padding: '2px 6px', fontSize: '0.7rem', width: 'auto', marginTop: 0 }}
+                              onClick={() => handleDeleteAlternative(selectedDetailPlace.id, alt.id)}
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+                          
+                          {alt.description && <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '2px', whiteSpace: 'pre-wrap' }}>{alt.description}</div>}
+                          {alt.tip && <div style={{ color: '#b45309', fontSize: '0.75rem', marginTop: '2px', whiteSpace: 'pre-wrap' }}>💡 {alt.tip}</div>}
+                          {alt.address && <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '2px' }}>📍 {alt.address}</div>}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Comments Section inside Detail Modal */}
+                <div className="detail-comments-section" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <h4 style={{ margin: '0 0 10px 0', fontSize: '0.95rem', fontWeight: 700 }}>💬 가족 댓글 피드</h4>
+                  
+                  <div style={{ 
+                    flex: 1, 
+                    border: '1px solid var(--border)', 
+                    borderRadius: '8px', 
+                    padding: '12px', 
+                    background: 'var(--bg-app)', 
+                    maxHeight: '200px', 
+                    overflowY: 'auto',
+                    marginBottom: '10px'
+                  }}>
+                    {!selectedDetailPlace.comments || selectedDetailPlace.comments.length === 0 ? (
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '20px 0' }}>첫 댓글을 달아 가족과 소통해 보세요!</div>
+                    ) : (
+                      selectedDetailPlace.comments.map(c => {
+                        const isMyComment = c.author === currentUser.name;
+                        const isEditing = editingCommentId === c.id;
+                        return (
+                          <div key={c.id} style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: isMyComment ? 'flex-end' : 'flex-start',
+                            marginBottom: '10px'
+                          }}>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
+                              {c.author} · <span style={{ fontSize: '0.7rem' }}>{c.time}</span>
+                            </div>
+                            <div style={{
+                              backgroundColor: isMyComment ? 'var(--primary-light, #e0e7ff)' : '#fff',
+                              border: '1px solid var(--border)',
+                              borderRadius: '12px',
+                              padding: '8px 12px',
+                              maxWidth: '85%',
+                              fontSize: '0.82rem',
+                              color: 'var(--text)',
+                              position: 'relative'
+                            }}>
+                              {isEditing ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                  <input 
+                                    type="text" 
+                                    className="comment-edit-input" 
+                                    value={editingCommentText} 
+                                    onChange={e => setEditingCommentText(e.target.value)}
+                                    onKeyDown={e => {
+                                      if (e.key === 'Enter') handleUpdateComment(selectedDetailPlace.id, c.id, editingCommentText);
+                                    }}
+                                    style={{ fontSize: '0.8rem', padding: '4px' }}
+                                  />
+                                  <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
+                                    <button type="button" className="btn-cancel-sm" style={{ padding: '2px 6px', fontSize: '0.7rem' }} onClick={() => { setEditingCommentId(null); setEditingCommentText(''); }}>취소</button>
+                                    <button type="button" className="btn-save-sm" style={{ padding: '2px 6px', fontSize: '0.7rem' }} onClick={() => handleUpdateComment(selectedDetailPlace.id, c.id, editingCommentText)}>저장</button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div>
+                                  <div>{c.text}</div>
+                                  {(c.author === currentUser.name || currentUser.role === 'admin') && (
+                                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', marginTop: '4px', opacity: 0.6 }}>
+                                      <span style={{ cursor: 'pointer', fontSize: '0.7rem', color: 'blue' }} onClick={() => { setEditingCommentId(c.id); setEditingCommentText(c.text); }}>수정</span>
+                                      <span style={{ cursor: 'pointer', fontSize: '0.7rem', color: 'red' }} onClick={() => handleDeleteComment(selectedDetailPlace.id, c.id)}>삭제</span>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+
+                  {/* Comment Input Box */}
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <input 
+                      type="text"
+                      placeholder="가족들과 이야기 나누기..."
+                      className="form-control"
+                      style={{ flex: 1, margin: 0, padding: '8px 12px', fontSize: '0.85rem' }}
+                      value={commentInputs[selectedDetailPlace.id] || ''}
+                      onChange={e => setCommentInputs({ ...commentInputs, [selectedDetailPlace.id]: e.target.value })}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') handleAddComment(selectedDetailPlace.id);
+                      }}
+                    />
+                    <button 
+                      className="comment-send-btn" 
+                      style={{ padding: '8px 16px', margin: 0, height: 'auto' }}
+                      onClick={() => handleAddComment(selectedDetailPlace.id)}
+                    >
+                      전송
+                    </button>
+                  </div>
+                </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2.5 ADD SAVED PLACE MODAL */}
+      {showAddSavedPlaceModal && (
+        <div className="modal-overlay" onClick={() => setShowAddSavedPlaceModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>📍 새 후보 장소 추가</h3>
+              <button className="close-btn" onClick={() => setShowAddSavedPlaceModal(false)}>×</button>
+            </div>
+            <form onSubmit={handleAddSavedPlace}>
+              <div className="form-group">
+                <label>장소 이름 <span style={{ color: 'red' }}>*</span></label>
+                <input type="text" required className="form-control" placeholder="예: 함덕 맛있는 식당" value={newSavedPlace.name} onChange={e => setNewSavedPlace({ ...newSavedPlace, name: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>카테고리</label>
+                <select className="form-control" value={newSavedPlace.category} onChange={e => setNewSavedPlace({ ...newSavedPlace, category: e.target.value })}>
+                  <option value="식사">식사</option>
+                  <option value="관광">관광</option>
+                  <option value="숙소">숙소</option>
+                  <option value="카페">카페</option>
+                  <option value="쇼핑">쇼핑</option>
+                  <option value="이동">이동</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>주소 (입력 시 지도 마킹)</label>
+                <input type="text" className="form-control" placeholder="예: 제주 제주시 조천읍 함덕리..." value={newSavedPlace.address} onChange={e => setNewSavedPlace({ ...newSavedPlace, address: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>설명 / 메모</label>
+                <textarea className="form-control" placeholder="예: 대기줄 많음, 맛있는 부위는 한정 판매" value={newSavedPlace.description} onChange={e => setNewSavedPlace({ ...newSavedPlace, description: e.target.value })}></textarea>
+              </div>
+              <div className="form-group">
+                <label>팁 / 주의사항</label>
+                <input type="text" className="form-control" placeholder="예: 오후 5시 이전 대기 필수" value={newSavedPlace.tip} onChange={e => setNewSavedPlace({ ...newSavedPlace, tip: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>웹 지도 링크 (Naver/Google Map 등)</label>
+                <input type="text" className="form-control" placeholder="https://..." value={newSavedPlace.url} onChange={e => setNewSavedPlace({ ...newSavedPlace, url: e.target.value })} />
+              </div>
+              <div className="modal-footer" style={{ marginTop: '20px' }}>
+                <button type="button" className="btn-secondary-sm" onClick={() => setShowAddSavedPlaceModal(false)}>취소</button>
+                <button type="submit" className="submit-btn" style={{ flex: 1 }}>등록</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 2.6 EDIT SAVED PLACE MODAL */}
+      {editingSavedPlace && (
+        <div className="modal-overlay" onClick={() => setEditingSavedPlace(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>✏️ 후보 장소 수정</h3>
+              <button className="close-btn" onClick={() => setEditingSavedPlace(null)}>×</button>
+            </div>
+            <form onSubmit={handleEditSavedPlace}>
+              <div className="form-group">
+                <label>장소 이름 <span style={{ color: 'red' }}>*</span></label>
+                <input type="text" required className="form-control" value={editingSavedPlace.name} onChange={e => setEditingSavedPlace({ ...editingSavedPlace, name: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>카테고리</label>
+                <select className="form-control" value={editingSavedPlace.category} onChange={e => setEditingSavedPlace({ ...editingSavedPlace, category: e.target.value })}>
+                  <option value="식사">식사</option>
+                  <option value="관광">관광</option>
+                  <option value="숙소">숙소</option>
+                  <option value="카페">카페</option>
+                  <option value="쇼핑">쇼핑</option>
+                  <option value="이동">이동</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>주소</label>
+                <input type="text" className="form-control" value={editingSavedPlace.address || ''} onChange={e => setEditingSavedPlace({ ...editingSavedPlace, address: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>설명 / 메모</label>
+                <textarea className="form-control" value={editingSavedPlace.description || ''} onChange={e => setEditingSavedPlace({ ...editingSavedPlace, description: e.target.value })}></textarea>
+              </div>
+              <div className="form-group">
+                <label>팁 / 주의사항</label>
+                <input type="text" className="form-control" value={editingSavedPlace.tip || ''} onChange={e => setEditingSavedPlace({ ...editingSavedPlace, tip: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>웹 지도 링크</label>
+                <input type="text" className="form-control" value={editingSavedPlace.url || ''} onChange={e => setEditingSavedPlace({ ...editingSavedPlace, url: e.target.value })} />
+              </div>
+              <div className="modal-footer" style={{ marginTop: '20px' }}>
+                <button type="button" className="btn-secondary-sm" onClick={() => setEditingSavedPlace(null)}>취소</button>
+                <button type="submit" className="submit-btn" style={{ flex: 1 }}>저장 완료</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 2.7 ALTERNATIVE ADD/EDIT MODAL */}
+      {alternativeForm && (
+        <div className="modal-overlay" onClick={() => setAlternativeForm(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>{alternativeForm.mode === 'add' ? '🔀 대안 일정 추가' : '✏️ 대안 일정 수정'}</h3>
+              <button className="close-btn" onClick={() => setAlternativeForm(null)}>×</button>
+            </div>
+            <form onSubmit={handleSaveAlternative}>
+              <div className="form-group">
+                <label>장소 이름 <span style={{ color: 'red' }}>*</span></label>
+                <input 
+                  type="text" 
+                  required 
+                  className="form-control" 
+                  value={alternativeForm.alt.name} 
+                  onChange={e => setAlternativeForm({
+                    ...alternativeForm,
+                    alt: { ...alternativeForm.alt, name: e.target.value }
+                  })} 
+                />
+              </div>
+              <div className="form-group">
+                <label>카테고리</label>
+                <select 
+                  className="form-control" 
+                  value={alternativeForm.alt.category} 
+                  onChange={e => setAlternativeForm({
+                    ...alternativeForm,
+                    alt: { ...alternativeForm.alt, category: e.target.value }
+                  })}
+                >
+                  <option value="식사">식사</option>
+                  <option value="관광">관광</option>
+                  <option value="숙소">숙소</option>
+                  <option value="카페">카페</option>
+                  <option value="쇼핑">쇼핑</option>
+                  <option value="이동">이동</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>주소</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  placeholder="예: 제주 조천읍 함덕리..." 
+                  value={alternativeForm.alt.address || ''} 
+                  onChange={e => setAlternativeForm({
+                    ...alternativeForm,
+                    alt: { ...alternativeForm.alt, address: e.target.value }
+                  })} 
+                />
+              </div>
+              <div className="form-group">
+                <label>설명 / 메모</label>
+                <textarea 
+                  className="form-control" 
+                  placeholder="설명 작성" 
+                  value={alternativeForm.alt.description || ''} 
+                  onChange={e => setAlternativeForm({
+                    ...alternativeForm,
+                    alt: { ...alternativeForm.alt, description: e.target.value }
+                  })}
+                ></textarea>
+              </div>
+              <div className="form-group">
+                <label>팁 / 주의사항</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  value={alternativeForm.alt.tip || ''} 
+                  onChange={e => setAlternativeForm({
+                    ...alternativeForm,
+                    alt: { ...alternativeForm.alt, tip: e.target.value }
+                  })} 
+                />
+              </div>
+              <div className="form-group">
+                <label>예상 금액</label>
+                <input 
+                  type="number" 
+                  min="0"
+                  className="form-control" 
+                  value={alternativeForm.alt.estimatedCost || ''} 
+                  onChange={e => setAlternativeForm({
+                    ...alternativeForm,
+                    alt: { ...alternativeForm.alt, estimatedCost: e.target.value }
+                  })} 
+                />
+              </div>
+              <div className="modal-footer" style={{ marginTop: '20px' }}>
+                <button type="button" className="btn-secondary-sm" onClick={() => setAlternativeForm(null)}>취소</button>
+                <button type="submit" className="submit-btn" style={{ flex: 1 }}>{alternativeForm.mode === 'add' ? '추가' : '저장 완료'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
         </>
       )}
 
@@ -4437,6 +5972,219 @@ function App() {
                 <button type="submit" className="submit-btn" style={{ flex: 1, padding: '12px', fontSize: '0.95rem' }}>수정 완료</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 2.8 PROFILE EDIT MODAL */}
+      {showProfileModal && (
+        <div className="modal-overlay" onClick={() => setShowProfileModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '420px', width: '90%' }}>
+            <div className="modal-header">
+              <h3 style={{ margin: 0, fontSize: '1.15rem' }}>⚙️ 프로필 수정</h3>
+              <button className="close-btn" onClick={() => setShowProfileModal(false)}>×</button>
+            </div>
+            <form onSubmit={handleUpdateProfile}>
+              
+              {/* Profile Image upload/preview */}
+              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
+                <div style={{ position: 'relative', width: '90px', height: '90px', marginBottom: '10px' }}>
+                  {profileForm.profileImage ? (
+                    <img 
+                      src={profileForm.profileImage} 
+                      alt="profile preview" 
+                      style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary)' }}
+                    />
+                  ) : (
+                    <div style={{ width: '90px', height: '90px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold' }}>
+                      {profileForm.nickname.slice(0, 1)}
+                    </div>
+                  )}
+                  <label 
+                    htmlFor="profile-upload" 
+                    style={{ 
+                      position: 'absolute', 
+                      bottom: '0', 
+                      right: '0', 
+                      backgroundColor: 'var(--primary)', 
+                      width: '28px', 
+                      height: '28px', 
+                      borderRadius: '50%', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      cursor: 'pointer',
+                      boxShadow: 'var(--shadow-sm)',
+                      border: '2px solid #fff',
+                      color: '#fff',
+                      fontSize: '0.85rem',
+                      margin: 0
+                    }}
+                    title="이미지 업로드"
+                  >
+                    📷
+                  </label>
+                  <input 
+                    id="profile-upload" 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleProfileImageUpload} 
+                    style={{ display: 'none' }} 
+                  />
+                </div>
+                {profileForm.profileImage && (
+                  <button 
+                    type="button" 
+                    className="btn-secondary-sm" 
+                    style={{ fontSize: '0.75rem', padding: '2px 8px', color: '#ef4444', border: 'none', background: 'none' }} 
+                    onClick={() => setProfileForm(prev => ({ ...prev, profileImage: null }))}
+                  >
+                    이미지 제거
+                  </button>
+                )}
+              </div>
+
+              {/* Nickname input */}
+              <div className="form-group">
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.9rem', fontWeight: 600 }}>닉네임 설정</label>
+                <input 
+                  type="text" 
+                  required 
+                  className="form-control" 
+                  value={profileForm.nickname} 
+                  onChange={e => setProfileForm(prev => ({ ...prev, nickname: e.target.value }))} 
+                  placeholder="사용하실 닉네임을 입력하세요"
+                />
+              </div>
+
+              {/* Password (PIN) input */}
+              <div className="form-group">
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.9rem', fontWeight: 600 }}>비밀번호 변경 (숫자 6자리)</label>
+                <input 
+                  type="password" 
+                  maxLength={6}
+                  className="form-control" 
+                  value={profileForm.password} 
+                  onChange={e => setProfileForm(prev => ({ ...prev, password: e.target.value.replace(/[^0-9]/g, '') }))} 
+                  placeholder="새로운 6자리 PIN (변경시에만 입력)"
+                />
+              </div>
+
+              {profileError && (
+                <div style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '12px', textAlign: 'center', fontWeight: 'bold' }}>
+                  ⚠️ {profileError}
+                </div>
+              )}
+
+              <div className="modal-footer" style={{ marginTop: '24px', display: 'flex', gap: '8px' }}>
+                <button type="button" className="btn-secondary-sm" style={{ padding: '12px', fontSize: '0.95rem', margin: 0 }} onClick={() => setShowProfileModal(false)} disabled={profileUpdating}>취소</button>
+                <button type="submit" className="submit-btn" style={{ flex: 1, padding: '12px', fontSize: '0.95rem', margin: 0 }} disabled={profileUpdating}>
+                  {profileUpdating ? '저장 중...' : '저장 완료'}
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 2.9 NOTIFICATION CENTER MODAL */}
+      {showNotifModal && (
+        <div className="modal-overlay" onClick={() => setShowNotifModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '440px', width: '95%', maxHeight: '75vh', display: 'flex', flexDirection: 'column' }}>
+            <div className="modal-header" style={{ marginBottom: '12px' }}>
+              <h3 style={{ margin: 0, fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                🔔 알림 센터
+                {notifications.filter(n => !n.readBy || !n.readBy.includes(currentUser.name)).length > 0 && (
+                  <span style={{ fontSize: '0.75rem', background: 'var(--danger)', color: '#fff', padding: '2px 8px', borderRadius: '12px' }}>
+                    {notifications.filter(n => !n.readBy || !n.readBy.includes(currentUser.name)).length}개 안읽음
+                  </span>
+                )}
+              </h3>
+              <button className="close-btn" onClick={() => setShowNotifModal(false)}>×</button>
+            </div>
+            
+            <div className="modal-body" style={{ flex: 1, overflowY: 'auto', padding: '4px 0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {notifications.length === 0 ? (
+                <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>📭</div>
+                  수신된 알림이 없습니다.
+                </div>
+              ) : (
+                notifications.map((notif) => {
+                  const isUnread = !notif.readBy || !notif.readBy.includes(currentUser.name);
+                  const actorInfo = usersMap[notif.actor] || { nickname: notif.actor, profileImage: null };
+                  
+                  // Icon by type
+                  let typeBadge = "📝";
+                  let badgeBg = "var(--bg-app)";
+                  if (notif.type === 'place_add') { typeBadge = "➕"; badgeBg = "#ecfdf5"; }
+                  else if (notif.type === 'place_edit') { typeBadge = "✏️"; badgeBg = "#eff6ff"; }
+                  else if (notif.type === 'comment_add') { typeBadge = "💬"; badgeBg = "#fff7ed"; }
+                  else if (notif.type === 'checklist_add') { typeBadge = "✅"; badgeBg = "#f5f3ff"; }
+                  else if (notif.type === 'expense_add') { typeBadge = "💰"; badgeBg = "#fef2f2"; }
+                  
+                  return (
+                    <div 
+                      key={notif.id} 
+                      onClick={() => handleNotificationClick(notif)}
+                      style={{ 
+                        display: 'flex', 
+                        gap: '12px', 
+                        padding: '12px', 
+                        borderRadius: '12px', 
+                        border: '1px solid var(--border)',
+                        background: isUnread ? 'var(--primary-light)' : 'var(--bg-card)', 
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s',
+                        position: 'relative',
+                        boxShadow: 'var(--shadow-sm)'
+                      }}
+                      className="notif-item"
+                    >
+                      {/* Actor Avatar */}
+                      <div style={{ position: 'relative', width: '38px', height: '38px', flexShrink: 0 }}>
+                        {actorInfo.profileImage ? (
+                          <img src={actorInfo.profileImage} alt={actorInfo.nickname} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.85rem' }}>
+                            {actorInfo.nickname.slice(0, 1)}
+                          </div>
+                        )}
+                        <span style={{ position: 'absolute', bottom: '-4px', right: '-4px', background: badgeBg, borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', border: '1px solid var(--border)' }}>
+                          {typeBadge}
+                        </span>
+                      </div>
+
+                      {/* Content */}
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--primary)' }}>
+                          📌 {notif.planTitle || '여행 계획'}
+                        </div>
+                        <div style={{ fontSize: '0.84rem', color: 'var(--text-main)', fontWeight: isUnread ? '600' : 'normal', lineHeight: '1.4' }}>
+                          {notif.message}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          {new Date(notif.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} {new Date(notif.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </div>
+
+                      {/* Unread dot */}
+                      {isUnread && (
+                        <div style={{ 
+                          width: '8px', 
+                          height: '8px', 
+                          borderRadius: '50%', 
+                          backgroundColor: 'var(--danger)', 
+                          alignSelf: 'center', 
+                          flexShrink: 0 
+                        }}></div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
       )}

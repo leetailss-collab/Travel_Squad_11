@@ -132,11 +132,91 @@ app.post('/api/auth/login', async (req, res) => {
       token: `mock-token-${user.name}-${Date.now()}`,
       user: {
         name: user.name,
-        role: user.role
+        role: user.role,
+        nickname: user.nickname,
+        profileImage: user.profileImage
       }
     });
   } catch (err) {
     console.error("Login error:", err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+// Update User Profile API (nickname, profileImage, pin)
+app.post('/api/auth/profile', async (req, res) => {
+  const { username, nickname, profileImage, password } = req.body;
+  if (!username) {
+    return res.status(400).json({ message: "사용자 정보가 필요합니다." });
+  }
+
+  try {
+    const updatedUser = await dbService.updateUserProfile(username, {
+      nickname,
+      profileImage,
+      pin: password
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
+    }
+
+    res.json({
+      message: "프로필이 성공적으로 수정되었습니다.",
+      user: updatedUser
+    });
+  } catch (err) {
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+// Get all users public profile info (name, nickname, profileImage)
+app.get('/api/auth/users', async (req, res) => {
+  try {
+    const users = await dbService.getAllUsers();
+    res.json(users);
+  } catch (err) {
+    console.error("Get users error:", err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+// Get all notifications
+app.get('/api/notifications', async (req, res) => {
+  try {
+    const list = await dbService.getNotifications();
+    res.json(list);
+  } catch (err) {
+    console.error("Get notifications error:", err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+// Create a new notification
+app.post('/api/notifications', async (req, res) => {
+  try {
+    const notif = await dbService.createNotification(req.body);
+    res.json(notif);
+  } catch (err) {
+    console.error("Create notification error:", err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+// Mark a notification as read by a user
+app.post('/api/notifications/:id/read', async (req, res) => {
+  const { username } = req.body;
+  if (!username) {
+    return res.status(400).json({ message: "사용자 정보가 필요합니다." });
+  }
+  try {
+    const notif = await dbService.markNotificationAsRead(req.params.id, username);
+    if (!notif) {
+      return res.status(404).json({ message: "알림을 찾을 수 없습니다." });
+    }
+    res.json(notif);
+  } catch (err) {
+    console.error("Mark notification read error:", err);
     res.status(500).json({ message: "서버 오류가 발생했습니다." });
   }
 });

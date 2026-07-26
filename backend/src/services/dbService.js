@@ -115,12 +115,46 @@ const authenticateUser = async (username, pin) => {
     if (!userDoc.exists) return null;
     const userData = userDoc.data();
     if (userData.pin === pin) {
-      return { name: userData.name, role: userData.role };
+      return { 
+        name: userData.name, 
+        role: userData.role,
+        nickname: userData.nickname || userData.name,
+        profileImage: userData.profileImage || null
+      };
     }
     return null;
   } catch (err) {
     console.error("Error authenticating user in Firestore:", err);
     return null;
+  }
+};
+
+// 1.1 Update user profile (nickname, profileImage, pin)
+const updateUserProfile = async (username, data) => {
+  try {
+    const userRef = db.collection('users').doc(username);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) return null;
+    
+    const updateData = {};
+    if (data.nickname !== undefined) updateData.nickname = data.nickname;
+    if (data.profileImage !== undefined) updateData.profileImage = data.profileImage;
+    if (data.pin !== undefined && String(data.pin).trim() !== '') updateData.pin = String(data.pin).trim();
+    
+    await userRef.update(updateData);
+    
+    // Return updated user data
+    const updatedDoc = await userRef.get();
+    const updatedData = updatedDoc.data();
+    return {
+      name: updatedData.name,
+      role: updatedData.role,
+      nickname: updatedData.nickname || updatedData.name,
+      profileImage: updatedData.profileImage || null
+    };
+  } catch (err) {
+    console.error(`Error updating profile for ${username}:`, err);
+    throw err;
   }
 };
 
@@ -448,6 +482,26 @@ const addPlace = async (planId, day, date, places) => {
   }
 };
 
+// 8.1 Get all users (name, nickname, profileImage)
+const getAllUsers = async () => {
+  try {
+    const snapshot = await db.collection('users').get();
+    const list = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      list.push({
+        name: data.name,
+        nickname: data.nickname || data.name,
+        profileImage: data.profileImage || null
+      });
+    });
+    return list;
+  } catch (err) {
+    console.error("Error getting users from Firestore:", err);
+    return [];
+  }
+};
+
 // 9. Get all anniversaries
 const getAnniversaries = async () => {
   try {
@@ -484,6 +538,65 @@ const saveAnniversary = async (data) => {
   }
 };
 
+// 12. Get notifications
+const getNotifications = async () => {
+  try {
+    const snapshot = await db.collection('notifications').orderBy('createdAt', 'desc').limit(50).get();
+    const list = [];
+    snapshot.forEach(doc => {
+      list.push(doc.data());
+    });
+    return list;
+  } catch (err) {
+    console.error("Error getting notifications from Firestore:", err);
+    return [];
+  }
+};
+
+// 13. Create a notification
+const createNotification = async (data) => {
+  try {
+    const id = data.id || `notif-${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const notification = {
+      id,
+      planId: Number(data.planId),
+      planTitle: data.planTitle || '',
+      actor: data.actor,
+      type: data.type, // 'place_add' | 'place_edit' | 'comment_add' | 'checklist_add' | 'expense_add' | 'trip_create'
+      targetId: data.targetId || '',
+      targetName: data.targetName || '',
+      tab: data.tab || 'itinerary',
+      message: data.message || '',
+      createdAt: Number(data.createdAt || Date.now()),
+      readBy: data.readBy || []
+    };
+    await db.collection('notifications').doc(id).set(notification);
+    return notification;
+  } catch (err) {
+    console.error("Error creating notification in Firestore:", err);
+    throw err;
+  }
+};
+
+// 14. Mark notification as read by user
+const markNotificationAsRead = async (id, username) => {
+  try {
+    const ref = db.collection('notifications').doc(id);
+    const doc = await ref.get();
+    if (!doc.exists) return null;
+    const data = doc.data();
+    const readBy = data.readBy || [];
+    if (!readBy.includes(username)) {
+      readBy.push(username);
+      await ref.update({ readBy });
+    }
+    return { ...data, readBy };
+  } catch (err) {
+    console.error(`Error marking notification ${id} as read:`, err);
+    throw err;
+  }
+};
+
 // 11. Delete an anniversary
 const deleteAnniversary = async (id) => {
   try {
@@ -512,5 +625,10 @@ module.exports = {
   getTrash,
   restorePlan,
   deletePlanPermanently,
-  uploadFileToStorage
+  uploadFileToStorage,
+  updateUserProfile,
+  getAllUsers,
+  getNotifications,
+  createNotification,
+  markNotificationAsRead
 };
