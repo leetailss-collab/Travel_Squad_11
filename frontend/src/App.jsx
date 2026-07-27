@@ -3857,70 +3857,50 @@ function App() {
                                          const naverWebMode = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'transit');
  
                                          // If at least one coordinate is resolved, we can use the nmap:// app scheme.
-                                         if (sCoords || dCoords) {
-                                           const params = [];
-                                           if (sCoords) {
-                                             params.push(`slat=${sCoords.lat}`);
-                                             params.push(`slng=${sCoords.lng}`);
+                                         const params = [];
+                                         if (sCoords) {
+                                           params.push(`slat=${sCoords.lat}`);
+                                           params.push(`slng=${sCoords.lng}`);
+                                         }
+                                         params.push(`sname=${encodeURIComponent(cleanSname)}`);
+                                         if (dCoords) {
+                                           params.push(`dlat=${dCoords.lat}`);
+                                           params.push(`dlng=${dCoords.lng}`);
+                                         }
+                                         params.push(`dname=${encodeURIComponent(cleanDname)}`);
+                                         params.push(`appname=travelsquad`);
+
+                                         const appUrl = `nmap://route/${appType}?${params.join('&')}`;
+
+                                         if (isMobile) {
+                                           // Mobile web fallback URL
+                                           let webFallback = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
+                                           if (sCoords && dCoords) {
+                                             webFallback = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&sx=${sCoords.lng}&sy=${sCoords.lat}&dname=${encodeURIComponent(cleanDname)}&ex=${dCoords.lng}&ey=${dCoords.lat}`;
                                            }
-                                           params.push(`sname=${encodeURIComponent(cleanSname)}`);
-                                           if (dCoords) {
-                                             params.push(`dlat=${dCoords.lat}`);
-                                             params.push(`dlng=${dCoords.lng}`);
-                                           }
-                                           params.push(`dname=${encodeURIComponent(cleanDname)}`);
-                                           params.push(`appname=travelsquad`);
- 
-                                           const appUrl = `nmap://route/${appType}?${params.join('&')}`;
- 
-                                           if (isMobile) {
-                                             // Mobile web fallback URL
-                                             let webFallback = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
-                                             if (sCoords && dCoords) {
-                                               webFallback = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&sx=${sCoords.lng}&sy=${sCoords.lat}&dname=${encodeURIComponent(cleanDname)}&ex=${dCoords.lng}&ey=${dCoords.lat}`;
-                                             }
-                                             
-                                             const start = Date.now();
-                                             window.location.href = appUrl;
-                                             setTimeout(() => {
-                                               if (Date.now() - start < 1500) {
-                                                 if (newWindow) newWindow.location.href = webFallback;
-                                               } else {
-                                                 if (newWindow) newWindow.close();
-                                               }
-                                             }, 1000);
-                                           } else {
-                                             // PC Web directions (populate the pre-opened window)
-                                             let pcUrl = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
-                                             if (sCoords && dCoords) {
-                                               pcUrl = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(cleanSname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(cleanDname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
-                                             }
-                                             console.log('PC Web Coordinates URL:', pcUrl);
-                                             if (newWindow) {
-                                               newWindow.location.href = pcUrl;
+                                           
+                                           console.log('Mobile navigation. App URL:', appUrl);
+                                           console.log('Mobile fallback URL:', webFallback);
+                                           const start = Date.now();
+                                           window.location.href = appUrl;
+                                           setTimeout(() => {
+                                             if (Date.now() - start < 1500) {
+                                               if (newWindow) newWindow.location.href = webFallback;
                                              } else {
-                                               window.open(pcUrl, '_blank');
+                                               if (newWindow) newWindow.close();
                                              }
-                                           }
+                                           }, 1000);
                                          } else {
-                                           console.log('No coordinates resolved, falling back to name search');
-                                           // Neither has coordinates (text names only).
-                                           if (isMobile) {
-                                             const webUrl = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
-                                             console.log('Mobile Web Fallback URL:', webUrl);
-                                             if (newWindow) {
-                                               newWindow.location.href = webUrl;
-                                             } else {
-                                               window.open(webUrl, '_blank');
-                                             }
+                                           // PC Web directions (populate the pre-opened window)
+                                           let pcUrl = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
+                                           if (sCoords && dCoords) {
+                                             pcUrl = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(cleanSname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(cleanDname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
+                                           }
+                                           console.log('PC Web directions URL:', pcUrl);
+                                           if (newWindow) {
+                                             newWindow.location.href = pcUrl;
                                            } else {
-                                             const pcNaverUrl = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
-                                             console.log('PC Web Fallback URL:', pcNaverUrl);
-                                             if (newWindow) {
-                                               newWindow.location.href = pcNaverUrl;
-                                             } else {
-                                               window.open(pcNaverUrl, '_blank');
-                                             }
+                                             window.open(pcUrl, '_blank');
                                            }
                                          }
                                       } else {
