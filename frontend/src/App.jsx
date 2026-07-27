@@ -3799,6 +3799,10 @@ function App() {
                                         const cleanSname = sname.replace(/\/출발|\/도착/g, '').trim();
                                         const cleanDname = dname.replace(/\/출발|\/도착/g, '').trim();
 
+                                         // Strip parenthetical details (e.g. "(정자동)", "(초당동)") to maximize Naver Geocoding API success
+                                         const geocodeQueryS = cleanSname.replace(/\(.*\)/g, '').replace(/\[.*\]/g, '').trim();
+                                         const geocodeQueryD = cleanDname.replace(/\(.*\)/g, '').replace(/\[.*\]/g, '').trim();
+
                                         // Official Naver Geocoding Helper with Nominatim fallback
                                         const fetchCoords = async (query) => {
                                           try {
@@ -3829,8 +3833,8 @@ function App() {
 
                                         // Fetch coordinates for departure & destination in parallel
                                         const [sCoords, dCoords] = await Promise.all([
-                                          fetchCoords(cleanSname),
-                                          fetchCoords(cleanDname)
+                                          fetchCoords(geocodeQueryS),
+                                          fetchCoords(geocodeQueryD)
                                         ]);
 
                                         const appType = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'public');
@@ -3869,7 +3873,7 @@ function App() {
                                              }, 1000);
                                            } else {
                                              // PC Web directions
-                                             let pcUrl = `https://map.naver.com/p/directions?stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}&menu=route`;
+                                             let pcUrl = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
                                              if (sCoords && dCoords) {
                                                pcUrl = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(cleanSname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(cleanDname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
                                              }
@@ -3882,7 +3886,7 @@ function App() {
                                              const webUrl = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&dname=${encodeURIComponent(cleanDname)}`;
                                              window.open(webUrl, '_blank');
                                            } else {
-                                             const pcNaverUrl = `https://map.naver.com/p/directions?stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}&menu=route`;
+                                             const pcNaverUrl = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
                                              window.open(pcNaverUrl, '_blank');
                                            }
                                          }
