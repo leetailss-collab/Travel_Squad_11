@@ -3801,9 +3801,9 @@ function App() {
                                         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                                         console.log('Device Mode: ', isMobile ? 'Mobile' : 'PC');
                                         
-                                        // Open a blank window immediately on PC to prevent pop-up blocking
-                                        const newWindow = isMobile ? null : window.open('', '_blank');
-                                        if (newWindow) console.log('Pre-opened blank tab for PC');
+                                        // Always pre-open a blank tab synchronously to prevent pop-up blockers on all devices
+                                        const newWindow = window.open('', '_blank');
+                                        console.log('Pre-opened blank tab for directions navigation');
 
                                         // Clean address names (removing extra slashes or indicators like '/출발')
                                         const cleanSname = sname.replace(/\/출발|\/도착/g, '').trim();
@@ -3884,7 +3884,9 @@ function App() {
                                              window.location.href = appUrl;
                                              setTimeout(() => {
                                                if (Date.now() - start < 1500) {
-                                                 window.location.href = webFallback;
+                                                 if (newWindow) newWindow.location.href = webFallback;
+                                               } else {
+                                                 if (newWindow) newWindow.close();
                                                }
                                              }, 1000);
                                            } else {
@@ -3906,7 +3908,11 @@ function App() {
                                            if (isMobile) {
                                              const webUrl = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&dname=${encodeURIComponent(cleanDname)}`;
                                              console.log('Mobile Web Fallback URL:', webUrl);
-                                             window.location.href = webUrl;
+                                             if (newWindow) {
+                                               newWindow.location.href = webUrl;
+                                             } else {
+                                               window.open(webUrl, '_blank');
+                                             }
                                            } else {
                                              const pcNaverUrl = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
                                              console.log('PC Web Fallback URL:', pcNaverUrl);
