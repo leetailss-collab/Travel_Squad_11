@@ -4983,6 +4983,13 @@ function App() {
                 🕒 {selectedDetailPlace.time} {selectedDetailPlace.duration > 0 && " (" + Math.floor(selectedDetailPlace.duration / 60) + "시간 " + (selectedDetailPlace.duration % 60) + "분 체류)"}
               </div>
 
+              {/* Address */}
+              {selectedDetailPlace.address && (
+                <div style={{ fontSize: '0.88rem', color: 'var(--text)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '500' }}>
+                  📍 {selectedDetailPlace.address}
+                </div>
+              )}
+
               {/* Description */}
               {selectedDetailPlace.description && (
                 <div className="detail-field">
