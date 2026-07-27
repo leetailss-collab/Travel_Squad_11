@@ -115,6 +115,12 @@ app.get('/api/geocoding', (req, res) => {
   apiReq.end();
 });
 
+// Get Naver client ID config for frontend Map SDK
+app.get('/api/config/naver-client-id', (req, res) => {
+  res.json({ clientId: process.env.NAVER_CLIENT_ID || '' });
+});
+
+
 // Authentication API
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;

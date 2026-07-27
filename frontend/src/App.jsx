@@ -409,8 +409,10 @@ function App() {
   const [editingSavedPlace, setEditingSavedPlace] = useState(null);
   const [showAddSavedPlaceModal, setShowAddSavedPlaceModal] = useState(false);
   const [leafletLoaded, setLeafletLoaded] = useState(false);
+  const [naverMapLoaded, setNaverMapLoaded] = useState(false);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
+  const naverMapInstanceRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [lightboxImagesList, setLightboxImagesList] = useState([]); // Array of image URLs
   const [lightboxActiveIndex, setLightboxActiveIndex] = useState(0); // Current active image index in lightbox
@@ -486,37 +488,34 @@ function App() {
     } else if (window.L) {
       setLeafletLoaded(true);
     }
+
+    // Dynamic loading of Naver Map SDK
+    const loadNaverMap = async () => {
+      try {
+        const res = await fetch('/api/config/naver-client-id');
+        if (res.ok) {
+          const { clientId } = await res.json();
+          if (clientId && !document.getElementById('naver-map-js')) {
+            const script = document.createElement('script');
+            script.id = 'naver-map-js';
+            script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}`;
+            script.onload = () => {
+              setNaverMapLoaded(true);
+            };
+            document.body.appendChild(script);
+          } else if (window.naver && window.naver.maps) {
+            setNaverMapLoaded(true);
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to load Naver Map SDK:", err);
+      }
+    };
+    loadNaverMap();
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'places' && mapRef.current && window.L && leafletLoaded) {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-
-      const savedPlaces = plan?.savedPlaces || [];
-      let center = [33.4996, 126.5312]; // Default Jeju
-      let zoom = 10;
-
-      const validPlaces = savedPlaces.filter(p => p.lat && p.lng);
-      if (validPlaces.length > 0) {
-        center = [validPlaces[0].lat, validPlaces[0].lng];
-        zoom = 12;
-      } else if (plan && plan.title) {
-        if (plan.title.includes('서울')) {
-          center = [37.5665, 126.9780];
-        } else if (plan.title.includes('부산')) {
-          center = [35.1796, 129.0756];
-        } else if (plan.title.includes('도쿄')) {
-          center = [35.6762, 139.6503];
-        } else if (plan.title.includes('오사카')) {
-          center = [34.6937, 135.5023];
-        } else if (plan.title.includes('후쿠오카')) {
-          center = [33.5902, 130.4017];
-        }
-      }
-
+    const initLeafletMap = (center, zoom, validPlaces) => {
       try {
         const map = window.L.map(mapRef.current).setView(center, zoom);
         window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -542,15 +541,107 @@ function App() {
       } catch (err) {
         console.error("Leaflet initialization failed:", err);
       }
+    };
+
+    if (activeTab === 'places' && mapRef.current) {
+      if (mapInstanceRef.current) {
+        if (typeof mapInstanceRef.current.remove === 'function') {
+          mapInstanceRef.current.remove();
+        }
+        mapInstanceRef.current = null;
+      }
+      if (naverMapInstanceRef.current) {
+        if (mapRef.current) mapRef.current.innerHTML = '';
+        naverMapInstanceRef.current = null;
+      }
+
+      const savedPlaces = plan?.savedPlaces || [];
+      let center = [33.4996, 126.5312]; // Default Jeju
+      let zoom = 10;
+
+      const validPlaces = savedPlaces.filter(p => p.lat && p.lng);
+      if (validPlaces.length > 0) {
+        center = [validPlaces[0].lat, validPlaces[0].lng];
+        zoom = 12;
+      } else if (plan && plan.title) {
+        if (plan.title.includes('서울')) center = [37.5665, 126.9780];
+        else if (plan.title.includes('부산')) center = [35.1796, 129.0756];
+        else if (plan.title.includes('강릉')) center = [37.7518, 128.8761];
+        else if (plan.title.includes('도쿄')) center = [35.6762, 139.6503];
+        else if (plan.title.includes('오사카')) center = [34.6937, 135.5023];
+        else if (plan.title.includes('후쿠오카')) center = [33.5902, 130.4017];
+      }
+
+      // If naverMapLoaded is true, and coordinate center is in Korea, use Naver Map!
+      const isKorea = center[0] >= 33 && center[0] <= 39 && center[1] >= 124 && center[1] <= 132;
+
+      if (naverMapLoaded && window.naver && window.naver.maps && isKorea) {
+        try {
+          const naverZoom = zoom === 12 ? 14 : 10;
+          const map = new window.naver.maps.Map(mapRef.current, {
+            center: new window.naver.maps.LatLng(center[0], center[1]),
+            zoom: naverZoom,
+            mapTypeControl: true
+          });
+
+          validPlaces.forEach(p => {
+            const marker = new window.naver.maps.Marker({
+              position: new window.naver.maps.LatLng(p.lat, p.lng),
+              map: map,
+              title: p.name
+            });
+
+            const popupContent = `
+              <div style="font-family: sans-serif; font-size: 13px; line-height: 1.4; padding: 10px; min-width: 150px; background: #fff; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                <h4 style="margin: 0 0 4px 0; color: #6366f1; font-size: 14px; font-weight: bold;">${p.name}</h4>
+                <span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #eee; font-weight: bold; display: inline-block; margin-bottom: 6px; color: #555;">${p.category}</span>
+                <p style="margin: 0; color: #555; font-size: 11px;">${p.address || '주소 정보가 없습니다.'}</p>
+                ${p.description ? `<p style="margin: 6px 0 0 0; font-style: italic; color: #777; font-size: 11px; border-top: 1px solid #eee; padding-top: 6px;">${p.description}</p>` : ''}
+                ${p.url ? `<a href="${p.url}" target="_blank" style="display: block; margin-top: 8px; text-decoration: none; color: #fff; background: #6366f1; font-size: 11px; font-weight: bold; text-align: center; padding: 5px 8px; border-radius: 4px;">지도에서 열기</a>` : ''}
+              </div>
+            `;
+
+            const infoWindow = new window.naver.maps.InfoWindow({
+              content: popupContent,
+              borderWidth: 0,
+              backgroundColor: "transparent",
+              disableAnchor: true
+            });
+
+            window.naver.maps.Event.addListener(marker, "click", () => {
+              if (infoWindow.getMap()) {
+                infoWindow.close();
+              } else {
+                infoWindow.open(map, marker);
+              }
+            });
+          });
+
+          naverMapInstanceRef.current = map;
+        } catch (err) {
+          console.error("Naver native map initialization failed, falling back to Leaflet:", err);
+          if (leafletLoaded && window.L) {
+            initLeafletMap(center, zoom, validPlaces);
+          }
+        }
+      } else if (leafletLoaded && window.L) {
+        initLeafletMap(center, zoom, validPlaces);
+      }
     }
 
     return () => {
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
+        if (typeof mapInstanceRef.current.remove === 'function') {
+          mapInstanceRef.current.remove();
+        }
         mapInstanceRef.current = null;
       }
+      if (naverMapInstanceRef.current) {
+        if (mapRef.current) mapRef.current.innerHTML = '';
+        naverMapInstanceRef.current = null;
+      }
     };
-  }, [activeTab, plan?.savedPlaces, leafletLoaded]);
+  }, [activeTab, plan?.savedPlaces, leafletLoaded, naverMapLoaded]);
 
   const openConfirm = (title, message, onConfirm) => {
     setConfirmModal({
