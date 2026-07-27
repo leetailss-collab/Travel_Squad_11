@@ -3795,6 +3795,9 @@ function App() {
                                         e.preventDefault();
                                         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                                         
+                                        // Open a blank window immediately on PC to prevent pop-up blocking
+                                        const newWindow = isMobile ? null : window.open('', '_blank');
+
                                         // Clean address names (removing extra slashes or indicators like '/출발')
                                         const cleanSname = sname.replace(/\/출발|\/도착/g, '').trim();
                                         const cleanDname = dname.replace(/\/출발|\/도착/g, '').trim();
@@ -3868,26 +3871,33 @@ function App() {
                                              window.location.href = appUrl;
                                              setTimeout(() => {
                                                if (Date.now() - start < 1500) {
-                                                 window.open(webFallback, '_blank');
+                                                 window.location.href = webFallback;
                                                }
                                              }, 1000);
                                            } else {
-                                             // PC Web directions
+                                             // PC Web directions (populate the pre-opened window)
                                              let pcUrl = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
                                              if (sCoords && dCoords) {
                                                pcUrl = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(cleanSname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(cleanDname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
                                              }
-                                             window.open(pcUrl, '_blank');
+                                             if (newWindow) {
+                                               newWindow.location.href = pcUrl;
+                                             } else {
+                                               window.open(pcUrl, '_blank');
+                                             }
                                            }
                                          } else {
                                            // Neither has coordinates (text names only).
-                                           // We directly open Mobile Web / PC Web directions to guarantee names are pre-filled.
                                            if (isMobile) {
                                              const webUrl = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&dname=${encodeURIComponent(cleanDname)}`;
-                                             window.open(webUrl, '_blank');
+                                             window.location.href = webUrl;
                                            } else {
                                              const pcNaverUrl = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
-                                             window.open(pcNaverUrl, '_blank');
+                                             if (newWindow) {
+                                               newWindow.location.href = pcNaverUrl;
+                                             } else {
+                                               window.open(pcNaverUrl, '_blank');
+                                             }
                                            }
                                          }
                                       } else {
