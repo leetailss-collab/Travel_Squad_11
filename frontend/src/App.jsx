@@ -3834,41 +3834,58 @@ function App() {
                                         ]);
 
                                         const appType = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'public');
-                                        const naverWebMode = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'transit');
-
-                                        if (sCoords && dCoords) {
-                                          if (isMobile) {
-                                            const appUrl = `nmap://route/${appType}?slat=${sCoords.lat}&slng=${sCoords.lng}&sname=${encodeURIComponent(cleanSname)}&dlat=${dCoords.lat}&dlng=${dCoords.lng}&dname=${encodeURIComponent(cleanDname)}&appname=travelsquad`;
-                                            const webFallback = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&sx=${sCoords.lng}&sy=${sCoords.lat}&dname=${encodeURIComponent(cleanDname)}&ex=${dCoords.lng}&ey=${dCoords.lat}`;
-                                            
-                                            const start = Date.now();
-                                            window.location.href = appUrl;
-                                            setTimeout(() => {
-                                              if (Date.now() - start < 1500) {
-                                                window.open(webFallback, '_blank');
-                                              }
-                                            }, 1000);
-                                          } else {
-                                            const pcUrl = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(cleanSname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(cleanDname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
-                                            window.open(pcUrl, '_blank');
-                                          }
-                                        } else {
-                                          // Domestic fallback if geocoding yields no coordinates -> STILL NAVER MAP!
-                                          if (isMobile) {
-                                            const appUrl = `nmap://route/${appType}?sname=${encodeURIComponent(cleanSname)}&dname=${encodeURIComponent(cleanDname)}&appname=travelsquad`;
-                                            const webFallback = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&dname=${encodeURIComponent(cleanDname)}`;
-                                            const start = Date.now();
-                                            window.location.href = appUrl;
-                                            setTimeout(() => {
-                                              if (Date.now() - start < 1500) {
-                                                window.open(webFallback, '_blank');
-                                              }
-                                            }, 1000);
-                                          } else {
-                                            const pcNaverUrl = `https://map.naver.com/p/directions?stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}&menu=route`;
-                                            window.open(pcNaverUrl, '_blank');
-                                          }
-                                        }
+                                         const naverWebMode = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'transit');
+ 
+                                         // If at least one coordinate is resolved, we can use the nmap:// app scheme.
+                                         if (sCoords || dCoords) {
+                                           const params = [];
+                                           if (sCoords) {
+                                             params.push(`slat=${sCoords.lat}`);
+                                             params.push(`slng=${sCoords.lng}`);
+                                           }
+                                           params.push(`sname=${encodeURIComponent(cleanSname)}`);
+                                           if (dCoords) {
+                                             params.push(`dlat=${dCoords.lat}`);
+                                             params.push(`dlng=${dCoords.lng}`);
+                                           }
+                                           params.push(`dname=${encodeURIComponent(cleanDname)}`);
+                                           params.push(`appname=travelsquad`);
+ 
+                                           const appUrl = `nmap://route/${appType}?${params.join('&')}`;
+ 
+                                           if (isMobile) {
+                                             // Mobile web fallback URL
+                                             let webFallback = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&dname=${encodeURIComponent(cleanDname)}`;
+                                             if (sCoords && dCoords) {
+                                               webFallback = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&sx=${sCoords.lng}&sy=${sCoords.lat}&dname=${encodeURIComponent(cleanDname)}&ex=${dCoords.lng}&ey=${dCoords.lat}`;
+                                             }
+                                             
+                                             const start = Date.now();
+                                             window.location.href = appUrl;
+                                             setTimeout(() => {
+                                               if (Date.now() - start < 1500) {
+                                                 window.open(webFallback, '_blank');
+                                               }
+                                             }, 1000);
+                                           } else {
+                                             // PC Web directions
+                                             let pcUrl = `https://map.naver.com/p/directions?stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}&menu=route`;
+                                             if (sCoords && dCoords) {
+                                               pcUrl = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(cleanSname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(cleanDname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
+                                             }
+                                             window.open(pcUrl, '_blank');
+                                           }
+                                         } else {
+                                           // Neither has coordinates (text names only).
+                                           // We directly open Mobile Web / PC Web directions to guarantee names are pre-filled.
+                                           if (isMobile) {
+                                             const webUrl = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&dname=${encodeURIComponent(cleanDname)}`;
+                                             window.open(webUrl, '_blank');
+                                           } else {
+                                             const pcNaverUrl = `https://map.naver.com/p/directions?stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}&menu=route`;
+                                             window.open(pcNaverUrl, '_blank');
+                                           }
+                                         }
                                       } else {
                                         // Overseas travel -> Google Maps
                                         e.preventDefault();
