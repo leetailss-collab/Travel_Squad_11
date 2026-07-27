@@ -3891,11 +3891,11 @@ function App() {
                                              }
                                            }, 1000);
                                          } else {
-                                           // PC Web directions (populate the pre-opened window)
-                                           let pcUrl = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
-                                           if (sCoords && dCoords) {
-                                             pcUrl = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(cleanSname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(cleanDname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
-                                           }
+                                           // PC Web directions (populate the pre-opened window using native V5 path parameters)
+                                           const sPart = sCoords ? `${sCoords.lng},${sCoords.lat},${encodeURIComponent(cleanSname)}` : `-,-,${encodeURIComponent(cleanSname)}`;
+                                           const dPart = dCoords ? `${dCoords.lng},${dCoords.lat},${encodeURIComponent(cleanDname)}` : `-,-,${encodeURIComponent(cleanDname)}`;
+                                           const pcUrl = `https://map.naver.com/p/directions/${sPart}/${dPart}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
+                                           
                                            console.log('PC Web directions URL:', pcUrl);
                                            if (newWindow) {
                                              newWindow.location.href = pcUrl;
