@@ -3875,7 +3875,7 @@ function App() {
  
                                            if (isMobile) {
                                              // Mobile web fallback URL
-                                             let webFallback = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&dname=${encodeURIComponent(cleanDname)}`;
+                                             let webFallback = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
                                              if (sCoords && dCoords) {
                                                webFallback = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&sx=${sCoords.lng}&sy=${sCoords.lat}&dname=${encodeURIComponent(cleanDname)}&ex=${dCoords.lng}&ey=${dCoords.lat}`;
                                              }
@@ -3906,7 +3906,7 @@ function App() {
                                            console.log('No coordinates resolved, falling back to name search');
                                            // Neither has coordinates (text names only).
                                            if (isMobile) {
-                                             const webUrl = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&dname=${encodeURIComponent(cleanDname)}`;
+                                             const webUrl = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
                                              console.log('Mobile Web Fallback URL:', webUrl);
                                              if (newWindow) {
                                                newWindow.location.href = webUrl;
