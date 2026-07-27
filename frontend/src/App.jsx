@@ -3795,6 +3795,10 @@ function App() {
                                         e.preventDefault();
                                         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                                         
+                                        // Clean address names (removing extra slashes or indicators like '/출발')
+                                        const cleanSname = sname.replace(/\/출발|\/도착/g, '').trim();
+                                        const cleanDname = dname.replace(/\/출발|\/도착/g, '').trim();
+
                                         // Official Naver Geocoding Helper with Nominatim fallback
                                         const fetchCoords = async (query) => {
                                           try {
@@ -3825,8 +3829,8 @@ function App() {
 
                                         // Fetch coordinates for departure & destination in parallel
                                         const [sCoords, dCoords] = await Promise.all([
-                                          fetchCoords(sname),
-                                          fetchCoords(dname)
+                                          fetchCoords(cleanSname),
+                                          fetchCoords(cleanDname)
                                         ]);
 
                                         const appType = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'public');
@@ -3834,8 +3838,8 @@ function App() {
 
                                         if (sCoords && dCoords) {
                                           if (isMobile) {
-                                            const appUrl = `nmap://route/${appType}?slat=${sCoords.lat}&slng=${sCoords.lng}&sname=${encodeURIComponent(sname)}&dlat=${dCoords.lat}&dlng=${dCoords.lng}&dname=${encodeURIComponent(dname)}&appname=travelsquad`;
-                                            const webFallback = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(sname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(dname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
+                                            const appUrl = `nmap://route/${appType}?slat=${sCoords.lat}&slng=${sCoords.lng}&sname=${encodeURIComponent(cleanSname)}&dlat=${dCoords.lat}&dlng=${dCoords.lng}&dname=${encodeURIComponent(cleanDname)}&appname=travelsquad`;
+                                            const webFallback = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&sx=${sCoords.lng}&sy=${sCoords.lat}&dname=${encodeURIComponent(cleanDname)}&ex=${dCoords.lng}&ey=${dCoords.lat}`;
                                             
                                             const start = Date.now();
                                             window.location.href = appUrl;
@@ -3845,14 +3849,14 @@ function App() {
                                               }
                                             }, 1000);
                                           } else {
-                                            const pcUrl = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(sname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(dname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
+                                            const pcUrl = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(cleanSname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(cleanDname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
                                             window.open(pcUrl, '_blank');
                                           }
                                         } else {
                                           // Domestic fallback if geocoding yields no coordinates -> STILL NAVER MAP!
                                           if (isMobile) {
-                                            const appUrl = `nmap://route/${appType}?sname=${encodeURIComponent(sname)}&dname=${encodeURIComponent(dname)}&appname=travelsquad`;
-                                            const webFallback = `https://m.map.naver.com/search2/search.naver?query=${encodeURIComponent(dname)}`;
+                                            const appUrl = `nmap://route/${appType}?sname=${encodeURIComponent(cleanSname)}&dname=${encodeURIComponent(cleanDname)}&appname=travelsquad`;
+                                            const webFallback = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&dname=${encodeURIComponent(cleanDname)}`;
                                             const start = Date.now();
                                             window.location.href = appUrl;
                                             setTimeout(() => {
@@ -3861,7 +3865,7 @@ function App() {
                                               }
                                             }, 1000);
                                           } else {
-                                            const pcNaverUrl = `https://map.naver.com/p/directions?stext=${encodeURIComponent(sname)}&etext=${encodeURIComponent(dname)}&menu=route`;
+                                            const pcNaverUrl = `https://map.naver.com/p/directions?stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}&menu=route`;
                                             window.open(pcNaverUrl, '_blank');
                                           }
                                         }
