@@ -3791,12 +3791,19 @@ function App() {
                                       const dname = dayItem.places[idx+1].address || dayItem.places[idx+1].name;
                                       const transportType = place.transportType;
                                       
+                                      console.log('=== [Naver Map Routing Clicked] ===');
+                                      console.log('Departure name:', sname);
+                                      console.log('Destination name:', dname);
+                                      console.log('Transport Type:', transportType);
+                                      
                                       if (planCurrency === 'KRW') {
                                         e.preventDefault();
                                         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                                        console.log('Device Mode: ', isMobile ? 'Mobile' : 'PC');
                                         
                                         // Open a blank window immediately on PC to prevent pop-up blocking
                                         const newWindow = isMobile ? null : window.open('', '_blank');
+                                        if (newWindow) console.log('Pre-opened blank tab for PC');
 
                                         // Clean address names (removing extra slashes or indicators like '/출발')
                                         const cleanSname = sname.replace(/\/출발|\/도착/g, '').trim();
@@ -3834,11 +3841,17 @@ function App() {
                                           return null;
                                         };
 
+                                        console.log('Geocoding query S:', geocodeQueryS);
+                                        console.log('Geocoding query D:', geocodeQueryD);
+                                        
                                         // Fetch coordinates for departure & destination in parallel
                                         const [sCoords, dCoords] = await Promise.all([
                                           fetchCoords(geocodeQueryS),
                                           fetchCoords(geocodeQueryD)
                                         ]);
+                                        
+                                        console.log('Resolved sCoords:', sCoords);
+                                        console.log('Resolved dCoords:', dCoords);
 
                                         const appType = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'public');
                                          const naverWebMode = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'transit');
@@ -3880,6 +3893,7 @@ function App() {
                                              if (sCoords && dCoords) {
                                                pcUrl = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(cleanSname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(cleanDname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
                                              }
+                                             console.log('PC Web Coordinates URL:', pcUrl);
                                              if (newWindow) {
                                                newWindow.location.href = pcUrl;
                                              } else {
@@ -3887,12 +3901,15 @@ function App() {
                                              }
                                            }
                                          } else {
+                                           console.log('No coordinates resolved, falling back to name search');
                                            // Neither has coordinates (text names only).
                                            if (isMobile) {
                                              const webUrl = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&dname=${encodeURIComponent(cleanDname)}`;
+                                             console.log('Mobile Web Fallback URL:', webUrl);
                                              window.location.href = webUrl;
                                            } else {
                                              const pcNaverUrl = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
+                                             console.log('PC Web Fallback URL:', pcNaverUrl);
                                              if (newWindow) {
                                                newWindow.location.href = pcNaverUrl;
                                              } else {
