@@ -3801,9 +3801,9 @@ function App() {
                                         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                                         console.log('Device Mode: ', isMobile ? 'Mobile' : 'PC');
                                         
-                                        // Always pre-open a blank tab synchronously to prevent pop-up blockers on all devices
-                                        const newWindow = window.open('', '_blank');
-                                        console.log('Pre-opened blank tab for directions navigation');
+                                        // Open a blank window immediately on PC to prevent pop-up blocking
+                                        const newWindow = isMobile ? null : window.open('', '_blank');
+                                        if (newWindow) console.log('Pre-opened blank tab for PC');
 
                                         // Clean address names (removing extra slashes or indicators like '/출발')
                                         const cleanSname = sname.replace(/\/출발|\/도착/g, '').trim();
@@ -3885,9 +3885,7 @@ function App() {
                                            window.location.href = appUrl;
                                            setTimeout(() => {
                                              if (Date.now() - start < 1500) {
-                                               if (newWindow) newWindow.location.href = webFallback;
-                                             } else {
-                                               if (newWindow) newWindow.close();
+                                               window.location.href = webFallback;
                                              }
                                            }, 1000);
                                          } else {
