@@ -3857,29 +3857,56 @@ function App() {
                                          const geocodeQueryD = cleanForGeocode(cleanDname);
 
                                         // Official Naver Geocoding Helper with Nominatim fallback
+                                        // Multi-stage progressive Geocoding Helper (Guarantees coordinates by relaxing query on fallback)
                                         const fetchCoords = async (query) => {
-                                          try {
-                                            // 1. Try Official Naver Geocoding API via Backend Proxy
-                                            const nRes = await fetch(`/api/geocoding?query=${encodeURIComponent(query)}`);
-                                            if (nRes.ok) {
-                                              const nData = await nRes.json();
-                                              if (nData && nData.lat && nData.lng) {
-                                                return { lat: nData.lat, lng: nData.lng };
+                                          if (!query) return null;
+
+                                          const attemptSingle = async (q) => {
+                                            try {
+                                              const nRes = await fetch(`/api/geocoding?query=${encodeURIComponent(q)}`);
+                                              if (nRes.ok) {
+                                                const nData = await nRes.json();
+                                                if (nData && nData.lat && nData.lng) {
+                                                  return { lat: nData.lat, lng: nData.lng };
+                                                }
                                               }
-                                            }
-                                          } catch (e) {
-                                            console.warn('Backend Naver Geocoding proxy error, trying fallback:', e);
+                                            } catch (e) {}
+
+                                            try {
+                                              const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=kr`);
+                                              const data = await res.json();
+                                              if (data && data.length > 0) {
+                                                return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+                                              }
+                                            } catch (err) {}
+                                            return null;
+                                          };
+
+                                          // Build progressive query variants
+                                          const variants = [query];
+
+                                          // Variant 2: Replace '특별자치도' with '도' or remove
+                                          const v2 = query.replace(/특별자치도/g, '도').trim();
+                                          if (v2 !== query) variants.push(v2);
+
+                                          // Variant 3: Strip house/building number
+                                          const v3 = query.replace(/\s\d+-\d+/g, '').replace(/\s\d+/g, '').trim();
+                                          if (v3 && !variants.includes(v3)) variants.push(v3);
+
+                                          // Variant 4: Town/District level (first 3 words)
+                                          const parts = query.split(' ');
+                                          if (parts.length >= 3) {
+                                            const v4 = parts.slice(0, 3).join(' ');
+                                            if (!variants.includes(v4)) variants.push(v4);
                                           }
-                                          
-                                          try {
-                                            // 2. Fallback to OpenStreetMap Nominatim
-                                            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=kr`);
-                                            const data = await res.json();
-                                            if (data && data.length > 0) {
-                                              return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-                                            }
-                                          } catch (err) {
-                                            console.error('Geocoding fallback error:', err);
+                                          if (parts.length >= 2) {
+                                            const v5 = parts.slice(0, 2).join(' ');
+                                            if (!variants.includes(v5)) variants.push(v5);
+                                          }
+
+                                          for (const variant of variants) {
+                                            const coords = await attemptSingle(variant);
+                                            if (coords) return coords;
                                           }
                                           return null;
                                         };
