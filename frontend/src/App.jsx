@@ -3809,9 +3809,20 @@ function App() {
                                         const cleanSname = sname.replace(/\/출발|\/도착/g, '').trim();
                                         const cleanDname = dname.replace(/\/출발|\/도착/g, '').trim();
 
-                                         // Strip parenthetical details (e.g. "(정자동)", "(초당동)") to maximize Naver Geocoding API success
-                                         const geocodeQueryS = cleanSname.replace(/\(.*\)/g, '').replace(/\[.*\]/g, '').trim();
-                                         const geocodeQueryD = cleanDname.replace(/\(.*\)/g, '').replace(/\[.*\]/g, '').trim();
+                                         // Helper to strip detail floor/room numbers (e.g. ' 1층', ' 2층', ' 101호') for geocoding queries
+                                         const cleanForGeocode = (addr) => {
+                                           if (!addr) return '';
+                                           return addr
+                                             .replace(/\s지하\d+층.*/g, '')
+                                             .replace(/\s\d+층.*/g, '')
+                                             .replace(/\s\d+호.*/g, '')
+                                             .replace(/\(.*?\)/g, '')
+                                             .replace(/\[.*?\]/g, '')
+                                             .trim();
+                                         };
+
+                                         const geocodeQueryS = cleanForGeocode(cleanSname);
+                                         const geocodeQueryD = cleanForGeocode(cleanDname);
 
                                         // Official Naver Geocoding Helper with Nominatim fallback
                                         const fetchCoords = async (query) => {
