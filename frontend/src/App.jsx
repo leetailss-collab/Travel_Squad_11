@@ -361,6 +361,43 @@ const getAnniversariesForYear = (year, anniversariesList, viewerName) => {
 };
 
 function App() {
+  // Universal Map Search Helper (Handles Mobile App 1st priority, Mobile Web 2nd priority in new window, PC Web in new window)
+  const handleMapSearch = (e, query, currency) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!query) return;
+
+    const cleanQuery = query.replace(/\/출발|\/도착/g, '').trim();
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (currency === 'KRW') {
+      if (isMobile) {
+        // 1st Priority: Mobile Naver Map App
+        const appUrl = `nmap://search?query=${encodeURIComponent(cleanQuery)}&appname=travelsquad`;
+        // 2nd Priority: Mobile Naver Map Web Search (opens in a new window)
+        const webUrl = `https://m.map.naver.com/search2/search.naver?query=${encodeURIComponent(cleanQuery)}`;
+        
+        const start = Date.now();
+        window.location.href = appUrl;
+        setTimeout(() => {
+          if (Date.now() - start < 1500) {
+            window.open(webUrl, '_blank');
+          }
+        }, 1000);
+      } else {
+        // PC: Naver Map PC Web Search in a new window
+        const pcUrl = `https://map.naver.com/p/search/${encodeURIComponent(cleanQuery)}`;
+        window.open(pcUrl, '_blank');
+      }
+    } else {
+      // Overseas: Google Maps Web Search in a new window
+      const googleUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanQuery)}`;
+      window.open(googleUrl, '_blank');
+    }
+  };
+
   // Authentication State
   const [currentUser, setCurrentUser] = useState(null);
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
@@ -3620,16 +3657,9 @@ function App() {
                                 {/* Action Buttons and Indicators Row */}
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }} onClick={e => e.stopPropagation()}>
                                   {/* Map Search / View */}
-                                  <a
-                                    href={planCurrency === 'KRW'
-                                      ? (new RegExp('iPhone|iPad|iPod|Android', 'i').test(navigator.userAgent)
-                                          ? `https://m.map.naver.com/search2/search.naver?query=${encodeURIComponent(place.address || place.name)}`
-                                          : `https://map.naver.com/p/search/${encodeURIComponent(place.address || place.name)}`)
-                                      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address || place.name)}`
-                                    }
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={(e) => e.stopPropagation()}
+                                  <button
+                                    type="button"
+                                    onClick={(e) => handleMapSearch(e, place.address || place.name, planCurrency)}
                                     title={place.address ? `지도 보기: ${place.address}` : '지도 검색'}
                                     style={{ 
                                       fontSize: '0.75rem', 
@@ -3641,11 +3671,13 @@ function App() {
                                       background: 'var(--primary-light)', 
                                       padding: '4px 8px', 
                                       borderRadius: '6px',
-                                      fontWeight: 'bold'
+                                      fontWeight: 'bold',
+                                      border: 'none',
+                                      cursor: 'pointer'
                                     }}
                                   >
                                     🗺️{place.address ? '보기' : '찾기'}
-                                  </a>
+                                  </button>
 
                                   {/* Reservation badge toggle */}
                                   {place.needsReservation && (
@@ -5089,20 +5121,14 @@ function App() {
 
               {/* Action Buttons Row */}
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', paddingBottom: '8px', borderBottom: '1px solid var(--border)' }}>
-                <a
-                  href={planCurrency === 'KRW'
-                    ? (new RegExp('iPhone|iPad|iPod|Android', 'i').test(navigator.userAgent)
-                        ? `https://m.map.naver.com/search2/search.naver?query=${encodeURIComponent(selectedDetailPlace.address || selectedDetailPlace.name)}`
-                        : `https://map.naver.com/p/search/${encodeURIComponent(selectedDetailPlace.address || selectedDetailPlace.name)}`)
-                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedDetailPlace.address || selectedDetailPlace.name)}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={(e) => handleMapSearch(e, selectedDetailPlace.address || selectedDetailPlace.name, planCurrency)}
                   className="btn-secondary-sm"
-                  style={{ padding: '8px 12px', fontSize: '0.8rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  style={{ padding: '8px 12px', fontSize: '0.8rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
                 >
                   🗺️{selectedDetailPlace.address ? '보기' : '찾기'}
-                </a>
+                </button>
 
                 {selectedDetailPlace.needsReservation && (
                   <button 
