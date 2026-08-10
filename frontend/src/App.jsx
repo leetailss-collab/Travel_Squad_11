@@ -383,7 +383,7 @@ function App() {
         window.location.href = appUrl;
         setTimeout(() => {
           if (Date.now() - start < 1500) {
-            window.open(webUrl, '_blank');
+            window.location.href = webUrl;
           }
         }, 1000);
       } else {
@@ -1891,12 +1891,31 @@ function App() {
     return sorted;
   };
 
+  const prepareEditingPlace = (place) => {
+    if (!place) return null;
+    let costsList = place.costs ? [...place.costs] : [];
+    if (costsList.length === 0 && Number(place.estimatedCost) > 0) {
+      costsList = [{
+        id: `${place.id}_c0`,
+        title: place.name,
+        amount: Number(place.estimatedCost),
+        category: place.category || '관광',
+        payer: place.payer || '미지정'
+      }];
+    }
+    return {
+      ...place,
+      duration: place.duration || 0,
+      costs: costsList
+    };
+  };
+
   // Long-press event handlers for itinerary cards
   const handleStartPress = (e, place) => {
     if (e) e.stopPropagation();
     if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
     pressTimerRef.current = setTimeout(() => {
-      setEditingPlace({ ...place, duration: place.duration || 0 });
+      setEditingPlace(prepareEditingPlace(place));
     }, 700);
   };
 
@@ -1929,10 +1948,22 @@ function App() {
     
     const targetDateStr = getTargetDate(plan.startDate, dayNumber);
     const placeId = Date.now();
-    const costValue = newPlace.estimatedCost ? Number(newPlace.estimatedCost) : 0;
-    const costCurrency = newPlace.currency || plan.currency || 'KRW';
-    const payerValue = newPlace.payer || '미지정';
     const durationValue = newPlace.duration ? Number(newPlace.duration) : 60; // default 1 hour
+    const costCurrency = newPlace.currency || plan.currency || 'KRW';
+
+    // Process costs breakdown
+    let costsList = newPlace.costs ? newPlace.costs.filter(c => Number(c.amount) > 0) : [];
+    if (costsList.length === 0 && Number(newPlace.estimatedCost) > 0) {
+      costsList = [{
+        id: `${placeId}_c0`,
+        title: newPlace.name,
+        amount: Number(newPlace.estimatedCost),
+        category: newPlace.category || '관광',
+        payer: newPlace.payer || '미지정'
+      }];
+    }
+    const totalCostValue = costsList.reduce((sum, c) => sum + Number(c.amount || 0), 0);
+    const primaryPayer = costsList.length === 1 ? costsList[0].payer : (newPlace.payer || '미지정');
 
     const newPlaceObj = {
       id: placeId,
@@ -1941,13 +1972,14 @@ function App() {
       address: newPlace.address || '',
       description: newPlace.description,
       category: newPlace.category,
-      estimatedCost: costValue,
+      estimatedCost: totalCostValue,
       currency: costCurrency,
       needsReservation: newPlace.needsReservation,
-      isReservationCompleted: newPlace.isReservationCompleted || false,
+      isReservationCompleted: newPlace.needsReservation ? newPlace.isReservationCompleted : false,
       tip: newPlace.tip,
-      payer: payerValue,
+      payer: primaryPayer,
       duration: durationValue,
+      costs: costsList,
       comments: [],
       images: newPlace.images || [],
       mapImages: newPlace.mapImages || [],
@@ -1966,26 +1998,33 @@ function App() {
       updatedPlan.itinerary[dayIndex].places = shiftItineraryTimes(updatedPlan.itinerary[dayIndex].places);
     }
 
-    // Auto-sync to expenses if there is a positive cost
-    if (costValue > 0) {
-      const newExpenseItem = {
-        id: placeId,
-        placeId: placeId,
-        title: `[일정] ${newPlace.name}`,
-        amount: Math.round(costCurrency === 'KRW' ? costValue : costValue * (costCurrency === (plan.currency || 'KRW') ? exchangeRate.rate : (FALLBACK_KRW_RATES[costCurrency] || 1))),
-        originalAmount: costValue,
-        currency: costCurrency,
-        payer: payerValue,
-        date: targetDateStr
-      };
-      updatedPlan.expenses.push(newExpenseItem);
+    // Auto-sync costs breakdown to plan.expenses
+    if (costsList.length > 0) {
+      costsList.forEach((cItem, cIdx) => {
+        const cAmount = Number(cItem.amount || 0);
+        if (cAmount > 0) {
+          const expenseAmount = Math.round(costCurrency === 'KRW' ? cAmount : cAmount * (costCurrency === (plan.currency || 'KRW') ? exchangeRate.rate : (FALLBACK_KRW_RATES[costCurrency] || 1)));
+          const expenseItem = {
+            id: cItem.id || `${placeId}_c${cIdx}`,
+            placeId: placeId,
+            title: `[일정] ${newPlace.name}${cItem.title ? ` - ${cItem.title}` : ''}`,
+            amount: expenseAmount,
+            originalAmount: cAmount,
+            currency: costCurrency,
+            payer: cItem.payer || '미지정',
+            date: targetDateStr,
+            category: cItem.category || newPlace.category || '기타'
+          };
+          updatedPlan.expenses.push(expenseItem);
+        }
+      });
     }
 
     saveUpdatedPlan(updatedPlan);
     triggerNotification('place_add', placeId, newPlaceObj.name, 'itinerary');
     setNewPlace({
       day: 1, time: '', name: '', address: '', description: '', category: '관광', estimatedCost: '',
-      currency: plan.currency || 'KRW', needsReservation: false, isReservationCompleted: false, tip: '', payer: '', duration: 60, images: [],
+      currency: plan.currency || 'KRW', needsReservation: false, isReservationCompleted: false, tip: '', payer: '미지정', duration: 60, costs: [], images: [],
       transportType: '', transportDuration: ''
     });
     setShowModal(false);
@@ -2015,10 +2054,22 @@ function App() {
       const idx = dayItem.places.findIndex(p => p.id === editingPlace.id);
       if (idx !== -1) {
         dayNo = dayItem.day;
-        const costValue = editingPlace.estimatedCost ? Number(editingPlace.estimatedCost) : 0;
-        const costCurrency = editingPlace.currency || plan.currency || 'KRW';
-        const payerValue = editingPlace.payer || '미지정';
         const durationValue = editingPlace.duration ? Number(editingPlace.duration) : 0;
+        const costCurrency = editingPlace.currency || plan.currency || 'KRW';
+
+        // Process costs breakdown
+        let costsList = editingPlace.costs ? editingPlace.costs.filter(c => Number(c.amount) > 0) : [];
+        if (costsList.length === 0 && Number(editingPlace.estimatedCost) > 0) {
+          costsList = [{
+            id: `${editingPlace.id}_c0`,
+            title: editingPlace.name,
+            amount: Number(editingPlace.estimatedCost),
+            category: editingPlace.category || '관광',
+            payer: editingPlace.payer || '미지정'
+          }];
+        }
+        const totalCostValue = costsList.reduce((sum, c) => sum + Number(c.amount || 0), 0);
+        const primaryPayer = costsList.length === 1 ? costsList[0].payer : (editingPlace.payer || '미지정');
 
         dayItem.places[idx] = {
           ...dayItem.places[idx],
@@ -2028,12 +2079,13 @@ function App() {
           duration: durationValue,
           category: editingPlace.category,
           description: editingPlace.description,
-          estimatedCost: costValue,
+          estimatedCost: totalCostValue,
           currency: costCurrency,
           needsReservation: editingPlace.needsReservation,
           isReservationCompleted: editingPlace.isReservationCompleted || false,
           tip: editingPlace.tip,
-          payer: payerValue,
+          payer: primaryPayer,
+          costs: costsList,
           images: editingPlace.images || [],
           mapImages: editingPlace.mapImages || [],
           transportType: editingPlace.transportType || '',
@@ -2044,32 +2096,29 @@ function App() {
         dayItem.places = shiftItineraryTimes(dayItem.places);
         found = true;
 
-        // Auto-sync or update linked expense
+        // Auto-sync or update linked expenses: remove old ones for this place first
         const targetDateStr = getTargetDate(plan.startDate, dayNo);
-        const expenseIdx = updatedPlan.expenses.findIndex(exp => exp.placeId === editingPlace.id || exp.id === editingPlace.id);
-        
-        if (costValue > 0) {
-          const expenseAmount = Math.round(costCurrency === 'KRW' ? costValue : costValue * (costCurrency === (plan.currency || 'KRW') ? exchangeRate.rate : (FALLBACK_KRW_RATES[costCurrency] || 1)));
-          const updatedExpenseItem = {
-            id: editingPlace.id,
-            placeId: editingPlace.id,
-            title: `[일정] ${editingPlace.name}`,
-            amount: expenseAmount,
-            originalAmount: costValue,
-            currency: costCurrency,
-            payer: payerValue,
-            date: targetDateStr
-          };
-          if (expenseIdx !== -1) {
-            updatedPlan.expenses[expenseIdx] = updatedExpenseItem;
-          } else {
-            updatedPlan.expenses.push(updatedExpenseItem);
-          }
-        } else {
-          // If cost became 0 or empty, delete the linked expense
-          if (expenseIdx !== -1) {
-            updatedPlan.expenses.splice(expenseIdx, 1);
-          }
+        updatedPlan.expenses = updatedPlan.expenses.filter(exp => exp.placeId !== editingPlace.id && exp.id !== editingPlace.id && !(typeof exp.id === 'string' && exp.id.startsWith(`${editingPlace.id}_`)));
+
+        if (costsList.length > 0) {
+          costsList.forEach((cItem, cIdx) => {
+            const cAmount = Number(cItem.amount || 0);
+            if (cAmount > 0) {
+              const expenseAmount = Math.round(costCurrency === 'KRW' ? cAmount : cAmount * (costCurrency === (plan.currency || 'KRW') ? exchangeRate.rate : (FALLBACK_KRW_RATES[costCurrency] || 1)));
+              const expenseItem = {
+                id: cItem.id || `${editingPlace.id}_c${cIdx}`,
+                placeId: editingPlace.id,
+                title: `[일정] ${editingPlace.name}${cItem.title ? ` - ${cItem.title}` : ''}`,
+                amount: expenseAmount,
+                originalAmount: cAmount,
+                currency: costCurrency,
+                payer: cItem.payer || '미지정',
+                date: targetDateStr,
+                category: cItem.category || editingPlace.category || '기타'
+              };
+              updatedPlan.expenses.push(expenseItem);
+            }
+          });
         }
         break;
       }
@@ -2722,6 +2771,13 @@ function App() {
     triggerNotification('expense_add', newItem.id, newItem.title, 'expense');
     setNewExpense({ title: '', amount: '', payer: '', date: '', category: '기타' });
     setShowModal(false);
+  };
+
+  // Delete Standalone Expense Item
+  const handleDeleteExpense = (expenseId) => {
+    const updatedPlan = { ...plan };
+    updatedPlan.expenses = updatedPlan.expenses.filter(e => e.id !== expenseId);
+    saveUpdatedPlan(updatedPlan);
   };
 
   // Toggle Checklist Checked State
@@ -3622,7 +3678,7 @@ function App() {
 
                                 {/* Image Gallery Preview */}
                                 {place.images && place.images.length > 0 && (
-                                  <div className="timeline-images-gallery" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '6px 0', scrollbarWidth: 'thin' }} onClick={e => e.stopPropagation()}>
+                                  <div className="timeline-images-gallery" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '6px 0', scrollbarWidth: 'thin' }}>
                                     {place.images.map((imgUrl, imgIdx) => (
                                       <img
                                         key={imgIdx}
@@ -3798,7 +3854,7 @@ function App() {
                                       style={{ cursor: 'pointer', opacity: 0.7 }} 
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        setEditingPlace({ ...place, duration: place.duration || 0 });
+                                        setEditingPlace(prepareEditingPlace(place));
                                       }}
                                       title="클릭하여 이동 정보 입력"
                                     >
@@ -3924,53 +3980,58 @@ function App() {
                                         console.log('Resolved dCoords:', dCoords);
 
                                         const appType = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'public');
-                                         const naverWebMode = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'transit');
- 
-                                         // If at least one coordinate is resolved, we can use the nmap:// app scheme.
-                                         const params = [];
-                                         if (sCoords) {
-                                           params.push(`slat=${sCoords.lat}`);
-                                           params.push(`slng=${sCoords.lng}`);
-                                         }
-                                         params.push(`sname=${encodeURIComponent(cleanSname)}`);
-                                         if (dCoords) {
-                                           params.push(`dlat=${dCoords.lat}`);
-                                           params.push(`dlng=${dCoords.lng}`);
-                                         }
-                                         params.push(`dname=${encodeURIComponent(cleanDname)}`);
-                                         params.push(`appname=travelsquad`);
+                                        const naverWebMode = transportType === '자차' ? 'car' : (transportType === '도보' ? 'walk' : 'transit');
 
-                                         const appUrl = `nmap://route/${appType}?${params.join('&')}`;
+                                        if (sCoords && dCoords) {
+                                          // Case 1: Both departure & destination coordinates resolved (Exact Pinpoint Route)
+                                          const appUrl = `nmap://route/${appType}?slat=${sCoords.lat}&slng=${sCoords.lng}&sname=${encodeURIComponent(cleanSname)}&dlat=${dCoords.lat}&dlng=${dCoords.lng}&dname=${encodeURIComponent(cleanDname)}&appname=travelsquad`;
+                                          const webFallback = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&sx=${sCoords.lng}&sy=${sCoords.lat}&dname=${encodeURIComponent(cleanDname)}&ex=${dCoords.lng}&ey=${dCoords.lat}`;
+                                          const pcUrl = `https://map.naver.com/p/directions/${sCoords.lng},${sCoords.lat},${encodeURIComponent(cleanSname)}/${dCoords.lng},${dCoords.lat},${encodeURIComponent(cleanDname)}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
 
-                                         if (isMobile) {
-                                           // Mobile web fallback URL
-                                           let webFallback = `https://map.naver.com/index.nhn?menu=route&stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
-                                           if (sCoords && dCoords) {
-                                             webFallback = `https://m.map.naver.com/route/route.naver?sname=${encodeURIComponent(cleanSname)}&sx=${sCoords.lng}&sy=${sCoords.lat}&dname=${encodeURIComponent(cleanDname)}&ex=${dCoords.lng}&ey=${dCoords.lat}`;
-                                           }
-                                           
-                                           console.log('Mobile navigation. App URL:', appUrl);
-                                           console.log('Mobile fallback URL:', webFallback);
-                                           const start = Date.now();
-                                           window.location.href = appUrl;
-                                           setTimeout(() => {
-                                             if (Date.now() - start < 1500) {
-                                               window.location.href = webFallback;
-                                             }
-                                           }, 1000);
-                                         } else {
-                                           // PC Web directions (populate the pre-opened window using native V5 path parameters)
-                                           const sPart = sCoords ? `${sCoords.lng},${sCoords.lat},${encodeURIComponent(cleanSname)}` : `-,-,${encodeURIComponent(cleanSname)}`;
-                                           const dPart = dCoords ? `${dCoords.lng},${dCoords.lat},${encodeURIComponent(cleanDname)}` : `-,-,${encodeURIComponent(cleanDname)}`;
-                                           const pcUrl = `https://map.naver.com/p/directions/${sPart}/${dPart}/-/${naverWebMode}?c=14.00,0,0,0,dh`;
-                                           
-                                           console.log('PC Web directions URL:', pcUrl);
-                                           if (newWindow) {
-                                             newWindow.location.href = pcUrl;
-                                           } else {
-                                             window.open(pcUrl, '_blank');
-                                           }
-                                         }
+                                          console.log('Exact Coords Route - App:', appUrl);
+                                          console.log('Exact Coords Route - PC:', pcUrl);
+
+                                          if (isMobile) {
+                                            const start = Date.now();
+                                            window.location.href = appUrl;
+                                            setTimeout(() => {
+                                              if (Date.now() - start < 1500) {
+                                                window.location.href = webFallback;
+                                              }
+                                            }, 1000);
+                                          } else {
+                                            if (newWindow) {
+                                              newWindow.location.href = pcUrl;
+                                            } else {
+                                              window.open(pcUrl, '_blank');
+                                            }
+                                          }
+                                        } else {
+                                          // Case 2: One or both coordinates missing (Clean Fallback to Name Query Route)
+                                          const queryText = `${cleanSname}에서 ${cleanDname} 길찾기`;
+                                          const appUrl = `nmap://search?query=${encodeURIComponent(queryText)}&appname=travelsquad`;
+                                          const webFallback = `https://m.map.naver.com/search2/search.naver?query=${encodeURIComponent(queryText)}`;
+                                          const pcUrl = `https://map.naver.com/p/directions?stext=${encodeURIComponent(cleanSname)}&etext=${encodeURIComponent(cleanDname)}`;
+
+                                          console.log('Query Fallback Route - App:', appUrl);
+                                          console.log('Query Fallback Route - PC:', pcUrl);
+
+                                          if (isMobile) {
+                                            const start = Date.now();
+                                            window.location.href = appUrl;
+                                            setTimeout(() => {
+                                              if (Date.now() - start < 1500) {
+                                                window.location.href = webFallback;
+                                              }
+                                            }, 1000);
+                                          } else {
+                                            if (newWindow) {
+                                              newWindow.location.href = pcUrl;
+                                            } else {
+                                              window.open(pcUrl, '_blank');
+                                            }
+                                          }
+                                        }
                                       } else {
                                         // Overseas travel -> Google Maps
                                         e.preventDefault();
@@ -4105,72 +4166,326 @@ function App() {
             {/* 3. EXPENSE TAB */}
             {activeTab === 'expense' && (
               (() => {
+                const getExpenseCategory = (item) => {
+                  if (item.category && item.category !== '기타') return item.category;
+                  if (item.placeId && plan.itinerary) {
+                    for (const day of plan.itinerary) {
+                      const found = (day.places || []).find(p => p.id === item.placeId);
+                      if (found && found.category) return found.category;
+                    }
+                  }
+                  return item.category || '기타';
+                };
+
+                const grandTotal = plan.expenses.reduce((sum, item) => sum + (item.amount || 0), 0);
+                const memberCount = plan.members.length || 1;
+
+                const calculateTripDays = () => {
+                  if (!plan.startDate || !plan.endDate) return 1;
+                  try {
+                    const start = new Date(plan.startDate);
+                    const end = new Date(plan.endDate);
+                    const diffTime = Math.abs(end - start);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    return diffDays > 0 ? diffDays : 1;
+                  } catch (e) {
+                    return 1;
+                  }
+                };
+                const tripDays = calculateTripDays();
+
+                const perPersonTotal = Math.round(grandTotal / memberCount);
+                const perDayTotal = Math.round(grandTotal / tripDays);
+                const perPersonPerDayTotal = Math.round(grandTotal / (memberCount * tripDays));
+
+                // Major Category calculation
+                let fixedCostTotal = 0;
+                let localCostTotal = 0;
+
+                const categoryTotals = {
+                  '숙박': 0,
+                  '교통': 0,
+                  '식비': 0,
+                  '관광': 0,
+                  '쇼핑': 0,
+                  '기타': 0
+                };
+
+                plan.expenses.forEach(item => {
+                  const cat = getExpenseCategory(item);
+                  const amt = Number(item.amount || 0);
+                  if (categoryTotals[cat] !== undefined) {
+                    categoryTotals[cat] += amt;
+                  } else {
+                    categoryTotals['기타'] += amt;
+                  }
+
+                  if (cat === '숙박' || cat === '교통') {
+                    fixedCostTotal += amt;
+                  } else {
+                    localCostTotal += amt;
+                  }
+                });
+
+                const fixedPct = grandTotal > 0 ? Math.round((fixedCostTotal / grandTotal) * 100) : 0;
+                const localPct = grandTotal > 0 ? (100 - fixedPct) : 0;
+
+                // SVG Donut Chart slice computation
+                const catColors = {
+                  '숙박': '#8b5cf6',
+                  '교통': '#06b6d4',
+                  '식비': '#f59e0b',
+                  '관광': '#10b981',
+                  '쇼핑': '#ec4899',
+                  '기타': '#6b7280'
+                };
+
+                const circleCircumference = 226.195; // 2 * PI * 36
+                let accumulatedDash = 0;
+
+                const donutSlices = Object.entries(categoryTotals)
+                  .filter(([_, amt]) => amt > 0)
+                  .map(([cat, amt]) => {
+                    const pct = (amt / grandTotal);
+                    const dashLength = pct * circleCircumference;
+                    const strokeDasharray = `${dashLength} ${circleCircumference - dashLength}`;
+                    const strokeDashoffset = -accumulatedDash;
+                    accumulatedDash += dashLength;
+                    return {
+                      cat,
+                      amt,
+                      pctRatio: Math.round(pct * 100),
+                      color: catColors[cat] || '#6b7280',
+                      strokeDasharray,
+                      strokeDashoffset
+                    };
+                  });
+
+                // Expenses filter
                 const filteredExpenses = plan.expenses.filter(item => {
-                  const itemCat = item.category || '기타';
-                  return selectedExpenseFilter === 'all' || itemCat === selectedExpenseFilter;
+                  const itemCat = getExpenseCategory(item);
+                  if (selectedExpenseFilter === 'all') return true;
+                  if (selectedExpenseFilter === 'major_fixed') return itemCat === '숙박' || itemCat === '교통';
+                  if (selectedExpenseFilter === 'major_local') return itemCat !== '숙박' && itemCat !== '교통';
+                  return itemCat === selectedExpenseFilter;
                 });
                 const filteredTotal = filteredExpenses.reduce((sum, item) => sum + (item.amount || 0), 0);
 
                 return (
                   <div>
-                    {/* 2차 경비 필터 바 */}
-                    <div className="sub-filter-bar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '4px 4px 16px 4px', scrollbarWidth: 'none' }}>
-                      {['all', '교통', '숙박', '식비', '쇼핑', '관광', '기타'].map(cat => (
+                    <div className="card" style={{ padding: '14px', marginBottom: '16px', borderRadius: '12px', border: '1px solid var(--border)', overflowX: 'auto' }}>
+                      <div style={{ fontSize: '0.88rem', fontWeight: 700, marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span>📊 지출 종합 분석표</span>
+                        <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>({memberCount}명 / {tripDays}일 기준)</span>
+                      </div>
+
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'center' }}>
+                        <thead>
+                          <tr style={{ background: 'var(--bg-app)', borderBottom: '2px solid var(--border)' }}>
+                            <th style={{ padding: '8px 4px', color: 'var(--text-muted)', fontWeight: 600, width: '22%' }}>구분</th>
+                            <th style={{ padding: '8px 4px', color: 'var(--primary)', fontWeight: 700, width: '26%' }}>💰 총 지출</th>
+                            <th style={{ padding: '8px 4px', color: '#6d28d9', fontWeight: 700, width: '26%' }}>🏨🚗 고정/기초<br/><span style={{ fontSize: '0.68rem', fontWeight: 'normal' }}>(숙박+교통)</span></th>
+                            <th style={{ padding: '8px 4px', color: '#b45309', fontWeight: 700, width: '26%' }}>🍽️🎟️ 현지활동<br/><span style={{ fontSize: '0.68rem', fontWeight: 'normal' }}>(식비·관광 등)</span></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                            <td style={{ padding: '8px 4px', fontWeight: 700, color: 'var(--text)', background: 'var(--bg-app)' }}>총 금액</td>
+                            <td style={{ padding: '8px 4px', fontWeight: 800, color: 'var(--primary)' }}>{grandTotal.toLocaleString()}원</td>
+                            <td style={{ padding: '8px 4px', fontWeight: 700, color: '#5b21b6' }}>{fixedCostTotal.toLocaleString()}원 <div style={{ fontSize: '0.68rem', color: '#6d28d9' }}>({fixedPct}%)</div></td>
+                            <td style={{ padding: '8px 4px', fontWeight: 700, color: '#92400e' }}>{localCostTotal.toLocaleString()}원 <div style={{ fontSize: '0.68rem', color: '#b45309' }}>({localPct}%)</div></td>
+                          </tr>
+                          <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                            <td style={{ padding: '8px 4px', fontWeight: 600, color: 'var(--text)', background: 'var(--bg-app)' }}>👤 1인당</td>
+                            <td style={{ padding: '8px 4px', fontWeight: 700 }}>{perPersonTotal.toLocaleString()}원</td>
+                            <td style={{ padding: '8px 4px', color: '#5b21b6' }}>{Math.round(fixedCostTotal / memberCount).toLocaleString()}원</td>
+                            <td style={{ padding: '8px 4px', color: '#92400e' }}>{Math.round(localCostTotal / memberCount).toLocaleString()}원</td>
+                          </tr>
+                          <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                            <td style={{ padding: '8px 4px', fontWeight: 600, color: 'var(--text)', background: 'var(--bg-app)' }}>📅 1일당</td>
+                            <td style={{ padding: '8px 4px', fontWeight: 700 }}>{perDayTotal.toLocaleString()}원</td>
+                            <td style={{ padding: '8px 4px', color: '#5b21b6' }}>{Math.round(fixedCostTotal / tripDays).toLocaleString()}원</td>
+                            <td style={{ padding: '8px 4px', color: '#92400e' }}>{Math.round(localCostTotal / tripDays).toLocaleString()}원</td>
+                          </tr>
+                          <tr style={{ background: '#fffbeb' }}>
+                            <td style={{ padding: '8px 4px', fontWeight: 700, color: '#b45309' }}>⚡ 1인 1일당</td>
+                            <td style={{ padding: '8px 4px', fontWeight: 800, color: '#b45309' }}>{perPersonPerDayTotal.toLocaleString()}원</td>
+                            <td style={{ padding: '8px 4px', fontWeight: 700, color: '#5b21b6' }}>{Math.round(fixedCostTotal / (memberCount * tripDays)).toLocaleString()}원</td>
+                            <td style={{ padding: '8px 4px', fontWeight: 700, color: '#92400e' }}>{Math.round(localCostTotal / (memberCount * tripDays)).toLocaleString()}원</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* 3. 소분류 카테고리 Donut Chart & 비율 % */}
+                    {grandTotal > 0 && donutSlices.length > 0 && (
+                      <div className="card" style={{ padding: '16px', marginBottom: '16px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                        <h4 style={{ margin: '0 0 12px 0', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' }}>🍩 카테고리별 지출 비율</h4>
+                        
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                          {/* SVG Donut Chart */}
+                          <div style={{ position: 'relative', width: '110px', height: '110px', flexShrink: 0, margin: '0 auto' }}>
+                            <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                              <circle cx="50" cy="50" r="36" fill="transparent" stroke="#e2e8f0" strokeWidth="14" />
+                              {donutSlices.map((slice, idx) => (
+                                <circle
+                                  key={idx}
+                                  cx="50"
+                                  cy="50"
+                                  r="36"
+                                  fill="transparent"
+                                  stroke={slice.color}
+                                  strokeWidth="14"
+                                  strokeDasharray={slice.strokeDasharray}
+                                  strokeDashoffset={slice.strokeDashoffset}
+                                  style={{ transition: 'stroke-dasharray 0.4s ease, stroke-dashoffset 0.4s ease' }}
+                                />
+                              ))}
+                            </svg>
+                            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+                              <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>총 지출</span>
+                              <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text)' }}>
+                                {grandTotal >= 10000 ? `${Math.round(grandTotal / 10000)}만원` : `${grandTotal.toLocaleString()}원`}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Legend List */}
+                          <div style={{ flex: 1, minWidth: '160px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            {donutSlices.map((slice, idx) => (
+                              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: slice.color, display: 'inline-block' }} />
+                                  <span style={{ fontWeight: 600 }}>{slice.cat}</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>{slice.amt.toLocaleString()}원</span>
+                                  <span style={{ fontWeight: 700, backgroundColor: 'var(--bg-app)', padding: '1px 6px', borderRadius: '10px', fontSize: '0.75rem', color: slice.color }}>
+                                    {slice.pctRatio}%
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 4. 대분류 / 소분류 필터 바 */}
+                    <div className="sub-filter-bar" style={{ display: 'flex', gap: '6px', overflowX: 'auto', padding: '4px 4px 12px 4px', scrollbarWidth: 'none' }}>
+                      {[
+                        { id: 'all', label: '전체' },
+                        { id: 'major_fixed', label: '🏨🚗 고정/기초 (숙박·교통)' },
+                        { id: 'major_local', label: '🍽️🎟️ 현지활동 (식비·관광·쇼핑 등)' },
+                        { id: '교통', label: '🚗 교통' },
+                        { id: '숙박', label: '🏨 숙박' },
+                        { id: '식비', label: '🍽️ 식비' },
+                        { id: '관광', label: '🎟️ 관광' },
+                        { id: '쇼핑', label: '🛍️ 쇼핑' },
+                        { id: '기타', label: '📦 기타' }
+                      ].map(chip => (
                         <button
-                          key={cat}
-                          className={`filter-chip ${selectedExpenseFilter === cat ? 'active' : ''}`}
-                          onClick={() => setSelectedExpenseFilter(cat)}
+                          key={chip.id}
+                          className={`filter-chip ${selectedExpenseFilter === chip.id ? 'active' : ''}`}
+                          onClick={() => setSelectedExpenseFilter(chip.id)}
                           style={{
-                            padding: '6px 14px',
+                            padding: '6px 12px',
                             borderRadius: '20px',
                             border: '1px solid var(--border)',
-                            background: selectedExpenseFilter === cat ? 'var(--primary)' : 'var(--bg-card)',
-                            color: selectedExpenseFilter === cat ? '#fff' : 'var(--text)',
-                            fontSize: '0.82rem',
+                            background: selectedExpenseFilter === chip.id ? 'var(--primary)' : 'var(--bg-card)',
+                            color: selectedExpenseFilter === chip.id ? '#fff' : 'var(--text)',
+                            fontSize: '0.8rem',
                             fontWeight: '600',
                             cursor: 'pointer',
                             whiteSpace: 'nowrap',
                             flexShrink: 0
                           }}
                         >
-                          {cat === 'all' ? '전체' : cat}
+                          {chip.label}
                         </button>
                       ))}
                     </div>
 
-                    <div className="card" style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))', color: 'white' }}>
-                      <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>
-                        {selectedExpenseFilter === 'all' ? '총 지출액' : `${selectedExpenseFilter} 지출액`}
-                      </div>
-                      <div style={{ fontSize: '1.75rem', fontWeight: '800', marginTop: '4px' }}>
-                        {filteredTotal.toLocaleString()} 원
-                      </div>
-                      <div style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '8px' }}>
-                        인당 평균: {Math.round(filteredTotal / plan.members.length).toLocaleString()} 원 ({plan.members.length}명 기준)
-                      </div>
-                    </div>
-
                     <div className="card">
-                      <h3 className="card-title">💰 경비 상세 내역</h3>
+                      <h3 className="card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span>💰 경비 상세 내역</span>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)' }}>
+                          합계: {filteredTotal.toLocaleString()} 원
+                        </span>
+                      </h3>
                       <div>
                         {filteredExpenses.length === 0 ? (
                           <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px 0' }}>등록된 경비 내역이 없습니다.</div>
                         ) : (
-                          filteredExpenses.map((item) => (
-                            <div key={item.id} id={`expense-item-${item.id}`} className="expense-item">
-                              <div className="expense-info">
-                                <h4 style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                                  {item.title} 
-                                  <span style={{ fontSize: '0.68rem', fontWeight: 'normal', color: 'var(--text-muted)', backgroundColor: 'var(--border)', padding: '2px 6px', borderRadius: '4px' }}>
-                                    {item.category || '기타'}
-                                  </span>
-                                </h4>
-                                <p>{item.date}</p>
-                                <span className="expense-payer">{item.payer} 결제</span>
+                          filteredExpenses.map((item) => {
+                            const linkedPlace = item.placeId ? (() => {
+                              for (const day of (plan.itinerary || [])) {
+                                const match = (day.places || []).find(p => p.id === item.placeId);
+                                if (match) return match;
+                              }
+                              return null;
+                            })() : null;
+
+                            return (
+                              <div
+                                key={item.id}
+                                id={`expense-item-${item.id}`}
+                                className="expense-item"
+                                onClick={() => {
+                                  if (linkedPlace) {
+                                    setSelectedDetailPlace(linkedPlace);
+                                  }
+                                }}
+                                style={{
+                                  cursor: linkedPlace ? 'pointer' : 'default',
+                                  transition: 'background-color 0.2s',
+                                  position: 'relative',
+                                  padding: '12px 14px'
+                                }}
+                                title={linkedPlace ? '클릭하여 해당 일정 세부 내용 및 경비 수정하기' : ''}
+                              >
+                                <div className="expense-info" style={{ flex: 1 }}>
+                                  <h4 style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', margin: '0 0 4px 0' }}>
+                                    {item.title} 
+                                    <span style={{ fontSize: '0.68rem', fontWeight: 'normal', color: 'var(--text-muted)', backgroundColor: 'var(--border)', padding: '2px 6px', borderRadius: '4px' }}>
+                                      {getExpenseCategory(item)}
+                                    </span>
+                                  </h4>
+                                  <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.date}</p>
+                                  <span className="expense-payer" style={{ fontSize: '0.78rem' }}>{item.payer} 결제</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+                                  <div className="expense-amount" style={{ fontWeight: 'bold', fontSize: '1rem', color: 'var(--primary)' }}>
+                                    {item.amount.toLocaleString()} 원
+                                  </div>
+                                  {linkedPlace ? (
+                                    <span style={{ fontSize: '0.74rem', color: 'var(--primary)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '2px' }}>
+                                      일정 세부보기 / 수정 ➔
+                                    </span>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteExpense(item.id);
+                                      }}
+                                      style={{
+                                        border: '1px solid var(--danger)',
+                                        background: 'transparent',
+                                        color: 'var(--danger)',
+                                        borderRadius: '4px',
+                                        fontSize: '0.7rem',
+                                        padding: '2px 6px',
+                                        cursor: 'pointer'
+                                      }}
+                                    >
+                                      삭제
+                                    </button>
+                                  )}
+                                </div>
                               </div>
-                              <div className="expense-amount">{item.amount.toLocaleString()} 원</div>
-                            </div>
-                          ))
+                            );
+                          })
                         )}
                       </div>
                     </div>
@@ -4544,28 +4859,121 @@ function App() {
                         )}
                       </div>
 
-                      <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                        <div className="form-group" style={{ flex: 1 }}>
-                          <label>통화</label>
-                          <select className="form-control" value={newPlace.currency || planCurrency} onChange={e => setNewPlace({ ...newPlace, currency: e.target.value })}>
+                      {/* Multi-Cost Breakdown Section */}
+                      <div className="form-group" style={{ marginBottom: '16px', background: 'var(--bg-app)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                          <label style={{ margin: 0, fontWeight: 'bold', fontSize: '0.88rem' }}>
+                            💴 경비 세부 내역 (입장료/주차비/식비 등)
+                          </label>
+                          <button
+                            type="button"
+                            className="btn-secondary-sm"
+                            style={{ padding: '4px 10px', fontSize: '0.78rem', background: 'var(--primary-light)', color: 'var(--primary)', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
+                            onClick={() => {
+                              const curCosts = newPlace.costs || [];
+                              const newCost = { id: Date.now() + Math.random(), title: '', amount: '', category: newPlace.category || '관광', payer: '미지정' };
+                              setNewPlace({ ...newPlace, costs: [...curCosts, newCost] });
+                            }}
+                          >
+                            ➕ 항목 추가
+                          </button>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>통화:</span>
+                          <select
+                            className="form-control"
+                            style={{ width: 'auto', padding: '4px 8px', fontSize: '0.82rem' }}
+                            value={newPlace.currency || planCurrency}
+                            onChange={e => setNewPlace({ ...newPlace, currency: e.target.value })}
+                          >
                             <option value={planCurrency}>{planCurrencyMeta.symbol} {planCurrencyMeta.name}</option>
                             {planCurrency !== 'KRW' && <option value="KRW">₩ 원</option>}
                           </select>
+                          {newPlace.costs && newPlace.costs.length > 0 && (
+                            <span style={{ marginLeft: 'auto', fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--primary)' }}>
+                              총합: {newPlace.costs.reduce((sum, c) => sum + Number(c.amount || 0), 0).toLocaleString()} {newPlace.currency || planCurrency}
+                            </span>
+                          )}
                         </div>
-                        <div className="form-group" style={{ flex: 2 }}>
-                          <label>예상 비용 (선택사항)</label>
-                          <input type="number" min="0" placeholder="금액 입력" className="form-control" value={newPlace.estimatedCost || ''} onChange={e => setNewPlace({ ...newPlace, estimatedCost: e.target.value })} />
-                          {Number(newPlace.estimatedCost) > 0 && <div className="cost-preview" style={{ fontSize: '0.72rem', marginTop: '4px' }}>{formatCostComparison(newPlace.estimatedCost, newPlace.currency || planCurrency)}</div>}
-                        </div>
-                        <div className="form-group" style={{ flex: 1 }}>
-                          <label>결제자</label>
-                          <select className="form-control" value={newPlace.payer || '미지정'} onChange={e => setNewPlace({ ...newPlace, payer: e.target.value })}>
-                            <option value="미지정">미지정</option>
-                            {plan.members.map((m, idx) => (
-                              <option key={idx} value={m}>{m}</option>
+
+                        {(!newPlace.costs || newPlace.costs.length === 0) ? (
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '8px 0' }}>
+                            경비가 없는 일정이면 비워두시고, 여러 경비가 발생할 경우 <b>'➕ 항목 추가'</b>를 눌러주세요.
+                          </div>
+                        ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            {newPlace.costs.map((c, cIdx) => (
+                              <div key={c.id || cIdx} style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap', background: '#fff', padding: '6px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                                <input
+                                  type="text"
+                                  placeholder="항목명 (예: 입장료)"
+                                  className="form-control"
+                                  style={{ flex: 2, minWidth: '100px', fontSize: '0.82rem' }}
+                                  value={c.title || ''}
+                                  onChange={e => {
+                                    const updated = [...newPlace.costs];
+                                    updated[cIdx] = { ...updated[cIdx], title: e.target.value };
+                                    setNewPlace({ ...newPlace, costs: updated });
+                                  }}
+                                />
+                                <input
+                                  type="number"
+                                  min="0"
+                                  placeholder="금액"
+                                  className="form-control"
+                                  style={{ flex: 1.5, minWidth: '75px', fontSize: '0.82rem' }}
+                                  value={c.amount || ''}
+                                  onChange={e => {
+                                    const updated = [...newPlace.costs];
+                                    updated[cIdx] = { ...updated[cIdx], amount: e.target.value };
+                                    setNewPlace({ ...newPlace, costs: updated });
+                                  }}
+                                />
+                                <select
+                                  className="form-control"
+                                  style={{ flex: 1.2, minWidth: '70px', fontSize: '0.82rem' }}
+                                  value={c.category || '관광'}
+                                  onChange={e => {
+                                    const updated = [...newPlace.costs];
+                                    updated[cIdx] = { ...updated[cIdx], category: e.target.value };
+                                    setNewPlace({ ...newPlace, costs: updated });
+                                  }}
+                                >
+                                  {['관광', '식비', '숙박', '교통', '쇼핑', '기타'].map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                  ))}
+                                </select>
+                                <select
+                                  className="form-control"
+                                  style={{ flex: 1.2, minWidth: '70px', fontSize: '0.82rem' }}
+                                  value={c.payer || '미지정'}
+                                  onChange={e => {
+                                    const updated = [...newPlace.costs];
+                                    updated[cIdx] = { ...updated[cIdx], payer: e.target.value };
+                                    setNewPlace({ ...newPlace, costs: updated });
+                                  }}
+                                >
+                                  <option value="미지정">미지정</option>
+                                  {plan.members.map((m, idx) => (
+                                    <option key={idx} value={m}>{m}</option>
+                                  ))}
+                                </select>
+                                <button
+                                  type="button"
+                                  style={{ border: 'none', background: 'transparent', color: 'var(--danger)', fontSize: '1.1rem', cursor: 'pointer', padding: '0 4px' }}
+                                  onClick={() => {
+                                    const updated = newPlace.costs.filter((_, i) => i !== cIdx);
+                                    setNewPlace({ ...newPlace, costs: updated });
+                                  }}
+                                  title="항목 삭제"
+                                >
+                                  ✕
+                                </button>
+                              </div>
                             ))}
-                          </select>
-                        </div>
+                          </div>
+                        )}
                       </div>
 
                       <div style={{ display: 'flex', gap: '12px', marginTop: '4px', marginBottom: '12px' }}>
@@ -4890,28 +5298,121 @@ function App() {
                         </label>
                       )}
                     </div>
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                      <div className="form-group" style={{ flex: 1 }}>
-                        <label>통화</label>
-                        <select className="form-control" value={editingPlace.currency || planCurrency} onChange={e => setEditingPlace({ ...editingPlace, currency: e.target.value })}>
+                    {/* Multi-Cost Breakdown Section */}
+                    <div className="form-group" style={{ marginBottom: '16px', background: 'var(--bg-app)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <label style={{ margin: 0, fontWeight: 'bold', fontSize: '0.88rem' }}>
+                          💴 경비 세부 내역 (입장료/주차비/식비 등)
+                        </label>
+                        <button
+                          type="button"
+                          className="btn-secondary-sm"
+                          style={{ padding: '4px 10px', fontSize: '0.78rem', background: 'var(--primary-light)', color: 'var(--primary)', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
+                          onClick={() => {
+                            const curCosts = editingPlace.costs || [];
+                            const newCost = { id: Date.now() + Math.random(), title: '', amount: '', category: editingPlace.category || '관광', payer: '미지정' };
+                            setEditingPlace({ ...editingPlace, costs: [...curCosts, newCost] });
+                          }}
+                        >
+                          ➕ 항목 추가
+                        </button>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>통화:</span>
+                        <select
+                          className="form-control"
+                          style={{ width: 'auto', padding: '4px 8px', fontSize: '0.82rem' }}
+                          value={editingPlace.currency || planCurrency}
+                          onChange={e => setEditingPlace({ ...editingPlace, currency: e.target.value })}
+                        >
                           <option value={planCurrency}>{planCurrencyMeta.symbol} {planCurrencyMeta.name}</option>
                           {planCurrency !== 'KRW' && <option value="KRW">₩ 원</option>}
                         </select>
+                        {editingPlace.costs && editingPlace.costs.length > 0 && (
+                          <span style={{ marginLeft: 'auto', fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--primary)' }}>
+                            총합: {editingPlace.costs.reduce((sum, c) => sum + Number(c.amount || 0), 0).toLocaleString()} {editingPlace.currency || planCurrency}
+                          </span>
+                        )}
                       </div>
-                      <div className="form-group" style={{ flex: 2 }}>
-                        <label>예상 비용 (선택사항)</label>
-                        <input type="number" min="0" placeholder="금액 입력" className="form-control" value={editingPlace.estimatedCost || ''} onChange={e => setEditingPlace({ ...editingPlace, estimatedCost: e.target.value })} />
-                        {Number(editingPlace.estimatedCost) > 0 && <div className="cost-preview" style={{ fontSize: '0.72rem', marginTop: '4px' }}>{formatCostComparison(editingPlace.estimatedCost, editingPlace.currency || planCurrency)}</div>}
-                      </div>
-                      <div className="form-group" style={{ flex: 1 }}>
-                        <label>결제자</label>
-                        <select className="form-control" value={editingPlace.payer || '미지정'} onChange={e => setEditingPlace({ ...editingPlace, payer: e.target.value })}>
-                          <option value="미지정">미지정</option>
-                          {plan.members.map((m, idx) => (
-                            <option key={idx} value={m}>{m}</option>
+
+                      {(!editingPlace.costs || editingPlace.costs.length === 0) ? (
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '8px 0' }}>
+                          경비가 없는 일정이면 비워두시고, 여러 경비가 발생할 경우 <b>'➕ 항목 추가'</b>를 눌러주세요.
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {editingPlace.costs.map((c, cIdx) => (
+                            <div key={c.id || cIdx} style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap', background: '#fff', padding: '6px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                              <input
+                                type="text"
+                                placeholder="항목명 (예: 입장료)"
+                                className="form-control"
+                                style={{ flex: 2, minWidth: '100px', fontSize: '0.82rem' }}
+                                value={c.title || ''}
+                                onChange={e => {
+                                  const updated = [...editingPlace.costs];
+                                  updated[cIdx] = { ...updated[cIdx], title: e.target.value };
+                                  setEditingPlace({ ...editingPlace, costs: updated });
+                                }}
+                              />
+                              <input
+                                type="number"
+                                min="0"
+                                placeholder="금액"
+                                className="form-control"
+                                style={{ flex: 1.5, minWidth: '75px', fontSize: '0.82rem' }}
+                                value={c.amount || ''}
+                                onChange={e => {
+                                  const updated = [...editingPlace.costs];
+                                  updated[cIdx] = { ...updated[cIdx], amount: e.target.value };
+                                  setEditingPlace({ ...editingPlace, costs: updated });
+                                }}
+                              />
+                              <select
+                                className="form-control"
+                                style={{ flex: 1.2, minWidth: '70px', fontSize: '0.82rem' }}
+                                value={c.category || '관광'}
+                                onChange={e => {
+                                  const updated = [...editingPlace.costs];
+                                  updated[cIdx] = { ...updated[cIdx], category: e.target.value };
+                                  setEditingPlace({ ...editingPlace, costs: updated });
+                                }}
+                              >
+                                {['관광', '식비', '숙박', '교통', '쇼핑', '기타'].map(cat => (
+                                  <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                              </select>
+                              <select
+                                className="form-control"
+                                style={{ flex: 1.2, minWidth: '70px', fontSize: '0.82rem' }}
+                                value={c.payer || '미지정'}
+                                onChange={e => {
+                                  const updated = [...editingPlace.costs];
+                                  updated[cIdx] = { ...updated[cIdx], payer: e.target.value };
+                                  setEditingPlace({ ...editingPlace, costs: updated });
+                                }}
+                              >
+                                <option value="미지정">미지정</option>
+                                {plan.members.map((m, idx) => (
+                                  <option key={idx} value={m}>{m}</option>
+                                ))}
+                              </select>
+                              <button
+                                type="button"
+                                style={{ border: 'none', background: 'transparent', color: 'var(--danger)', fontSize: '1.1rem', cursor: 'pointer', padding: '0 4px' }}
+                                onClick={() => {
+                                  const updated = editingPlace.costs.filter((_, i) => i !== cIdx);
+                                  setEditingPlace({ ...editingPlace, costs: updated });
+                                }}
+                                title="항목 삭제"
+                              >
+                                ✕
+                              </button>
+                            </div>
                           ))}
-                        </select>
-                      </div>
+                        </div>
+                      )}
                     </div>
                   <div style={{ display: 'flex', gap: '12px', marginTop: '4px', marginBottom: '12px' }}>
                     <div className="form-group" style={{ flex: 1.5, marginBottom: 0 }}>
@@ -5090,16 +5591,35 @@ function App() {
               )}
 
               {/* Cost info */}
-              {(selectedDetailPlace.estimatedCost > 0 || selectedDetailPlace.cost > 0) && (
-                <div className="detail-field" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 600 }}>
-                  <span>💴 예상 경비:</span>
-                  <span style={{ color: 'var(--primary)' }}>
-                    {formatCostComparison(selectedDetailPlace.estimatedCost ?? selectedDetailPlace.cost, selectedDetailPlace.currency || planCurrency)}
-                  </span>
-                  {selectedDetailPlace.payer && (
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>
-                      ({selectedDetailPlace.payer} 결제)
+              {((selectedDetailPlace.costs && selectedDetailPlace.costs.length > 0) || selectedDetailPlace.estimatedCost > 0 || selectedDetailPlace.cost > 0) && (
+                <div className="detail-field" style={{ background: 'var(--bg-app)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>💴 경비 내역:</span>
+                    <span style={{ color: 'var(--primary)', fontSize: '1.05rem' }}>
+                      {formatCostComparison(selectedDetailPlace.estimatedCost ?? selectedDetailPlace.cost, selectedDetailPlace.currency || planCurrency)}
                     </span>
+                  </div>
+                  {selectedDetailPlace.costs && selectedDetailPlace.costs.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}>
+                      {selectedDetailPlace.costs.map((c, cIdx) => (
+                        <div key={cIdx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.84rem', background: '#fff', padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span className={`category-badge category-${c.category || '기타'}`} style={{ fontSize: '0.7rem', padding: '1px 5px' }}>{c.category || '기타'}</span>
+                            <span style={{ fontWeight: 600 }}>{c.title || selectedDetailPlace.name}</span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{Number(c.amount).toLocaleString()} {selectedDetailPlace.currency || planCurrency}</span>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>({c.payer || '미지정'})</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    selectedDetailPlace.payer && (
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                        결제자: {selectedDetailPlace.payer}
+                      </div>
+                    )
                   )}
                 </div>
               )}
@@ -5180,7 +5700,7 @@ function App() {
                   className="btn-secondary-sm" 
                   style={{ padding: '8px 12px', fontSize: '0.8rem' }}
                   onClick={() => {
-                    setEditingPlace({ ...selectedDetailPlace, duration: selectedDetailPlace.duration || 0 });
+                    setEditingPlace(prepareEditingPlace(selectedDetailPlace));
                     setSelectedDetailPlace(null);
                   }}
                 >
