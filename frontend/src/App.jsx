@@ -62,6 +62,17 @@ const detectTripCurrency = (title = '') => {
   return match ? { country: match[0], ...match[1] } : { country: '국내', ...CURRENCY_OPTIONS.KRW };
 };
 
+// Utility: Format Date object or string into YYYY-MM-DD in local timezone (KST)
+const getLocalDateStr = (d = new Date()) => {
+  if (!d) d = new Date();
+  const dateObj = typeof d === 'string' && d.length === 10 ? new Date(`${d}T00:00:00`) : new Date(d);
+  if (isNaN(dateObj.getTime())) return new Date().toLocaleDateString('sv-SE');
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 // Pre-registered Family Users
 const FAM_USERS = [
   { name: "이정우", pin: "570413", birth: "1957.04.11", passportBirth: "1957.04.13", engName: "LEE JUNG WOO", role: "user", isLunar: true },
@@ -1293,7 +1304,7 @@ function App() {
       for (let d = 1; d <= newDays; d++) {
         const targetDate = new Date(startStr);
         targetDate.setDate(targetDate.getDate() + (d - 1));
-        const dateStr = targetDate.toISOString().split('T')[0];
+        const dateStr = getLocalDateStr(targetDate);
         const existing = plan.itinerary ? plan.itinerary.find(item => item.day === d) : null;
         if (existing) {
           newItinerary.push({ ...existing, date: dateStr });
@@ -1940,7 +1951,7 @@ function App() {
       try {
         const date = new Date(start);
         date.setDate(date.getDate() + (dayNo - 1));
-        return date.toISOString().split('T')[0];
+        return getLocalDateStr(date);
       } catch (e) {
         return start;
       }
@@ -2043,7 +2054,7 @@ function App() {
       try {
         const date = new Date(start);
         date.setDate(date.getDate() + (dayNo - 1));
-        return date.toISOString().split('T')[0];
+        return getLocalDateStr(date);
       } catch (e) {
         return start;
       }
@@ -2762,7 +2773,7 @@ function App() {
       title: newExpense.title,
       amount: parseInt(newExpense.amount),
       payer: newExpense.payer || plan.members[0],
-      date: newExpense.date || new Date().toISOString().split('T')[0],
+      date: newExpense.date || getLocalDateStr(),
       category: newExpense.category || '기타'
     };
     updatedPlan.expenses.push(newItem);
@@ -2791,7 +2802,7 @@ function App() {
   };
 
   // Current Date Helper to divide plans
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateStr();
   const activeTrips = plans.filter(p => (currentUser?.role === 'admin' || p.members.includes(currentUser?.name)) && !p.isEvent && p.endDate >= today);
   const pastTrips = plans.filter(p => (currentUser?.role === 'admin' || p.members.includes(currentUser?.name)) && !p.isEvent && p.endDate < today);
 
@@ -3068,7 +3079,7 @@ function App() {
               };
 
               const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-              const todayStr = new Date().toISOString().split('T')[0];
+              const todayStr = getLocalDateStr();
               const selectedEvents = selectedCalendarDate ? getCellEvents(selectedCalendarDate) : [];
 
               return (
