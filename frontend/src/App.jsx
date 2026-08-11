@@ -73,6 +73,39 @@ const getLocalDateStr = (d = new Date()) => {
   return `${year}-${month}-${day}`;
 };
 
+// Utility: Convert text containing web URLs (http/https/www) into clickable <a> link elements
+const renderTextWithLinks = (text) => {
+  if (!text || typeof text !== 'string') return text;
+  
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+  const parts = text.split(urlRegex);
+  if (parts.length <= 1) return text;
+  
+  return parts.map((part, index) => {
+    if (part.match(/^(https?:\/\/|www\.)/i)) {
+      const href = part.toLowerCase().startsWith('www.') ? `https://${part}` : part;
+      return (
+        <a
+          key={index}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            color: '#2563eb',
+            textDecoration: 'underline',
+            wordBreak: 'break-all',
+            fontWeight: '600'
+          }}
+        >
+          {part} 🔗
+        </a>
+      );
+    }
+    return part;
+  });
+};
+
 // Pre-registered Family Users
 const FAM_USERS = [
   { name: "이정우", pin: "570413", birth: "1957.04.11", passportBirth: "1957.04.13", engName: "LEE JUNG WOO", role: "user", isLunar: true },
@@ -409,6 +442,45 @@ function App() {
     }
   };
 
+  // Universal Route Navigation Helper (Departure to Destination)
+  const handleRouteNav = (e, originQuery, destQuery, currency = 'KRW') => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!destQuery) return;
+
+    const sname = originQuery ? originQuery.replace(/\/출발|\/도착/g, '').trim() : '';
+    const dname = destQuery.replace(/\/출발|\/도착/g, '').trim();
+
+    if (!sname) {
+      handleMapSearch(e, dname, currency);
+      return;
+    }
+
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (currency === 'KRW') {
+      const pcUrl = `https://map.naver.com/p/directions?stext=${encodeURIComponent(sname)}&etext=${encodeURIComponent(dname)}`;
+      if (isMobile) {
+        const queryText = `${sname}에서 ${dname} 길찾기`;
+        const appUrl = `nmap://search?query=${encodeURIComponent(queryText)}&appname=travelsquad`;
+        const webFallback = `https://m.map.naver.com/search2/search.naver?query=${encodeURIComponent(queryText)}`;
+        const start = Date.now();
+        window.location.href = appUrl;
+        setTimeout(() => {
+          if (Date.now() - start < 1500) {
+            window.location.href = webFallback;
+          }
+        }, 1000);
+      } else {
+        window.open(pcUrl, '_blank');
+      }
+    } else {
+      const googleUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(sname)}&destination=${encodeURIComponent(dname)}`;
+      window.open(googleUrl, '_blank');
+    }
+  };
+
   // Authentication State
   const [currentUser, setCurrentUser] = useState(null);
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
@@ -445,7 +517,7 @@ function App() {
   // Form States inside detail tabs
   const [newPlace, setNewPlace] = useState({
     day: 1, time: '', name: '', address: '', description: '', category: '관광', estimatedCost: '',
-    currency: '', needsReservation: false, isReservationCompleted: false, tip: '', payer: '미지정', duration: 60, images: [], mapImages: [],
+    currency: '', needsReservation: false, isReservationCompleted: false, tip: '', payer: '미지정', duration: 0, images: [], mapImages: [],
     transportType: '', transportDuration: ''
   });
 
@@ -453,11 +525,12 @@ function App() {
   const [openMenuPlaceId, setOpenMenuPlaceId] = useState(null); // Place ID of active kebab menu
   const [selectedDetailPlace, setSelectedDetailPlace] = useState(null); // Currently open detail place modal
   const [alternativeForm, setAlternativeForm] = useState(null); // Alternative place form state: { mode, placeId, alt }
-  const [newSavedPlace, setNewSavedPlace] = useState({ name: '', category: '관광', address: '', description: '', tip: '', url: '' });
+  const [newSavedPlace, setNewSavedPlace] = useState({ name: '', category: '관광', address: '', description: '', tip: '', url: '', images: [] });
   const [editingSavedPlace, setEditingSavedPlace] = useState(null);
   const [showAddSavedPlaceModal, setShowAddSavedPlaceModal] = useState(false);
   const [leafletLoaded, setLeafletLoaded] = useState(false);
   const [naverMapLoaded, setNaverMapLoaded] = useState(false);
+  const [naverMapAuthFailed, setNaverMapAuthFailed] = useState(false);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const naverMapInstanceRef = useRef(null);
@@ -473,6 +546,9 @@ function App() {
   const addMapImgInputRef = useRef(null);
   const editImgInputRef = useRef(null);
   const editMapImgInputRef = useRef(null);
+  const addSavedPlaceImgInputRef = useRef(null);
+  const editSavedPlaceImgInputRef = useRef(null);
+  const altImgInputRef = useRef(null);
   const [newCheck, setNewCheck] = useState({ title: '', assignee: '', category: '공통' });
   const [editingCheck, setEditingCheck] = useState(null);
   const [newExpense, setNewExpense] = useState({ title: '', amount: '', payer: '', date: '', category: '기타' });
@@ -540,27 +616,91 @@ function App() {
     // Dynamic loading of Naver Map SDK
     const loadNaverMap = async () => {
       try {
+        window.navermap_authFailure = () => {
+          console.warn("Naver Map API authentication failed. Switching to Leaflet map fallback.");
+          setNaverMapAuthFailed(true);
+        };
+
         const res = await fetch('/api/config/naver-client-id');
         if (res.ok) {
           const { clientId } = await res.json();
-          if (clientId && !document.getElementById('naver-map-js')) {
-            const script = document.createElement('script');
-            script.id = 'naver-map-js';
-            script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}`;
-            script.onload = () => {
+          if (clientId && clientId.trim() !== '') {
+            // Remove stale script tag if Naver maps is not attached
+            const existingScript = document.getElementById('naver-map-js');
+            if (existingScript && (!window.naver || !window.naver.maps)) {
+              existingScript.remove();
+            }
+
+            if (!window.naver || !window.naver.maps) {
+              const script = document.createElement('script');
+              script.id = 'naver-map-js';
+              script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}&submodules=geocoder`;
+              script.onload = () => {
+                setNaverMapAuthFailed(false);
+                setNaverMapLoaded(true);
+              };
+              script.onerror = () => {
+                setNaverMapAuthFailed(true);
+              };
+              document.body.appendChild(script);
+            } else {
+              setNaverMapAuthFailed(false);
               setNaverMapLoaded(true);
-            };
-            document.body.appendChild(script);
-          } else if (window.naver && window.naver.maps) {
-            setNaverMapLoaded(true);
+            }
+          } else {
+            setNaverMapAuthFailed(true);
           }
+        } else {
+          setNaverMapAuthFailed(true);
         }
       } catch (err) {
         console.warn("Failed to load Naver Map SDK:", err);
+        setNaverMapAuthFailed(true);
       }
     };
     loadNaverMap();
   }, []);
+
+  // Auto-Repair Geocoding for savedPlaces missing lat/lng
+  useEffect(() => {
+    if (activeTab === 'places' && plan && plan.savedPlaces && plan.savedPlaces.length > 0) {
+      const missingPlaces = plan.savedPlaces.filter(sp => !sp.lat || !sp.lng);
+      if (missingPlaces.length === 0) return;
+
+      const repairGeocodes = async () => {
+        let hasChanges = false;
+        const updatedPlan = JSON.parse(JSON.stringify(plan));
+
+        for (const sp of missingPlaces) {
+          const queryStr = sp.address && sp.address.trim() !== '' ? sp.address : sp.name;
+          if (!queryStr) continue;
+
+          try {
+            const res = await fetch(`/api/geocoding?query=${encodeURIComponent(queryStr)}`);
+            if (res.ok) {
+              const data = await res.json();
+              if (data && data.lat && data.lng) {
+                const target = updatedPlan.savedPlaces.find(item => item.id === sp.id);
+                if (target) {
+                  target.lat = data.lat;
+                  target.lng = data.lng;
+                  hasChanges = true;
+                }
+              }
+            }
+          } catch (err) {
+            console.warn("Auto geocode repair failed for:", sp.name, err);
+          }
+        }
+
+        if (hasChanges) {
+          saveUpdatedPlan(updatedPlan);
+        }
+      };
+
+      repairGeocodes();
+    }
+  }, [activeTab, plan?.id]);
 
   useEffect(() => {
     const initLeafletMap = (center, zoom, validPlaces) => {
@@ -584,6 +724,11 @@ function App() {
             .addTo(map)
             .bindPopup(popupContent);
         });
+
+        if (validPlaces.length > 1) {
+          const bounds = validPlaces.map(p => [p.lat, p.lng]);
+          map.fitBounds(bounds, { padding: [30, 30] });
+        }
 
         mapInstanceRef.current = map;
       } catch (err) {
@@ -623,7 +768,7 @@ function App() {
       // If naverMapLoaded is true, and coordinate center is in Korea, use Naver Map!
       const isKorea = center[0] >= 33 && center[0] <= 39 && center[1] >= 124 && center[1] <= 132;
 
-      if (naverMapLoaded && window.naver && window.naver.maps && isKorea) {
+      if (naverMapLoaded && !naverMapAuthFailed && window.naver && window.naver.maps && isKorea) {
         try {
           const naverZoom = zoom === 12 ? 14 : 10;
           const map = new window.naver.maps.Map(mapRef.current, {
@@ -665,9 +810,18 @@ function App() {
             });
           });
 
+          if (validPlaces.length > 1) {
+            const bounds = new window.naver.maps.LatLngBounds();
+            validPlaces.forEach(p => {
+              bounds.extend(new window.naver.maps.LatLng(p.lat, p.lng));
+            });
+            map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
+          }
+
           naverMapInstanceRef.current = map;
         } catch (err) {
           console.error("Naver native map initialization failed, falling back to Leaflet:", err);
+          setNaverMapAuthFailed(true);
           if (leafletLoaded && window.L) {
             initLeafletMap(center, zoom, validPlaces);
           }
@@ -1838,6 +1992,88 @@ function App() {
     }
   };
 
+  // Saved Places Paste & Drop Handlers
+  const handleSavedPlaceImageAttach = async (files, isEdit = false) => {
+    const urls = await uploadImages(files);
+    if (urls.length === 0) return;
+    if (isEdit) {
+      setEditingSavedPlace(prev => ({
+        ...prev,
+        images: [...(prev.images || []), ...urls]
+      }));
+    } else {
+      setNewSavedPlace(prev => ({
+        ...prev,
+        images: [...(prev.images || []), ...urls]
+      }));
+    }
+  };
+
+  const handleSavedPlacePaste = (e, isEdit = false) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    const filesToUpload = [];
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) filesToUpload.push(file);
+      }
+    }
+    if (filesToUpload.length > 0) {
+      e.preventDefault();
+      handleSavedPlaceImageAttach(filesToUpload, isEdit);
+    }
+  };
+
+  const handleSavedPlaceDrop = (e, isEdit = false) => {
+    e.preventDefault();
+    const files = e.dataTransfer?.files;
+    if (!files || files.length === 0) return;
+    const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (imageFiles.length > 0) {
+      handleSavedPlaceImageAttach(imageFiles, isEdit);
+    }
+  };
+
+  // Alternative Places Paste & Drop Handlers
+  const handleAltImageAttach = async (files) => {
+    const urls = await uploadImages(files);
+    if (urls.length === 0) return;
+    setAlternativeForm(prev => ({
+      ...prev,
+      alt: {
+        ...prev.alt,
+        images: [...(prev.alt?.images || []), ...urls]
+      }
+    }));
+  };
+
+  const handleAltPaste = (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    const filesToUpload = [];
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) filesToUpload.push(file);
+      }
+    }
+    if (filesToUpload.length > 0) {
+      e.preventDefault();
+      handleAltImageAttach(filesToUpload);
+    }
+  };
+
+  const handleAltDrop = (e) => {
+    e.preventDefault();
+    const files = e.dataTransfer?.files;
+    if (!files || files.length === 0) return;
+    const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (imageFiles.length > 0) {
+      handleAltImageAttach(imageFiles);
+    }
+  };
+
   // Remove single image from temporary list
   const handleRemoveImage = (index, isEdit = false, isMap = false) => {
     if (isEdit) {
@@ -1959,7 +2195,7 @@ function App() {
     
     const targetDateStr = getTargetDate(plan.startDate, dayNumber);
     const placeId = Date.now();
-    const durationValue = newPlace.duration ? Number(newPlace.duration) : 60; // default 1 hour
+    const durationValue = newPlace.duration ? Number(newPlace.duration) : 0; // default 0 minutes
     const costCurrency = newPlace.currency || plan.currency || 'KRW';
 
     // Process costs breakdown
@@ -2035,7 +2271,7 @@ function App() {
     triggerNotification('place_add', placeId, newPlaceObj.name, 'itinerary');
     setNewPlace({
       day: 1, time: '', name: '', address: '', description: '', category: '관광', estimatedCost: '',
-      currency: plan.currency || 'KRW', needsReservation: false, isReservationCompleted: false, tip: '', payer: '미지정', duration: 60, costs: [], images: [],
+      currency: plan.currency || 'KRW', needsReservation: false, isReservationCompleted: false, tip: '', payer: '미지정', duration: 0, costs: [], images: [],
       transportType: '', transportDuration: ''
     });
     setShowModal(false);
@@ -2204,9 +2440,10 @@ function App() {
 
     let lat = null;
     let lng = null;
-    if (newSavedPlace.address && newSavedPlace.address.trim() !== '') {
+    const queryStr = newSavedPlace.address && newSavedPlace.address.trim() !== '' ? newSavedPlace.address : newSavedPlace.name;
+    if (queryStr && queryStr.trim() !== '') {
       try {
-        const response = await fetch(`/api/geocoding?query=${encodeURIComponent(newSavedPlace.address)}`);
+        const response = await fetch(`/api/geocoding?query=${encodeURIComponent(queryStr)}`);
         if (response.ok) {
           const data = await response.json();
           if (data && data.lat && data.lng) {
@@ -2229,6 +2466,7 @@ function App() {
       url: newSavedPlace.url || (planCurrency === 'KRW'
         ? `https://map.naver.com/p/search/${encodeURIComponent(newSavedPlace.address || newSavedPlace.name)}`
         : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(newSavedPlace.address || newSavedPlace.name)}`),
+      images: newSavedPlace.images ? [...newSavedPlace.images] : [],
       lat,
       lng
     };
@@ -2236,7 +2474,7 @@ function App() {
     updatedPlan.savedPlaces.push(newObj);
     saveUpdatedPlan(updatedPlan);
     setShowAddSavedPlaceModal(false);
-    setNewSavedPlace({ name: '', category: '관광', address: '', description: '', tip: '', url: '' });
+    setNewSavedPlace({ name: '', category: '관광', address: '', description: '', tip: '', url: '', images: [] });
   };
 
   // Edit Saved Place (Places Tab)
@@ -2251,22 +2489,23 @@ function App() {
     let lat = editingSavedPlace.lat;
     let lng = editingSavedPlace.lng;
     const oldAddr = plan.savedPlaces[idx].address;
+    const oldName = plan.savedPlaces[idx].name;
 
-    if (editingSavedPlace.address !== oldAddr && editingSavedPlace.address && editingSavedPlace.address.trim() !== '') {
-      try {
-        const response = await fetch(`/api/geocoding?query=${encodeURIComponent(editingSavedPlace.address)}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.lat && data.lng) {
-            lat = parseFloat(data.lat);
-            lng = parseFloat(data.lng);
-          } else {
-            lat = null;
-            lng = null;
+    if (!lat || !lng || editingSavedPlace.address !== oldAddr || editingSavedPlace.name !== oldName) {
+      const queryStr = editingSavedPlace.address && editingSavedPlace.address.trim() !== '' ? editingSavedPlace.address : editingSavedPlace.name;
+      if (queryStr && queryStr.trim() !== '') {
+        try {
+          const response = await fetch(`/api/geocoding?query=${encodeURIComponent(queryStr)}`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data && data.lat && data.lng) {
+              lat = parseFloat(data.lat);
+              lng = parseFloat(data.lng);
+            }
           }
+        } catch (err) {
+          console.warn("Geocoding failed:", err);
         }
-      } catch (err) {
-        console.warn("Geocoding failed:", err);
       }
     }
 
@@ -2330,7 +2569,7 @@ function App() {
         payer: alt.payer || '미지정',
         needsReservation: alt.needsReservation || false,
         isReservationCompleted: alt.isReservationCompleted || false,
-        images: [],
+        images: alt.images ? [...alt.images] : [],
         mapImages: []
       };
       foundPlace.alternatives.push(newAltObj);
@@ -2348,7 +2587,8 @@ function App() {
           currency: alt.currency || planCurrency,
           payer: alt.payer || '미지정',
           needsReservation: alt.needsReservation || false,
-          isReservationCompleted: alt.isReservationCompleted || false
+          isReservationCompleted: alt.isReservationCompleted || false,
+          images: alt.images ? [...alt.images] : (foundPlace.alternatives[altIdx].images || [])
         };
       }
     }
@@ -2415,7 +2655,7 @@ function App() {
       payer: '미지정',
       needsReservation: false,
       isReservationCompleted: false,
-      images: [],
+      images: savedPlaceObj.images ? [...savedPlaceObj.images] : [],
       mapImages: []
     };
 
@@ -3683,7 +3923,7 @@ function App() {
 
                                 {place.description && (
                                   <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '4px', whiteSpace: 'pre-wrap', lineHeight: '1.4' }}>
-                                    {place.description}
+                                    {renderTextWithLinks(place.description)}
                                   </div>
                                 )}
 
@@ -3717,7 +3957,7 @@ function App() {
                                 {/* Tip / Precautions */}
                                 {place.tip && (
                                   <div style={{ fontSize: '0.8rem', color: '#b45309', background: '#fffbeb', border: '1px solid #fef3c7', padding: '6px 10px', borderRadius: '6px', marginTop: '6px', whiteSpace: 'pre-wrap' }}>
-                                    💡 {place.tip}
+                                    💡 {renderTextWithLinks(place.tip)}
                                   </div>
                                 )}
 
@@ -4642,14 +4882,39 @@ function App() {
                           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <span>📍</span> <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '200px' }} title={sp.address}>{sp.address || '주소 없음'}</span>
                           </div>
+                          {sp.images && sp.images.length > 0 && (
+                            <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', marginBottom: '8px', scrollbarWidth: 'thin' }}>
+                              {sp.images.map((imgUrl, imgIdx) => (
+                                <img
+                                  key={imgIdx}
+                                  src={imgUrl}
+                                  alt={`${sp.name} ${imgIdx + 1}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setLightboxImagesList(sp.images);
+                                    setLightboxActiveIndex(imgIdx);
+                                  }}
+                                  style={{
+                                    width: '55px',
+                                    height: '55px',
+                                    objectFit: 'cover',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    border: '1px solid var(--border)',
+                                    flexShrink: 0
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          )}
                           {sp.description && (
                             <div style={{ fontSize: '0.8rem', color: 'var(--text)', marginBottom: '8px', background: 'var(--bg-app)', padding: '6px 8px', borderRadius: '6px', whiteSpace: 'pre-wrap' }}>
-                              {sp.description}
+                              {renderTextWithLinks(sp.description)}
                             </div>
                           )}
                           {sp.tip && (
                             <div style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '500', whiteSpace: 'pre-wrap' }}>
-                              💡 {sp.tip}
+                              💡 {renderTextWithLinks(sp.tip)}
                             </div>
                           )}
                         </div>
@@ -4749,7 +5014,7 @@ function App() {
                           <input 
                             type="number" 
                             min="0"
-                            placeholder="예: 90" 
+                            placeholder="미설정 (예: 60)" 
                             className="form-control" 
                             value={newPlace.duration || ''} 
                             onChange={e => setNewPlace({ ...newPlace, duration: e.target.value === '' ? 0 : Number(e.target.value) })} 
@@ -5195,7 +5460,7 @@ function App() {
                         <input 
                           type="number" 
                           min="0"
-                          placeholder="예: 90" 
+                          placeholder="미설정 (예: 60)" 
                           className="form-control" 
                           value={editingPlace.duration || ''} 
                           onChange={e => setEditingPlace({ ...editingPlace, duration: e.target.value === '' ? 0 : Number(e.target.value) })} 
@@ -5528,7 +5793,7 @@ function App() {
                       setNewPlace({
                         day: copyTarget.day || 1,
                         time: copyTarget.time || '',
-                        duration: copyTarget.duration || 60,
+                        duration: copyTarget.duration || 0,
                         name: `${copyTarget.name || ''} (복사)`,
                         address: copyTarget.address || '',
                         category: copyTarget.category || '관광',
@@ -5588,7 +5853,7 @@ function App() {
                 <div className="detail-field">
                   <h4 style={{ margin: '0 0 6px 0', fontSize: '0.88rem', color: 'var(--text-muted)' }}>📝 메모 / 설명</h4>
                   <div style={{ fontSize: '0.9rem', color: 'var(--text)', whiteSpace: 'pre-wrap', lineHeight: '1.5', background: 'var(--bg-app)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                    {selectedDetailPlace.description}
+                    {renderTextWithLinks(selectedDetailPlace.description)}
                   </div>
                 </div>
               )}
@@ -5597,7 +5862,7 @@ function App() {
               {selectedDetailPlace.tip && (
                 <div className="detail-field" style={{ background: '#fffbeb', border: '1px solid #fef3c7', padding: '12px', borderRadius: '8px' }}>
                   <h4 style={{ margin: '0 0 4px 0', fontSize: '0.88rem', color: '#b45309', display: 'flex', alignItems: 'center', gap: '4px' }}>💡 팁 / 주의사항</h4>
-                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#78350f', whiteSpace: 'pre-wrap', lineHeight: '1.4' }}>{selectedDetailPlace.tip}</p>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#78350f', whiteSpace: 'pre-wrap', lineHeight: '1.4' }}>{renderTextWithLinks(selectedDetailPlace.tip)}</p>
                 </div>
               )}
 
@@ -5725,7 +5990,7 @@ function App() {
                     setNewPlace({
                       day: selectedDetailPlace.day || 1,
                       time: selectedDetailPlace.time,
-                      duration: selectedDetailPlace.duration || 60,
+                      duration: selectedDetailPlace.duration || 0,
                       name: `${selectedDetailPlace.name} (복사)`,
                       address: selectedDetailPlace.address || '',
                       category: selectedDetailPlace.category || '관광',
@@ -5864,14 +6129,32 @@ function App() {
                             <strong style={{ marginLeft: '6px' }}>{alt.name}</strong>
                           </div>
                           
-                          <div style={{ display: 'flex', gap: '4px' }}>
+                          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                             <button 
                               type="button" 
                               className="btn-secondary-sm"
                               style={{ padding: '2px 6px', fontSize: '0.7rem', color: 'var(--primary)', fontWeight: 'bold' }}
                               onClick={() => handleSwapPlaceWithAlternative(selectedDetailPlace.id, alt.id)}
                             >
-                              🔄 교체
+                              🔄 대표 교체
+                            </button>
+                            <button 
+                              type="button" 
+                              className="btn-secondary-sm"
+                              style={{ padding: '2px 6px', fontSize: '0.7rem' }}
+                              onClick={(e) => handleMapSearch(e, alt.address || alt.name, planCurrency)}
+                              title="대안 장소 지도 보기"
+                            >
+                              🗺️ 지도
+                            </button>
+                            <button 
+                              type="button" 
+                              className="btn-secondary-sm"
+                              style={{ padding: '2px 6px', fontSize: '0.7rem' }}
+                              onClick={(e) => handleRouteNav(e, selectedDetailPlace.address || selectedDetailPlace.name, alt.address || alt.name, planCurrency)}
+                              title="대표 장소 ➔ 대안 장소 길찾기"
+                            >
+                              🚗 길찾기
                             </button>
                             <button 
                               type="button" 
@@ -5898,8 +6181,33 @@ function App() {
                           </div>
                         </div>
                           
-                          {alt.description && <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '2px', whiteSpace: 'pre-wrap' }}>{alt.description}</div>}
-                          {alt.tip && <div style={{ color: '#b45309', fontSize: '0.75rem', marginTop: '2px', whiteSpace: 'pre-wrap' }}>💡 {alt.tip}</div>}
+                        {alt.images && alt.images.length > 0 && (
+                          <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', padding: '4px 0', scrollbarWidth: 'thin' }}>
+                            {alt.images.map((imgUrl, imgIdx) => (
+                              <img
+                                key={imgIdx}
+                                src={imgUrl}
+                                alt={`${alt.name} ${imgIdx + 1}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setLightboxImagesList(alt.images);
+                                  setLightboxActiveIndex(imgIdx);
+                                }}
+                                style={{
+                                  width: '55px',
+                                  height: '55px',
+                                  objectFit: 'cover',
+                                  borderRadius: '6px',
+                                  cursor: 'pointer',
+                                  border: '1px solid var(--border)',
+                                  flexShrink: 0
+                                }}
+                              />
+                            ))}
+                          </div>
+                        )}
+                          {alt.description && <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '2px', whiteSpace: 'pre-wrap' }}>{renderTextWithLinks(alt.description)}</div>}
+                          {alt.tip && <div style={{ color: '#b45309', fontSize: '0.75rem', marginTop: '2px', whiteSpace: 'pre-wrap' }}>💡 {renderTextWithLinks(alt.tip)}</div>}
                           {alt.address && <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '2px' }}>📍 {alt.address}</div>}
                         </div>
                       ))
@@ -5966,7 +6274,7 @@ function App() {
                                 </div>
                               ) : (
                                 <div>
-                                  <div>{c.text}</div>
+                                  <div>{renderTextWithLinks(c.text)}</div>
                                   {(c.author === currentUser.name || currentUser.role === 'admin') && (
                                     <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', marginTop: '4px', opacity: 0.6 }}>
                                       <span style={{ cursor: 'pointer', fontSize: '0.7rem', color: 'blue' }} onClick={() => { setEditingCommentId(c.id); setEditingCommentText(c.text); }}>수정</span>
@@ -6051,9 +6359,67 @@ function App() {
                 <label>웹 지도 링크 (Naver/Google Map 등)</label>
                 <input type="text" className="form-control" placeholder="https://..." value={newSavedPlace.url} onChange={e => setNewSavedPlace({ ...newSavedPlace, url: e.target.value })} />
               </div>
-              <div className="modal-footer" style={{ marginTop: '20px' }}>
-                <button type="button" className="btn-secondary-sm" onClick={() => setShowAddSavedPlaceModal(false)}>취소</button>
-                <button type="submit" className="submit-btn" style={{ flex: 1 }}>등록</button>
+              <div className="form-group">
+                <label>📷 사진 첨부</label>
+                <div 
+                  className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
+                  onClick={() => addSavedPlaceImgInputRef.current?.click()}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => handleSavedPlaceDrop(e, false)}
+                  onPaste={(e) => handleSavedPlacePaste(e, false)}
+                  tabIndex={0}
+                  style={{
+                    border: '2px dashed var(--border)',
+                    borderRadius: '8px',
+                    padding: '16px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    backgroundColor: 'var(--bg-muted, #f9f9f9)',
+                    transition: 'all 0.2s',
+                    outline: 'none',
+                    fontSize: '0.85rem',
+                    color: 'var(--text-muted)'
+                  }}
+                >
+                  {uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 복사한 이미지를 여기에 붙여넣기(Ctrl+V), 드래그&드롭 또는 클릭하여 사진 추가'}
+                </div>
+                <input 
+                  type="file" 
+                  ref={addSavedPlaceImgInputRef}
+                  style={{ display: 'none' }}
+                  multiple 
+                  accept="image/*" 
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      handleSavedPlaceImageAttach(e.target.files, false);
+                    }
+                  }} 
+                />
+                {newSavedPlace.images && newSavedPlace.images.length > 0 && (
+                  <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', marginTop: '8px' }}>
+                    {newSavedPlace.images.map((img, i) => (
+                      <div key={i} style={{ position: 'relative' }}>
+                        <img src={img} alt="saved" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '6px' }} />
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            setNewSavedPlace(prev => ({
+                              ...prev,
+                              images: prev.images.filter((_, idx) => idx !== i)
+                            }));
+                          }} 
+                          style={{ position: 'absolute', top: -4, right: -4, background: 'red', color: '#fff', border: 'none', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', cursor: 'pointer' }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer" style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+                <button type="button" className="btn-secondary-sm" style={{ flex: 1, padding: '12px 0', fontSize: '0.95rem', fontWeight: 600 }} onClick={() => setShowAddSavedPlaceModal(false)}>취소</button>
+                <button type="submit" className="submit-btn" style={{ flex: 1, padding: '12px 0', fontSize: '0.95rem' }}>등록</button>
               </div>
             </form>
           </div>
@@ -6101,9 +6467,67 @@ function App() {
                 <label>웹 지도 링크</label>
                 <input type="text" className="form-control" value={editingSavedPlace.url || ''} onChange={e => setEditingSavedPlace({ ...editingSavedPlace, url: e.target.value })} />
               </div>
-              <div className="modal-footer" style={{ marginTop: '20px' }}>
-                <button type="button" className="btn-secondary-sm" onClick={() => setEditingSavedPlace(null)}>취소</button>
-                <button type="submit" className="submit-btn" style={{ flex: 1 }}>저장 완료</button>
+              <div className="form-group">
+                <label>📷 사진 첨부</label>
+                <div 
+                  className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
+                  onClick={() => editSavedPlaceImgInputRef.current?.click()}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => handleSavedPlaceDrop(e, true)}
+                  onPaste={(e) => handleSavedPlacePaste(e, true)}
+                  tabIndex={0}
+                  style={{
+                    border: '2px dashed var(--border)',
+                    borderRadius: '8px',
+                    padding: '16px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    backgroundColor: 'var(--bg-muted, #f9f9f9)',
+                    transition: 'all 0.2s',
+                    outline: 'none',
+                    fontSize: '0.85rem',
+                    color: 'var(--text-muted)'
+                  }}
+                >
+                  {uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 복사한 이미지를 여기에 붙여넣기(Ctrl+V), 드래그&드롭 또는 클릭하여 사진 추가'}
+                </div>
+                <input 
+                  type="file" 
+                  ref={editSavedPlaceImgInputRef}
+                  style={{ display: 'none' }}
+                  multiple 
+                  accept="image/*" 
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      handleSavedPlaceImageAttach(e.target.files, true);
+                    }
+                  }} 
+                />
+                {editingSavedPlace.images && editingSavedPlace.images.length > 0 && (
+                  <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', marginTop: '8px' }}>
+                    {editingSavedPlace.images.map((img, i) => (
+                      <div key={i} style={{ position: 'relative' }}>
+                        <img src={img} alt="saved" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '6px' }} />
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            setEditingSavedPlace(prev => ({
+                              ...prev,
+                              images: prev.images.filter((_, idx) => idx !== i)
+                            }));
+                          }} 
+                          style={{ position: 'absolute', top: -4, right: -4, background: 'red', color: '#fff', border: 'none', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', cursor: 'pointer' }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer" style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+                <button type="button" className="btn-secondary-sm" style={{ flex: 1, padding: '12px 0', fontSize: '0.95rem', fontWeight: 600 }} onClick={() => setEditingSavedPlace(null)}>취소</button>
+                <button type="submit" className="submit-btn" style={{ flex: 1, padding: '12px 0', fontSize: '0.95rem' }}>저장 완료</button>
               </div>
             </form>
           </div>
@@ -6201,9 +6625,70 @@ function App() {
                   })} 
                 />
               </div>
-              <div className="modal-footer" style={{ marginTop: '20px' }}>
-                <button type="button" className="btn-secondary-sm" onClick={() => setAlternativeForm(null)}>취소</button>
-                <button type="submit" className="submit-btn" style={{ flex: 1 }}>{alternativeForm.mode === 'add' ? '추가' : '저장 완료'}</button>
+              <div className="form-group">
+                <label>📷 사진 첨부</label>
+                <div 
+                  className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
+                  onClick={() => altImgInputRef.current?.click()}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => handleAltDrop(e)}
+                  onPaste={(e) => handleAltPaste(e)}
+                  tabIndex={0}
+                  style={{
+                    border: '2px dashed var(--border)',
+                    borderRadius: '8px',
+                    padding: '16px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    backgroundColor: 'var(--bg-muted, #f9f9f9)',
+                    transition: 'all 0.2s',
+                    outline: 'none',
+                    fontSize: '0.85rem',
+                    color: 'var(--text-muted)'
+                  }}
+                >
+                  {uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 복사한 이미지를 여기에 붙여넣기(Ctrl+V), 드래그&드롭 또는 클릭하여 사진 추가'}
+                </div>
+                <input 
+                  type="file" 
+                  ref={altImgInputRef}
+                  style={{ display: 'none' }}
+                  multiple 
+                  accept="image/*" 
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      handleAltImageAttach(e.target.files);
+                    }
+                  }} 
+                />
+                {alternativeForm.alt?.images && alternativeForm.alt.images.length > 0 && (
+                  <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', marginTop: '8px' }}>
+                    {alternativeForm.alt.images.map((img, i) => (
+                      <div key={i} style={{ position: 'relative' }}>
+                        <img src={img} alt="alt" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '6px' }} />
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            setAlternativeForm(prev => ({
+                              ...prev,
+                              alt: {
+                                ...prev.alt,
+                                images: prev.alt.images.filter((_, idx) => idx !== i)
+                              }
+                            }));
+                          }} 
+                          style={{ position: 'absolute', top: -4, right: -4, background: 'red', color: '#fff', border: 'none', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', cursor: 'pointer' }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer" style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+                <button type="button" className="btn-secondary-sm" style={{ flex: 1, padding: '12px 0', fontSize: '0.95rem', fontWeight: 600 }} onClick={() => setAlternativeForm(null)}>취소</button>
+                <button type="submit" className="submit-btn" style={{ flex: 1, padding: '12px 0', fontSize: '0.95rem' }}>{alternativeForm.mode === 'add' ? '추가' : '저장 완료'}</button>
               </div>
             </form>
           </div>

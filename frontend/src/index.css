@@ -635,6 +635,24 @@ body {
   cursor: pointer;
 }
 
+.modal-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.modal-footer button,
+.modal-footer .btn-secondary-sm,
+.modal-footer .submit-btn {
+  flex: 1;
+  margin: 0;
+  padding: 12px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
 .form-group {
   margin-bottom: 16px;
 }

@@ -608,6 +608,31 @@ const deleteAnniversary = async (id) => {
   }
 };
 
+// 15. System Config (Naver API Keys, etc.) in Firestore
+const getSystemConfig = async (key = 'naver_map') => {
+  try {
+    const docRef = db.collection('system_config').doc(key);
+    const docSnap = await docRef.get();
+    if (docSnap.exists) {
+      return docSnap.data();
+    }
+    return null;
+  } catch (err) {
+    console.warn(`Failed to fetch system_config (${key}) from Firestore:`, err.message);
+    return null;
+  }
+};
+
+const saveSystemConfig = async (key = 'naver_map', data) => {
+  try {
+    await db.collection('system_config').doc(key).set(data, { merge: true });
+    return true;
+  } catch (err) {
+    console.warn(`Failed to save system_config (${key}) to Firestore:`, err.message);
+    return false;
+  }
+};
+
 module.exports = {
   authenticateUser,
   getPlans,
@@ -630,5 +655,7 @@ module.exports = {
   getAllUsers,
   getNotifications,
   createNotification,
-  markNotificationAsRead
+  markNotificationAsRead,
+  getSystemConfig,
+  saveSystemConfig
 };

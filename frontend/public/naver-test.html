@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Naver Map Test</title>
+  <style>
+    #map { width: 100%; height: 500px; border: 2px solid #333; }
+    body { font-family: sans-serif; padding: 20px; }
+    .status { padding: 10px; margin: 10px 0; border-radius: 6px; font-weight: bold; }
+    .ok { background: #d4edda; color: #155724; }
+    .fail { background: #f8d7da; color: #721c24; }
+    .info { background: #d1ecf1; color: #0c5460; }
+  </style>
+</head>
+<body>
+  <h1>🗺️ Naver Map 인증 테스트</h1>
+  <div id="status" class="status info">⏳ 네이버 지도 SDK 로딩 중...</div>
+  <div id="map"></div>
+
+  <script>
+    // Auth failure callback - MUST be set before SDK loads
+    window.navermap_authFailure = function() {
+      document.getElementById('status').className = 'status fail';
+      document.getElementById('status').innerHTML = '❌ 인증 실패! navermap_authFailure 콜백이 호출되었습니다.<br>→ Web 서비스 URL 등록 또는 전파 지연 문제입니다.';
+      console.error('navermap_authFailure called!');
+    };
+
+    // Define load/error handlers BEFORE the SDK script is added
+    function initNaverMap() {
+      console.log('SDK script loaded. window.naver:', window.naver);
+      
+      if (window.naver && window.naver.maps) {
+        document.getElementById('status').className = 'status ok';
+        document.getElementById('status').innerHTML = '✅ 네이버 지도 SDK 로드 성공! 지도를 그립니다...';
+        
+        try {
+          var map = new naver.maps.Map('map', {
+            center: new naver.maps.LatLng(37.5665, 126.9780),
+            zoom: 12
+          });
+
+          new naver.maps.Marker({
+            position: new naver.maps.LatLng(37.5665, 126.9780),
+            map: map,
+            title: '서울 시청'
+          });
+
+          setTimeout(function() {
+            var statusEl = document.getElementById('status');
+            if (statusEl.className.indexOf('fail') === -1) {
+              statusEl.innerHTML = '✅ 네이버 지도 완전 정상 작동! 인증 성공!';
+            }
+          }, 3000);
+          
+        } catch(e) {
+          document.getElementById('status').className = 'status fail';
+          document.getElementById('status').innerHTML = '❌ 지도 생성 오류: ' + e.message;
+        }
+      } else {
+        document.getElementById('status').className = 'status fail';
+        document.getElementById('status').innerHTML = '❌ SDK는 로드되었지만 naver.maps 객체가 없습니다.';
+      }
+    }
+
+    // Dynamically add the Naver Maps SDK script
+    var script = document.createElement('script');
+    script.src = 'https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=om58tk12be';
+    script.onload = initNaverMap;
+    script.onerror = function() {
+      document.getElementById('status').className = 'status fail';
+      document.getElementById('status').innerHTML = '❌ SDK 스크립트 로드 자체가 실패했습니다.';
+    };
+    document.head.appendChild(script);
+  </script>
+</body>
+</html>

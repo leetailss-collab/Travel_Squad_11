@@ -61,18 +61,75 @@ app.post('/api/upload', upload.array('files'), async (req, res) => {
   }
 });
 
-// Naver Geocoding Proxy API
-app.get('/api/geocoding', (req, res) => {
+// Helper to get Naver API Keys (from process.env or Firestore system_config)
+const getNaverKeys = async () => {
+  let clientId = process.env.NAVER_CLIENT_ID;
+  let clientSecret = process.env.NAVER_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) {
+    const config = await dbService.getSystemConfig('naver_map');
+    if (config) {
+      clientId = clientId || config.clientId;
+      clientSecret = clientSecret || config.clientSecret;
+    }
+  } else {
+    // Sync local env keys to Firestore system_config for VM deployment
+    dbService.saveSystemConfig('naver_map', { clientId, clientSecret });
+  }
+
+  return { clientId: clientId || '', clientSecret: clientSecret || '' };
+};
+
+// Helper for Nominatim Geocoding Fallback
+function fetchNominatimGeocode(query, res) {
+  const https = require('https');
+  const options = {
+    hostname: 'nominatim.openstreetmap.org',
+    path: `/search?format=json&q=${encodeURIComponent(query)}`,
+    method: 'GET',
+    rejectUnauthorized: false,
+    headers: {
+      'User-Agent': 'TravelSquadApp/1.0'
+    }
+  };
+
+  const req = https.request(options, (apiRes) => {
+    let data = '';
+    apiRes.on('data', (chunk) => { data += chunk; });
+    apiRes.on('end', () => {
+      try {
+        const json = JSON.parse(data);
+        if (json && json.length > 0) {
+          return res.json({
+            lat: parseFloat(json[0].lat),
+            lng: parseFloat(json[0].lon),
+            address: json[0].display_name
+          });
+        }
+      } catch (e) {}
+      return res.json({ lat: null, lng: null });
+    });
+  });
+
+  req.on('error', (err) => {
+    console.error('Nominatim Geocoding error:', err);
+    return res.json({ lat: null, lng: null });
+  });
+
+  req.end();
+}
+
+// Naver Geocoding Proxy API (with Nominatim fallback)
+app.get('/api/geocoding', async (req, res) => {
   const { query } = req.query;
   if (!query) {
     return res.status(400).json({ message: 'Query parameter is required' });
   }
 
-  const clientId = process.env.NAVER_CLIENT_ID;
-  const clientSecret = process.env.NAVER_CLIENT_SECRET;
+  const { clientId, clientSecret } = await getNaverKeys();
 
   if (!clientId || !clientSecret) {
-    return res.status(500).json({ message: 'Naver API keys are not configured on server' });
+    return fetchNominatimGeocode(query, res);
   }
 
   const https = require('https');
@@ -80,6 +137,7 @@ app.get('/api/geocoding', (req, res) => {
     hostname: 'naveropenapi.apigw.ntruss.com',
     path: `/map-geocode/v2/geocode?query=${encodeURIComponent(query)}`,
     method: 'GET',
+    rejectUnauthorized: false,
     headers: {
       'X-NCP-APIGW-API-KEY-ID': clientId,
       'X-NCP-APIGW-API-KEY': clientSecret
@@ -100,24 +158,25 @@ app.get('/api/geocoding', (req, res) => {
             address: addr.roadAddress || addr.jibunAddress || addr.englishAddress
           });
         }
-        return res.json({ lat: null, lng: null });
+        return fetchNominatimGeocode(query, res);
       } catch (e) {
-        return res.status(500).json({ message: 'Error parsing geocoding response' });
+        return fetchNominatimGeocode(query, res);
       }
     });
   });
 
   apiReq.on('error', (err) => {
-    console.error('Naver Geocoding request error:', err);
-    return res.status(500).json({ message: 'Geocoding request failed' });
+    console.error('Naver Geocoding request error, falling back to Nominatim:', err);
+    return fetchNominatimGeocode(query, res);
   });
 
   apiReq.end();
 });
 
 // Get Naver client ID config for frontend Map SDK
-app.get('/api/config/naver-client-id', (req, res) => {
-  res.json({ clientId: process.env.NAVER_CLIENT_ID || '' });
+app.get('/api/config/naver-client-id', async (req, res) => {
+  const { clientId } = await getNaverKeys();
+  res.json({ clientId });
 });
 
 
