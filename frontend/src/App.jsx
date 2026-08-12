@@ -52,6 +52,10 @@ const COUNTRY_CURRENCY_MAP = {
   싱가포르: CURRENCY_OPTIONS.SGD
 };
 
+const API_BASE = typeof window !== 'undefined' && (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
+  ? 'https://34-45-73-57.sslip.io'
+  : '';
+
 const FALLBACK_KRW_RATES = {
   KRW: 1, JPY: 9.3, USD: 1380, EUR: 1510, GBP: 1790, CNY: 190,
   THB: 41, VND: 0.054, TWD: 42, AUD: 910, CAD: 1010, PHP: 24, SGD: 1060
@@ -621,7 +625,7 @@ function App() {
           setNaverMapAuthFailed(true);
         };
 
-        const res = await fetch('/api/config/naver-client-id');
+        const res = await fetch(`${API_BASE}/api/config/naver-client-id`);
         if (res.ok) {
           const { clientId } = await res.json();
           if (clientId && clientId.trim() !== '') {
@@ -676,7 +680,7 @@ function App() {
           if (!queryStr) continue;
 
           try {
-            const res = await fetch(`/api/geocoding?query=${encodeURIComponent(queryStr)}`);
+            const res = await fetch(`${API_BASE}/api/geocoding?query=${encodeURIComponent(queryStr)}`);
             if (res.ok) {
               const data = await res.json();
               if (data && data.lat && data.lng) {
@@ -1559,7 +1563,7 @@ function App() {
     e.preventDefault();
     setLoginError('');
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginForm)
@@ -1600,7 +1604,7 @@ function App() {
     setProfileUpdating(true);
 
     try {
-      const response = await fetch('/api/auth/profile', {
+      const response = await fetch(`${API_BASE}/api/auth/profile`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1704,7 +1708,7 @@ function App() {
       const formData = new FormData();
       formData.append('files', blob, 'profile.jpg');
 
-      const response = await fetch('/api/upload', {
+      const response = await fetch(`${API_BASE}/api/upload`, {
         method: 'POST',
         body: formData
       });
@@ -1743,7 +1747,7 @@ function App() {
     localStorage.setItem('family_travel_plans', JSON.stringify(updatedPlans));
     
     // Sync with backend API
-    fetch(`/api/plans/${updatedPlan.id}/sync`, {
+    fetch(`${API_BASE}/api/plans/${updatedPlan.id}/sync`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedPlan)
@@ -1787,7 +1791,7 @@ function App() {
     };
 
     try {
-      const response = await fetch('/api/plans', {
+      const response = await fetch(`${API_BASE}/api/plans`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newPlanData)
@@ -1843,7 +1847,7 @@ function App() {
     };
 
     try {
-      const response = await fetch('/api/plans', {
+      const response = await fetch(`${API_BASE}/api/plans`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newEventData)
@@ -1888,7 +1892,7 @@ function App() {
       }
 
       try {
-        const response = await fetch(`/api/plans/${id}`, {
+        const response = await fetch(`${API_BASE}/api/plans/${id}`, {
           method: 'DELETE'
         });
         if (!response.ok) {
@@ -1911,7 +1915,7 @@ function App() {
     }
     
     try {
-      const response = await fetch('/api/upload', {
+      const response = await fetch(`${API_BASE}/api/upload`, {
         method: 'POST',
         body: formData
       });
