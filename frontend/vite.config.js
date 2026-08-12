@@ -8,6 +8,15 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'mask-icon.svg'],
+      workbox: {
+        navigateFallbackDenylist: [/^\/api/],
+        runtimeCaching: [
+          {
+            urlPattern: /^\/api/,
+            handler: 'NetworkOnly'
+          }
+        ]
+      },
       manifest: {
         name: 'Travel Squad 11',
         short_name: 'Travel Squad 11',
