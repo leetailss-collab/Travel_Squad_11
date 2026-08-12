@@ -1062,7 +1062,7 @@ function App() {
       }
 
       try {
-        const res = await fetch('/api/auth/users');
+        const res = await fetch(`${API_BASE}/api/auth/users`);
         if (res.ok) {
           const data = await res.json();
           const mapping = {};
@@ -1099,7 +1099,7 @@ function App() {
   // Fetch and sync notifications
   const fetchNotifications = async () => {
     try {
-      const res = await fetch('/api/notifications');
+      const res = await fetch(`${API_BASE}/api/notifications`);
       if (res.ok) {
         const data = await res.json();
         setNotifications(data);
@@ -1142,7 +1142,7 @@ function App() {
     }
 
     try {
-      const response = await fetch('/api/notifications', {
+      const response = await fetch(`${API_BASE}/api/notifications`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1170,7 +1170,7 @@ function App() {
   const handleNotificationClick = async (notif) => {
     // 1. Mark as read
     try {
-      await fetch(`/api/notifications/${notif.id}/read`, {
+      await fetch(`${API_BASE}/api/notifications/${notif.id}/read`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: currentUser.name })
@@ -1188,7 +1188,7 @@ function App() {
     
     if (!targetPlan) {
       try {
-        const res = await fetch(`/api/plans/${targetPlanId}`);
+        const res = await fetch(`${API_BASE}/api/plans/${targetPlanId}`);
         if (res.ok) {
           targetPlan = await res.json();
         }
@@ -1264,7 +1264,7 @@ function App() {
 
       // Proactive silent profile sync to Firestore (so offline profile images sync immediately when backend is up)
       if (parsedUser.name && (parsedUser.profileImage || parsedUser.nickname)) {
-        fetch('/api/auth/profile', {
+        fetch(`${API_BASE}/api/auth/profile`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1294,7 +1294,7 @@ function App() {
       if (savedView === 'detail' && savedPlanId) {
         const id = Number(savedPlanId);
         try {
-          const response = await fetch(`/api/plans/${id}`);
+          const response = await fetch(`${API_BASE}/api/plans/${id}`);
           if (response.ok) {
             const data = await response.json();
             setPlan(data);
@@ -1315,7 +1315,7 @@ function App() {
 
   const fetchTrashPlans = async () => {
     try {
-      const response = await fetch('/api/trash');
+      const response = await fetch(`${API_BASE}/api/trash`);
       if (response.ok) {
         const data = await response.json();
         setTrashPlans(data);
@@ -1327,7 +1327,7 @@ function App() {
 
   const handleRestorePlan = async (id) => {
     try {
-      const response = await fetch(`/api/trash/${id}/restore`, {
+      const response = await fetch(`${API_BASE}/api/trash/${id}/restore`, {
         method: 'POST'
       });
       if (response.ok) {
@@ -1341,7 +1341,7 @@ function App() {
 
   const handleDeletePermanently = async (id) => {
     try {
-      const response = await fetch(`/api/trash/${id}`, {
+      const response = await fetch(`${API_BASE}/api/trash/${id}`, {
         method: 'DELETE'
       });
       if (response.ok) {
@@ -1500,7 +1500,7 @@ function App() {
 
   const fetchAnniversaries = async () => {
     try {
-      const response = await fetch('/api/anniversaries');
+      const response = await fetch(`${API_BASE}/api/anniversaries`);
       if (response.ok) {
         const dbAnns = await response.json();
         setAnniversaries(dbAnns);
@@ -1512,7 +1512,7 @@ function App() {
 
   const fetchPlans = async () => {
     try {
-      const response = await fetch('/api/plans');
+      const response = await fetch(`${API_BASE}/api/plans`);
       if (response.ok) {
         const data = await response.json();
         setPlans(data);
@@ -1536,7 +1536,7 @@ function App() {
   const fetchSinglePlan = async (id) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/plans/${id}`);
+      const response = await fetch(`${API_BASE}/api/plans/${id}`);
       if (response.ok) {
         const data = await response.json();
         setPlan(data);
@@ -2447,7 +2447,7 @@ function App() {
     const queryStr = newSavedPlace.address && newSavedPlace.address.trim() !== '' ? newSavedPlace.address : newSavedPlace.name;
     if (queryStr && queryStr.trim() !== '') {
       try {
-        const response = await fetch(`/api/geocoding?query=${encodeURIComponent(queryStr)}`);
+        const response = await fetch(`${API_BASE}/api/geocoding?query=${encodeURIComponent(queryStr)}`);
         if (response.ok) {
           const data = await response.json();
           if (data && data.lat && data.lng) {
@@ -2499,7 +2499,7 @@ function App() {
       const queryStr = editingSavedPlace.address && editingSavedPlace.address.trim() !== '' ? editingSavedPlace.address : editingSavedPlace.name;
       if (queryStr && queryStr.trim() !== '') {
         try {
-          const response = await fetch(`/api/geocoding?query=${encodeURIComponent(queryStr)}`);
+          const response = await fetch(`${API_BASE}/api/geocoding?query=${encodeURIComponent(queryStr)}`);
           if (response.ok) {
             const data = await response.json();
             if (data && data.lat && data.lng) {
@@ -2760,7 +2760,7 @@ function App() {
     if (!newAnniversary.name) return;
 
     try {
-      const response = await fetch('/api/anniversaries', {
+      const response = await fetch(`${API_BASE}/api/anniversaries`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newAnniversary)
@@ -2779,7 +2779,7 @@ function App() {
     if (!editingAnniversary || !editingAnniversary.name) return;
 
     try {
-      const response = await fetch('/api/anniversaries', {
+      const response = await fetch(`${API_BASE}/api/anniversaries`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -2804,7 +2804,7 @@ function App() {
   const handleDeleteAnniversary = (id) => {
     openConfirm("🗑️ 기념일 삭제", "정말로 이 기념일을 삭제하시겠습니까?", async () => {
       try {
-        const response = await fetch(`/api/anniversaries/${id}`, {
+        const response = await fetch(`${API_BASE}/api/anniversaries/${id}`, {
           method: 'DELETE'
         });
         if (response.ok) {
@@ -2858,7 +2858,7 @@ function App() {
 
       // Send to server
       try {
-        await fetch(`/api/plans/${plan.id}/places/${placeId}/comments`, {
+        await fetch(`${API_BASE}/api/plans/${plan.id}/places/${placeId}/comments`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ author, text })
@@ -2901,7 +2901,7 @@ function App() {
 
       // Send to server
       try {
-        await fetch(`/api/plans/${plan.id}/places/${placeId}/comments/${commentId}`, {
+        await fetch(`${API_BASE}/api/plans/${plan.id}/places/${placeId}/comments/${commentId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: newText })
@@ -2942,7 +2942,7 @@ function App() {
 
       // Send to server
       try {
-        await fetch(`/api/plans/${plan.id}/places/${placeId}/comments/${commentId}`, {
+        await fetch(`${API_BASE}/api/plans/${plan.id}/places/${placeId}/comments/${commentId}`, {
           method: 'DELETE'
         });
       } catch (err) {
@@ -4174,7 +4174,7 @@ function App() {
 
                                           const attemptSingle = async (q) => {
                                             try {
-                                              const nRes = await fetch(`/api/geocoding?query=${encodeURIComponent(q)}`);
+                                              const nRes = await fetch(`${API_BASE}/api/geocoding?query=${encodeURIComponent(q)}`);
                                               if (nRes.ok) {
                                                 const nData = await nRes.json();
                                                 if (nData && nData.lat && nData.lng) {
