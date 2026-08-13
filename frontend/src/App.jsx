@@ -638,7 +638,7 @@ function App() {
             if (!window.naver || !window.naver.maps) {
               const script = document.createElement('script');
               script.id = 'naver-map-js';
-              script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}&submodules=geocoder`;
+              script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}&submodules=geocoder`;
               script.onload = () => {
                 setNaverMapAuthFailed(false);
                 setNaverMapLoaded(true);
