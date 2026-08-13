@@ -513,6 +513,32 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false); // Modal inside tabs (Add Itinerary / Expense / Checklist)
   const [showAddTripModal, setShowAddTripModal] = useState(false); // Modal for creating a new travel plan
+  const [isFabVisible, setIsFabVisible] = useState(true);
+
+  // Auto-hide FAB on scroll down, show on scroll up
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          if (currentScrollY > lastScrollY && currentScrollY > 60) {
+            setIsFabVisible(false); // Scroll Down -> hide FAB
+          } else {
+            setIsFabVisible(true);  // Scroll Up or top -> show FAB
+          }
+          lastScrollY = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Comment section toggle state map: { [placeId]: boolean }
   const [toggledComments, setToggledComments] = useState({});
@@ -3641,7 +3667,7 @@ function App() {
           </main>
 
           {/* Floating Action Button on Home Screen */}
-          {!isGuest && <button className="fab" onClick={() => setShowAddTripModal(true)}>+</button>}
+          {!isGuest && <button className={`fab ${isFabVisible ? '' : 'hidden'}`} onClick={() => setShowAddTripModal(true)}>+</button>}
         </>
       )}
 
@@ -4961,7 +4987,7 @@ function App() {
           {/* Floating Action Button inside Details */}
           {!isGuest && activeTab !== 'members' && (
             <button 
-              className="fab" 
+              className={`fab ${isFabVisible ? '' : 'hidden'}`} 
               onClick={() => {
                 if (activeTab === 'places') {
                   setNewSavedPlace({ name: '', category: '관광', address: '', description: '', tip: '', url: '' });
