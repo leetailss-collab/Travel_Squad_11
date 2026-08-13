@@ -63,19 +63,18 @@ app.post('/api/upload', upload.array('files'), async (req, res) => {
 
 // Helper to get Naver API Keys (from process.env or Firestore system_config)
 const getNaverKeys = async () => {
-  let clientId = process.env.NAVER_CLIENT_ID || 'ulajr4bnvg';
-  let clientSecret = process.env.NAVER_CLIENT_SECRET || 'XzkLyaQxCXWLSlvi9zduGTt8RQ0pQ3d5qbDHbf7o';
+  let clientId = process.env.NAVER_CLIENT_ID;
+  let clientSecret = process.env.NAVER_CLIENT_SECRET;
 
-  // If env has older keys or missing, override with valid keys
-  if (clientId === 'om58tk12be') {
-    clientId = 'ulajr4bnvg';
-    clientSecret = 'XzkLyaQxCXWLSlvi9zduGTt8RQ0pQ3d5qbDHbf7o';
+  if (!clientId || !clientSecret) {
+    const config = await dbService.getSystemConfig('naver_map');
+    if (config) {
+      clientId = clientId || config.clientId;
+      clientSecret = clientSecret || config.clientSecret;
+    }
   }
 
-  // Force sync valid keys to Firestore system_config
-  dbService.saveSystemConfig('naver_map', { clientId, clientSecret });
-
-  return { clientId, clientSecret };
+  return { clientId: clientId || '', clientSecret: clientSecret || '' };
 };
 
 // Helper for Nominatim Geocoding Fallback
@@ -173,7 +172,8 @@ app.get('/api/geocoding', async (req, res) => {
 
 // Get Naver client ID config for frontend Map SDK
 app.get('/api/config/naver-client-id', async (req, res) => {
-  res.json({ clientId: 'ulajr4bnvg' });
+  const { clientId } = await getNaverKeys();
+  res.json({ clientId });
 });
 
 

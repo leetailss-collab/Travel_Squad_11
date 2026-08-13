@@ -53,7 +53,7 @@ const COUNTRY_CURRENCY_MAP = {
 };
 
 const API_BASE = typeof window !== 'undefined' && (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
-  ? 'https://34-45-73-57.sslip.io'
+  ? (import.meta.env.VITE_API_BASE || 'https://34-45-73-57.sslip.io')
   : '';
 
 const FALLBACK_KRW_RATES = {
