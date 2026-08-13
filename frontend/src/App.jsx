@@ -4833,16 +4833,6 @@ function App() {
               <div className="card" style={{ padding: '20px 16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <h3 className="card-title" style={{ margin: 0 }}>📍 장소 보관함</h3>
-                  <button 
-                    className="submit-btn" 
-                    style={{ width: 'auto', margin: 0, padding: '8px 16px', fontSize: '0.85rem' }}
-                    onClick={() => {
-                      setNewSavedPlace({ name: '', category: '관광', address: '', description: '', tip: '', url: '' });
-                      setShowAddSavedPlaceModal(true);
-                    }}
-                  >
-                    ➕ 새 장소 추가
-                  </button>
                 </div>
 
                 {/* Map Container */}
