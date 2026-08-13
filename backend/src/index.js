@@ -173,8 +173,7 @@ app.get('/api/geocoding', async (req, res) => {
 
 // Get Naver client ID config for frontend Map SDK
 app.get('/api/config/naver-client-id', async (req, res) => {
-  const { clientId } = await getNaverKeys();
-  res.json({ clientId });
+  res.json({ clientId: 'ulajr4bnvg' });
 });
 
 
