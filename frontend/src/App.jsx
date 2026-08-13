@@ -424,14 +424,14 @@ function App() {
       if (isMobile) {
         // 1st Priority: Mobile Naver Map App
         const appUrl = `nmap://search?query=${encodeURIComponent(cleanQuery)}&appname=travelsquad`;
-        // 2nd Priority: Mobile Naver Map Web Search (opens in a new window)
+        // 2nd Priority: Mobile Naver Map Web Search (opens in a new tab)
         const webUrl = `https://m.map.naver.com/search2/search.naver?query=${encodeURIComponent(cleanQuery)}`;
         
         const start = Date.now();
         window.location.href = appUrl;
         setTimeout(() => {
           if (Date.now() - start < 1500) {
-            window.location.href = webUrl;
+            window.open(webUrl, '_blank');
           }
         }, 1000);
       } else {
@@ -447,7 +447,7 @@ function App() {
   };
 
   // Universal Route Navigation Helper (Departure to Destination)
-  const handleRouteNav = (e, originQuery, destQuery, currency = 'KRW') => {
+  const handleRouteNav = (e, originQuery, destQuery, currency = 'KRW', transportType = '') => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -462,9 +462,11 @@ function App() {
       return;
     }
 
+    const googleMode = transportType === '자차' ? 'driving' : (transportType === '도보' ? 'walking' : 'transit');
+
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     if (currency === 'KRW') {
-      const pcUrl = `https://map.naver.com/p/directions?stext=${encodeURIComponent(sname)}&etext=${encodeURIComponent(dname)}`;
+      const pcUrl = `https://map.naver.com/p/directions?stext=${encodeURIComponent(sname)}&etext=${encodeURIComponent(dname)}&menu=route`;
       if (isMobile) {
         const queryText = `${sname}에서 ${dname} 길찾기`;
         const appUrl = `nmap://search?query=${encodeURIComponent(queryText)}&appname=travelsquad`;
@@ -473,14 +475,14 @@ function App() {
         window.location.href = appUrl;
         setTimeout(() => {
           if (Date.now() - start < 1500) {
-            window.location.href = webFallback;
+            window.open(webFallback, '_blank');
           }
         }, 1000);
       } else {
         window.open(pcUrl, '_blank');
       }
     } else {
-      const googleUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(sname)}&destination=${encodeURIComponent(dname)}`;
+      const googleUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(sname)}&destination=${encodeURIComponent(dname)}&travelmode=${googleMode}`;
       window.open(googleUrl, '_blank');
     }
   };
@@ -4251,7 +4253,7 @@ function App() {
                                             window.location.href = appUrl;
                                             setTimeout(() => {
                                               if (Date.now() - start < 1500) {
-                                                window.location.href = webFallback;
+                                                window.open(webFallback, '_blank');
                                               }
                                             }, 1000);
                                           } else {
@@ -4276,7 +4278,7 @@ function App() {
                                             window.location.href = appUrl;
                                             setTimeout(() => {
                                               if (Date.now() - start < 1500) {
-                                                window.location.href = webFallback;
+                                                window.open(webFallback, '_blank');
                                               }
                                             }, 1000);
                                           } else {
@@ -4305,7 +4307,7 @@ function App() {
                                     }}
                                     title="지도 검색 열기"
                                   >
-                                    🗺️ 이동경로(test) ➔
+                                    🗺️ 이동경로 ➔
                                   </a>
                                 </div>
                               </div>
@@ -6155,7 +6157,7 @@ function App() {
                               type="button" 
                               className="btn-secondary-sm"
                               style={{ padding: '2px 6px', fontSize: '0.7rem' }}
-                              onClick={(e) => handleRouteNav(e, selectedDetailPlace.address || selectedDetailPlace.name, alt.address || alt.name, planCurrency)}
+                              onClick={(e) => handleRouteNav(e, selectedDetailPlace.address || selectedDetailPlace.name, alt.address || alt.name, planCurrency, selectedDetailPlace.transportType)}
                               title="대표 장소 ➔ 대안 장소 길찾기"
                             >
                               🚗 길찾기
