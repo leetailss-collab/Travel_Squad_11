@@ -205,6 +205,17 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// Middleware: Block data mutation requests for read-only guest user
+app.use((req, res, next) => {
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+    const username = req.headers['x-user-name'] || (req.body && req.body.username) || (req.body && req.body.author);
+    if (username === 'guest') {
+      return res.status(403).json({ message: "게스트(조회 전용) 계정은 수정 권한이 없습니다." });
+    }
+  }
+  next();
+});
+
 // Update User Profile API (nickname, profileImage, pin)
 app.post('/api/auth/profile', async (req, res) => {
   const { username, nickname, profileImage, password } = req.body;

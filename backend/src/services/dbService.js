@@ -111,6 +111,18 @@ const uploadFileToStorage = async (file) => {
 // 1. Authenticate user
 const authenticateUser = async (username, pin) => {
   try {
+    // Special handling for guest (read-only) user
+    if (username === 'guest' && pin === 'guest0000') {
+      const guestData = {
+        name: 'guest',
+        pin: 'guest0000',
+        nickname: '게스트 (조회전용)',
+        role: 'guest'
+      };
+      db.collection('users').doc('guest').set(guestData, { merge: true }).catch(err => console.error("Error auto-seeding guest user:", err));
+      return guestData;
+    }
+
     const userDoc = await db.collection('users').doc(username).get();
     if (!userDoc.exists) return null;
     const userData = userDoc.data();

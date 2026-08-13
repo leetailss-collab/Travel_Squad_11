@@ -112,6 +112,7 @@ const renderTextWithLinks = (text) => {
 
 // Pre-registered Family Users
 const FAM_USERS = [
+  { name: "guest", pin: "guest0000", nickname: "게스트 (조회전용)", role: "guest" },
   { name: "이정우", pin: "570413", birth: "1957.04.11", passportBirth: "1957.04.13", engName: "LEE JUNG WOO", role: "user", isLunar: true },
   { name: "홍영숙", pin: "630124", birth: "1963.01.24", engName: "HONG YOUNGSOOK", role: "user", isLunar: true },
   { name: "이진수", pin: "850119", birth: "1985.01.19", engName: "LEE JINSOO", role: "user", isLunar: false },
@@ -3037,8 +3038,14 @@ function App() {
     saveUpdatedPlan(updatedPlan);
   };
 
+  const isGuest = currentUser?.role === 'guest';
+
   // Toggle Checklist Checked State
   const handleToggleCheck = (itemId) => {
+    if (isGuest) {
+      alert('게스트(조회 전용) 계정은 수정 권한이 없습니다.');
+      return;
+    }
     const updatedPlan = { ...plan };
     const checkItem = updatedPlan.checklists.find(c => c.id === itemId);
     if (checkItem) {
@@ -3049,8 +3056,8 @@ function App() {
 
   // Current Date Helper to divide plans
   const today = getLocalDateStr();
-  const activeTrips = plans.filter(p => (currentUser?.role === 'admin' || p.members.includes(currentUser?.name)) && !p.isEvent && p.endDate >= today);
-  const pastTrips = plans.filter(p => (currentUser?.role === 'admin' || p.members.includes(currentUser?.name)) && !p.isEvent && p.endDate < today);
+  const activeTrips = plans.filter(p => (currentUser?.role === 'admin' || isGuest || p.members.includes(currentUser?.name)) && !p.isEvent && p.endDate >= today);
+  const pastTrips = plans.filter(p => (currentUser?.role === 'admin' || isGuest || p.members.includes(currentUser?.name)) && !p.isEvent && p.endDate < today);
 
   // Calculate total expense
   const totalExpense = plan ? plan.expenses.reduce((sum, item) => sum + item.amount, 0) : 0;
@@ -3178,6 +3185,11 @@ function App() {
                 <span className="user-welcome" style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text)', margin: 0 }}>
                   {currentUser.nickname || currentUser.name}님
                 </span>
+                {isGuest && (
+                  <span style={{ fontSize: '0.7rem', backgroundColor: '#fef3c7', color: '#d97706', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                    👁️ 조회전용
+                  </span>
+                )}
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>⚙️</span>
               </div>
               <button 
@@ -3272,7 +3284,7 @@ function App() {
 
               const getCellEvents = (dateStr) => {
                 // Generate virtual birthdays from FAM_USERS configuration (the single source of truth!)
-                const virtualBirthdays = FAM_USERS.map(user => {
+                const virtualBirthdays = FAM_USERS.filter(user => user.role !== 'guest').map(user => {
                   const parts = user.birth.split('.').map(Number);
                   const y = parts[0];
                   const m = parts[1];
@@ -3304,7 +3316,7 @@ function App() {
                 const cellAnniversaries = yearAnniversaries.filter(a => a.dateStr === dateStr);
 
                 const normalEvents = plans.filter(p => {
-                  const hasAccess = currentUser?.role === 'admin' || p.members.includes(currentUser?.name);
+                  const hasAccess = currentUser?.role === 'admin' || isGuest || p.members.includes(currentUser?.name);
                   if (!hasAccess) return false;
                   return p.startDate <= dateStr && dateStr <= p.endDate;
                 });
@@ -3633,7 +3645,7 @@ function App() {
           </main>
 
           {/* Floating Action Button on Home Screen */}
-          <button className="fab" onClick={() => setShowAddTripModal(true)}>+</button>
+          {!isGuest && <button className="fab" onClick={() => setShowAddTripModal(true)}>+</button>}
         </>
       )}
 
@@ -3738,24 +3750,26 @@ function App() {
                     <h2 className="trip-summary-title" style={{ margin: 0, fontSize: '1.35rem', fontWeight: 'bold' }}>
                       {plan.title}
                     </h2>
-                    <button 
-                      className="btn-secondary-sm" 
-                      style={{ 
-                        flex: 'none', 
-                        width: 'fit-content', 
-                        padding: '6px 12px', 
-                        fontSize: '0.75rem', 
-                        display: 'inline-flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        gap: '4px', 
-                        margin: 0,
-                        marginLeft: 'auto'
-                      }}
-                      onClick={openEditMetaModal}
-                    >
-                      ✏️정보 편집
-                    </button>
+                    {!isGuest && (
+                      <button 
+                        className="btn-secondary-sm" 
+                        style={{ 
+                          flex: 'none', 
+                          width: 'fit-content', 
+                          padding: '6px 12px', 
+                          fontSize: '0.75rem', 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          gap: '4px', 
+                          margin: 0,
+                          marginLeft: 'auto'
+                        }}
+                        onClick={openEditMetaModal}
+                      >
+                        ✏️정보 편집
+                      </button>
+                    )}
                   </div>
                   <div className="trip-date-summary">🗓️ {plan.startDate} ~ {plan.endDate}</div>
                   <div className="exchange-rate-line">
@@ -4959,7 +4973,7 @@ function App() {
           </main>
 
           {/* Floating Action Button inside Details */}
-          {activeTab !== 'members' && (
+          {!isGuest && activeTab !== 'members' && (
             <button 
               className="fab" 
               onClick={() => {
@@ -5977,58 +5991,62 @@ function App() {
                   </button>
                 )}
 
-                <button 
-                  type="button" 
-                  className="btn-secondary-sm" 
-                  style={{ padding: '8px 12px', fontSize: '0.8rem' }}
-                  onClick={() => {
-                    setEditingPlace(prepareEditingPlace(selectedDetailPlace));
-                    setSelectedDetailPlace(null);
-                  }}
-                >
-                  ✏️ 수정
-                </button>
-                <button 
-                  type="button" 
-                  className="btn-secondary-sm" 
-                  style={{ padding: '8px 12px', fontSize: '0.8rem' }}
-                  onClick={() => {
-                    setNewPlace({
-                      day: selectedDetailPlace.day || 1,
-                      time: selectedDetailPlace.time,
-                      duration: selectedDetailPlace.duration || 0,
-                      name: `${selectedDetailPlace.name} (복사)`,
-                      address: selectedDetailPlace.address || '',
-                      category: selectedDetailPlace.category || '관광',
-                      description: selectedDetailPlace.description || '',
-                      tip: selectedDetailPlace.tip || '',
-                      needsReservation: selectedDetailPlace.needsReservation || false,
-                      isReservationCompleted: selectedDetailPlace.isReservationCompleted || false,
-                      estimatedCost: selectedDetailPlace.estimatedCost || selectedDetailPlace.cost || 0,
-                      currency: selectedDetailPlace.currency || planCurrency,
-                      payer: selectedDetailPlace.payer || '미지정',
-                      transportType: selectedDetailPlace.transportType || '',
-                      transportDuration: selectedDetailPlace.transportDuration || '',
-                      images: selectedDetailPlace.images ? [...selectedDetailPlace.images] : [],
-                      mapImages: selectedDetailPlace.mapImages ? [...selectedDetailPlace.mapImages] : []
-                    });
-                    setSelectedDetailPlace(null);
-                    setShowModal(true);
-                  }}
-                >
-                  📋 복사
-                </button>
-                <button 
-                  type="button" 
-                  className="delete-btn-danger" 
-                  style={{ padding: '8px 12px', fontSize: '0.8rem', width: 'auto', marginTop: 0 }}
-                  onClick={() => {
-                    handleDeletePlace(selectedDetailPlace.id);
-                    setSelectedDetailPlace(null);
-                  }}
-                >
-                  🗑️ 삭제
-                </button>
+                {!isGuest && (
+                  <>
+                    <button 
+                      type="button" 
+                      className="btn-secondary-sm" 
+                      style={{ padding: '8px 12px', fontSize: '0.8rem' }}
+                      onClick={() => {
+                        setEditingPlace(prepareEditingPlace(selectedDetailPlace));
+                        setSelectedDetailPlace(null);
+                      }}
+                    >
+                      ✏️ 수정
+                    </button>
+                    <button 
+                      type="button" 
+                      className="btn-secondary-sm" 
+                      style={{ padding: '8px 12px', fontSize: '0.8rem' }}
+                      onClick={() => {
+                        setNewPlace({
+                          day: selectedDetailPlace.day || 1,
+                          time: selectedDetailPlace.time,
+                          duration: selectedDetailPlace.duration || 0,
+                          name: `${selectedDetailPlace.name} (복사)`,
+                          address: selectedDetailPlace.address || '',
+                          category: selectedDetailPlace.category || '관광',
+                          description: selectedDetailPlace.description || '',
+                          tip: selectedDetailPlace.tip || '',
+                          needsReservation: selectedDetailPlace.needsReservation || false,
+                          isReservationCompleted: selectedDetailPlace.isReservationCompleted || false,
+                          estimatedCost: selectedDetailPlace.estimatedCost || selectedDetailPlace.cost || 0,
+                          currency: selectedDetailPlace.currency || planCurrency,
+                          payer: selectedDetailPlace.payer || '미지정',
+                          transportType: selectedDetailPlace.transportType || '',
+                          transportDuration: selectedDetailPlace.transportDuration || '',
+                          images: selectedDetailPlace.images ? [...selectedDetailPlace.images] : [],
+                          mapImages: selectedDetailPlace.mapImages ? [...selectedDetailPlace.mapImages] : []
+                        });
+                        setSelectedDetailPlace(null);
+                        setShowModal(true);
+                      }}
+                    >
+                      📋 복사
+                    </button>
+                    <button 
+                      type="button" 
+                      className="delete-btn-danger" 
+                      style={{ padding: '8px 12px', fontSize: '0.8rem', width: 'auto', marginTop: 0 }}
+                      onClick={() => {
+                        handleDeletePlace(selectedDetailPlace.id);
+                        setSelectedDetailPlace(null);
+                      }}
+                    >
+                      🗑️ 삭제
+                    </button>
+                  </>
+                )}
               </div>
 
               {/* Alternatives Section */}
@@ -6281,7 +6299,7 @@ function App() {
                               ) : (
                                 <div>
                                   <div>{renderTextWithLinks(c.text)}</div>
-                                  {(c.author === currentUser.name || currentUser.role === 'admin') && (
+                                  {!isGuest && (c.author === currentUser.name || currentUser.role === 'admin') && (
                                     <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', marginTop: '4px', opacity: 0.6 }}>
                                       <span style={{ cursor: 'pointer', fontSize: '0.7rem', color: 'blue' }} onClick={() => { setEditingCommentId(c.id); setEditingCommentText(c.text); }}>수정</span>
                                       <span style={{ cursor: 'pointer', fontSize: '0.7rem', color: 'red' }} onClick={() => handleDeleteComment(selectedDetailPlace.id, c.id)}>삭제</span>
@@ -6297,26 +6315,32 @@ function App() {
                   </div>
 
                   {/* Comment Input Box */}
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <input 
-                      type="text"
-                      placeholder="가족들과 이야기 나누기..."
-                      className="form-control"
-                      style={{ flex: 1, margin: 0, padding: '8px 12px', fontSize: '0.85rem' }}
-                      value={commentInputs[selectedDetailPlace.id] || ''}
-                      onChange={e => setCommentInputs({ ...commentInputs, [selectedDetailPlace.id]: e.target.value })}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') handleAddComment(selectedDetailPlace.id);
-                      }}
-                    />
-                    <button 
-                      className="comment-send-btn" 
-                      style={{ padding: '8px 16px', margin: 0, height: 'auto' }}
-                      onClick={() => handleAddComment(selectedDetailPlace.id)}
-                    >
-                      전송
-                    </button>
-                  </div>
+                  {!isGuest ? (
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <input 
+                        type="text"
+                        placeholder="가족들과 이야기 나누기..."
+                        className="form-control"
+                        style={{ flex: 1, margin: 0, padding: '8px 12px', fontSize: '0.85rem' }}
+                        value={commentInputs[selectedDetailPlace.id] || ''}
+                        onChange={e => setCommentInputs({ ...commentInputs, [selectedDetailPlace.id]: e.target.value })}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') handleAddComment(selectedDetailPlace.id);
+                        }}
+                      />
+                      <button 
+                        className="comment-send-btn" 
+                        style={{ padding: '8px 16px', margin: 0, height: 'auto' }}
+                        onClick={() => handleAddComment(selectedDetailPlace.id)}
+                      >
+                        전송
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '8px', backgroundColor: 'var(--bg-app)', borderRadius: '8px' }}>
+                      👁️ 게스트(조회 전용) 계정은 댓글 작성이 제한됩니다.
+                    </div>
+                  )}
                 </div>
 
             </div>
