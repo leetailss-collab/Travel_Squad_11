@@ -134,7 +134,7 @@ body {
 /* Main Content */
 .app-content {
   flex: 1;
-  padding: 16px 16px 100px 16px;
+  padding: 16px 16px 32px 16px;
 }
 
 /* Card */
