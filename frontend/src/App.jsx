@@ -3690,33 +3690,156 @@ function App() {
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
             borderBottom: '1px solid var(--border)'
           }}>
-            <button className="back-btn" onClick={() => setView('home')} style={{ fontSize: '1.25rem', padding: '6px', margin: 0, display: 'flex', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer' }} title="홈으로 이동">🏠</button>
+            <button 
+              className="back-btn" 
+              onClick={() => setView('home')} 
+              style={{ 
+                minWidth: '54px', 
+                padding: '6px 10px', 
+                fontSize: '0.8rem', 
+                fontWeight: '600', 
+                color: 'var(--text)', 
+                backgroundColor: 'var(--bg-card, #ffffff)', 
+                border: '1px solid var(--border)', 
+                borderRadius: '8px', 
+                cursor: 'pointer', 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                whiteSpace: 'nowrap', 
+                flexShrink: 0,
+                margin: 0
+              }} 
+              title="홈으로 이동"
+            >
+              홈
+            </button>
             <div className="header-tabs" style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', gap: '5px', overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch', padding: '4px 0' }}>
-              <button className={`tab-btn ${activeTab === 'itinerary' ? 'active' : ''}`} style={{ flex: 'none', flexShrink: 0, padding: '6px 10px', fontSize: '0.8rem', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => setActiveTab('itinerary')}>
+              <button 
+                className={`tab-btn ${activeTab === 'itinerary' ? 'active' : ''}`} 
+                style={{ 
+                  minWidth: '54px', 
+                  padding: '6px 10px', 
+                  fontSize: '0.8rem', 
+                  fontWeight: activeTab === 'itinerary' ? '700' : '600', 
+                  color: activeTab === 'itinerary' ? '#ffffff' : 'var(--text-muted)', 
+                  backgroundColor: activeTab === 'itinerary' ? 'var(--primary)' : 'var(--bg-card, #ffffff)', 
+                  border: `1px solid ${activeTab === 'itinerary' ? 'var(--primary)' : 'var(--border)'}`, 
+                  borderRadius: '8px', 
+                  cursor: 'pointer', 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  whiteSpace: 'nowrap', 
+                  flexShrink: 0,
+                  margin: 0 
+                }} 
+                onClick={() => setActiveTab('itinerary')}
+              >
                 일정
               </button>
-              <button className={`tab-btn ${activeTab === 'checklist' ? 'active' : ''}`} style={{ flex: 'none', flexShrink: 0, padding: '6px 10px', fontSize: '0.8rem', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => setActiveTab('checklist')}>
+              <button 
+                className={`tab-btn ${activeTab === 'places' ? 'active' : ''}`} 
+                style={{ 
+                  minWidth: '54px', 
+                  padding: '6px 10px', 
+                  fontSize: '0.8rem', 
+                  fontWeight: activeTab === 'places' ? '700' : '600', 
+                  color: activeTab === 'places' ? '#ffffff' : 'var(--text-muted)', 
+                  backgroundColor: activeTab === 'places' ? 'var(--primary)' : 'var(--bg-card, #ffffff)', 
+                  border: `1px solid ${activeTab === 'places' ? 'var(--primary)' : 'var(--border)'}`, 
+                  borderRadius: '8px', 
+                  cursor: 'pointer', 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  whiteSpace: 'nowrap', 
+                  flexShrink: 0,
+                  margin: 0 
+                }} 
+                onClick={() => {
+                  setActiveTab('places');
+                  setSelectedDayFilter('all');
+                  setSelectedChecklistFilter('all');
+                  setSelectedExpenseFilter('all');
+                }}
+              >
+                장소
+              </button>
+              <button 
+                className={`tab-btn ${activeTab === 'checklist' ? 'active' : ''}`} 
+                style={{ 
+                  minWidth: '54px', 
+                  padding: '6px 10px', 
+                  fontSize: '0.8rem', 
+                  fontWeight: activeTab === 'checklist' ? '700' : '600', 
+                  color: activeTab === 'checklist' ? '#ffffff' : 'var(--text-muted)', 
+                  backgroundColor: activeTab === 'checklist' ? 'var(--primary)' : 'var(--bg-card, #ffffff)', 
+                  border: `1px solid ${activeTab === 'checklist' ? 'var(--primary)' : 'var(--border)'}`, 
+                  borderRadius: '8px', 
+                  cursor: 'pointer', 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  whiteSpace: 'nowrap', 
+                  flexShrink: 0,
+                  margin: 0 
+                }} 
+                onClick={() => setActiveTab('checklist')}
+              >
                 준비물
               </button>
-              <button className={`tab-btn ${activeTab === 'expense' ? 'active' : ''}`} style={{ flex: 'none', flexShrink: 0, padding: '6px 10px', fontSize: '0.8rem', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => setActiveTab('expense')}>
+              <button 
+                className={`tab-btn ${activeTab === 'expense' ? 'active' : ''}`} 
+                style={{ 
+                  minWidth: '54px', 
+                  padding: '6px 10px', 
+                  fontSize: '0.8rem', 
+                  fontWeight: activeTab === 'expense' ? '700' : '600', 
+                  color: activeTab === 'expense' ? '#ffffff' : 'var(--text-muted)', 
+                  backgroundColor: activeTab === 'expense' ? 'var(--primary)' : 'var(--bg-card, #ffffff)', 
+                  border: `1px solid ${activeTab === 'expense' ? 'var(--primary)' : 'var(--border)'}`, 
+                  borderRadius: '8px', 
+                  cursor: 'pointer', 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  whiteSpace: 'nowrap', 
+                  flexShrink: 0,
+                  margin: 0 
+                }} 
+                onClick={() => setActiveTab('expense')}
+              >
                 경비
               </button>
-              <button className={`tab-btn ${activeTab === 'members' ? 'active' : ''}`} style={{ flex: 'none', flexShrink: 0, padding: '6px 10px', fontSize: '0.8rem', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => {
-                setActiveTab('members');
-                // Reset sub-filters on changing tabs
-                setSelectedDayFilter('all');
-                setSelectedChecklistFilter('all');
-                setSelectedExpenseFilter('all');
-              }}>
+              <button 
+                className={`tab-btn ${activeTab === 'members' ? 'active' : ''}`} 
+                style={{ 
+                  minWidth: '54px', 
+                  padding: '6px 10px', 
+                  fontSize: '0.8rem', 
+                  fontWeight: activeTab === 'members' ? '700' : '600', 
+                  color: activeTab === 'members' ? '#ffffff' : 'var(--text-muted)', 
+                  backgroundColor: activeTab === 'members' ? 'var(--primary)' : 'var(--bg-card, #ffffff)', 
+                  border: `1px solid ${activeTab === 'members' ? 'var(--primary)' : 'var(--border)'}`, 
+                  borderRadius: '8px', 
+                  cursor: 'pointer', 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  whiteSpace: 'nowrap', 
+                  flexShrink: 0,
+                  margin: 0 
+                }} 
+                onClick={() => {
+                  setActiveTab('members');
+                  // Reset sub-filters on changing tabs
+                  setSelectedDayFilter('all');
+                  setSelectedChecklistFilter('all');
+                  setSelectedExpenseFilter('all');
+                }}
+              >
                 가족
-              </button>
-              <button className={`tab-btn ${activeTab === 'places' ? 'active' : ''}`} style={{ flex: 'none', flexShrink: 0, padding: '6px 10px', fontSize: '0.8rem', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }} onClick={() => {
-                setActiveTab('places');
-                setSelectedDayFilter('all');
-                setSelectedChecklistFilter('all');
-                setSelectedExpenseFilter('all');
-              }}>
-                장소
               </button>
             </div>
             <button 
