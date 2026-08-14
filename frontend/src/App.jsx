@@ -5982,11 +5982,74 @@ function App() {
             
             {/* Sticky Fixed Header */}
             <div className="detail-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
                 <span className={`category-badge category-${selectedDetailPlace.category}`}>{selectedDetailPlace.category}</span>
-                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700 }}>{selectedDetailPlace.name}</h3>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{selectedDetailPlace.name}</h3>
               </div>
-              <button className="close-btn" onClick={() => setSelectedDetailPlace(null)} style={{ fontSize: '1.8rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', color: 'var(--text-muted)' }}>×</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                {!isGuest && (
+                  <>
+                    <button 
+                      type="button" 
+                      className="btn-secondary-sm" 
+                      style={{ padding: '5px 9px', fontSize: '0.75rem', margin: 0, display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                      onClick={() => {
+                        setEditingPlace(prepareEditingPlace(selectedDetailPlace));
+                        setSelectedDetailPlace(null);
+                      }}
+                      title="장소 정보 수정"
+                    >
+                      ✏️ 수정
+                    </button>
+                    <button 
+                      type="button" 
+                      className="btn-secondary-sm" 
+                      style={{ padding: '5px 9px', fontSize: '0.75rem', margin: 0, display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                      onClick={() => {
+                        setNewPlace({
+                          day: selectedDetailPlace.day || 1,
+                          time: selectedDetailPlace.time,
+                          duration: selectedDetailPlace.duration || 0,
+                          name: `${selectedDetailPlace.name} (복사)`,
+                          address: selectedDetailPlace.address || '',
+                          category: selectedDetailPlace.category || '관광',
+                          description: selectedDetailPlace.description || '',
+                          tip: selectedDetailPlace.tip || '',
+                          needsReservation: selectedDetailPlace.needsReservation || false,
+                          isReservationCompleted: selectedDetailPlace.isReservationCompleted || false,
+                          estimatedCost: selectedDetailPlace.estimatedCost || selectedDetailPlace.cost || 0,
+                          currency: selectedDetailPlace.currency || planCurrency,
+                          payer: selectedDetailPlace.payer || '미지정',
+                          transportType: selectedDetailPlace.transportType || '',
+                          transportDuration: selectedDetailPlace.transportDuration || '',
+                          images: selectedDetailPlace.images ? [...selectedDetailPlace.images] : [],
+                          mapImages: selectedDetailPlace.mapImages ? [...selectedDetailPlace.mapImages] : []
+                        });
+                        setSelectedDetailPlace(null);
+                        setShowModal(true);
+                      }}
+                      title="일정에 장소 복사"
+                    >
+                      📋 복사
+                    </button>
+                    <button 
+                      type="button" 
+                      className="btn-secondary-sm" 
+                      style={{ padding: '5px 9px', fontSize: '0.75rem', margin: 0, color: '#dc2626', borderColor: '#fca5a5', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                      onClick={() => {
+                        if (window.confirm(`'${selectedDetailPlace.name}' 장소를 정말로 삭제하시겠습니까?`)) {
+                          handleDeletePlace(selectedDetailPlace.id);
+                          setSelectedDetailPlace(null);
+                        }
+                      }}
+                      title="장소 삭제"
+                    >
+                      🗑️ 삭제
+                    </button>
+                  </>
+                )}
+                <button className="close-btn" onClick={() => setSelectedDetailPlace(null)} style={{ fontSize: '1.8rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', color: 'var(--text-muted)' }}>×</button>
+              </div>
             </div>
 
             {/* Scrollable Body (Vertical Column) */}
@@ -6098,15 +6161,28 @@ function App() {
                 </div>
               )}
 
-              {/* Action Buttons Row */}
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', paddingBottom: '8px', borderBottom: '1px solid var(--border)' }}>
+              {/* Primary Content Actions (Map View & Reservation Status) */}
+              <div style={{ display: 'flex', gap: '8px', paddingBottom: '12px', marginBottom: '8px', borderBottom: '1px solid var(--border)' }}>
                 <button
                   type="button"
                   onClick={(e) => handleMapSearch(e, selectedDetailPlace.address || selectedDetailPlace.name, planCurrency)}
                   className="btn-secondary-sm"
-                  style={{ padding: '8px 12px', fontSize: '0.8rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                  style={{ 
+                    flex: 1, 
+                    padding: '10px 14px', 
+                    fontSize: '0.85rem', 
+                    fontWeight: '600',
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    gap: '6px', 
+                    cursor: 'pointer',
+                    backgroundColor: 'var(--primary-light, #e0e7ff)',
+                    color: 'var(--primary)',
+                    border: '1px solid var(--primary)'
+                  }}
                 >
-                  🗺️{selectedDetailPlace.address ? '보기' : '찾기'}
+                  🗺️ {selectedDetailPlace.address ? '지도에서 보기' : '지도 검색'}
                 </button>
 
                 {selectedDetailPlace.needsReservation && (
@@ -6114,74 +6190,28 @@ function App() {
                     type="button"
                     className="btn-secondary-sm"
                     style={{ 
-                      padding: '8px 12px', 
-                      fontSize: '0.8rem', 
+                      flex: 1,
+                      padding: '10px 14px', 
+                      fontSize: '0.85rem', 
                       backgroundColor: selectedDetailPlace.isReservationCompleted ? '#d1fae5' : '#fee2e2',
                       color: selectedDetailPlace.isReservationCompleted ? '#065f46' : '#991b1b',
-                      border: 'none',
-                      fontWeight: 'bold'
+                      border: `1px solid ${selectedDetailPlace.isReservationCompleted ? '#a7f3d0' : '#fca5a5'}`,
+                      fontWeight: 'bold',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
                     }}
-                    onClick={(e) => handleToggleReservationComplete(e, selectedDetailPlace.id)}
+                    onClick={(e) => {
+                      if (isGuest) {
+                        alert('게스트(조회 전용) 계정은 수정 권한이 없습니다.');
+                        return;
+                      }
+                      handleToggleReservationComplete(e, selectedDetailPlace.id);
+                    }}
                   >
                     {selectedDetailPlace.isReservationCompleted ? '✅ 예약 완료' : '🎫 예약 필요'}
                   </button>
-                )}
-
-                {!isGuest && (
-                  <>
-                    <button 
-                      type="button" 
-                      className="btn-secondary-sm" 
-                      style={{ padding: '8px 12px', fontSize: '0.8rem' }}
-                      onClick={() => {
-                        setEditingPlace(prepareEditingPlace(selectedDetailPlace));
-                        setSelectedDetailPlace(null);
-                      }}
-                    >
-                      ✏️ 수정
-                    </button>
-                    <button 
-                      type="button" 
-                      className="btn-secondary-sm" 
-                      style={{ padding: '8px 12px', fontSize: '0.8rem' }}
-                      onClick={() => {
-                        setNewPlace({
-                          day: selectedDetailPlace.day || 1,
-                          time: selectedDetailPlace.time,
-                          duration: selectedDetailPlace.duration || 0,
-                          name: `${selectedDetailPlace.name} (복사)`,
-                          address: selectedDetailPlace.address || '',
-                          category: selectedDetailPlace.category || '관광',
-                          description: selectedDetailPlace.description || '',
-                          tip: selectedDetailPlace.tip || '',
-                          needsReservation: selectedDetailPlace.needsReservation || false,
-                          isReservationCompleted: selectedDetailPlace.isReservationCompleted || false,
-                          estimatedCost: selectedDetailPlace.estimatedCost || selectedDetailPlace.cost || 0,
-                          currency: selectedDetailPlace.currency || planCurrency,
-                          payer: selectedDetailPlace.payer || '미지정',
-                          transportType: selectedDetailPlace.transportType || '',
-                          transportDuration: selectedDetailPlace.transportDuration || '',
-                          images: selectedDetailPlace.images ? [...selectedDetailPlace.images] : [],
-                          mapImages: selectedDetailPlace.mapImages ? [...selectedDetailPlace.mapImages] : []
-                        });
-                        setSelectedDetailPlace(null);
-                        setShowModal(true);
-                      }}
-                    >
-                      📋 복사
-                    </button>
-                    <button 
-                      type="button" 
-                      className="delete-btn-danger" 
-                      style={{ padding: '8px 12px', fontSize: '0.8rem', width: 'auto', marginTop: 0 }}
-                      onClick={() => {
-                        handleDeletePlace(selectedDetailPlace.id);
-                        setSelectedDetailPlace(null);
-                      }}
-                    >
-                      🗑️ 삭제
-                    </button>
-                  </>
                 )}
               </div>
 
