@@ -2132,6 +2132,47 @@ function App() {
     }
   };
 
+  const [draggedImgIdx, setDraggedImgIdx] = useState(null);
+  const [draggedMapImgIdx, setDraggedMapImgIdx] = useState(null);
+
+  // Drag-and-drop reorder images in editing/adding place
+  const handleReorderImages = (fromIdx, toIdx, isEdit = false, isMap = false) => {
+    if (fromIdx === null || fromIdx === undefined || fromIdx === toIdx) return;
+    if (isEdit) {
+      if (isMap) {
+        setEditingPlace(prev => {
+          const list = [...(prev.mapImages || [])];
+          const [moved] = list.splice(fromIdx, 1);
+          list.splice(toIdx, 0, moved);
+          return { ...prev, mapImages: list };
+        });
+      } else {
+        setEditingPlace(prev => {
+          const list = [...(prev.images || [])];
+          const [moved] = list.splice(fromIdx, 1);
+          list.splice(toIdx, 0, moved);
+          return { ...prev, images: list };
+        });
+      }
+    } else {
+      if (isMap) {
+        setNewPlace(prev => {
+          const list = [...(prev.mapImages || [])];
+          const [moved] = list.splice(fromIdx, 1);
+          list.splice(toIdx, 0, moved);
+          return { ...prev, mapImages: list };
+        });
+      } else {
+        setNewPlace(prev => {
+          const list = [...(prev.images || [])];
+          const [moved] = list.splice(fromIdx, 1);
+          list.splice(toIdx, 0, moved);
+          return { ...prev, images: list };
+        });
+      }
+    }
+  };
+
   // Helper functions for time calculations and cascading shift
   const timeToMinutes = (t) => {
     if (!t) return 0;
@@ -5594,9 +5635,63 @@ function App() {
           {editingPlace && (
             <div className="modal-overlay" onClick={() => setEditingPlace(null)} style={{ zIndex: 1250 }}>
               <div className="modal-content modal-content-scrollable" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                  <h3>📅 일정 상세 수정</h3>
-                  <button className="close-btn" onClick={() => setEditingPlace(null)}>×</button>
+                {/* Fixed Header (2-Row Compact Layout) */}
+                <div className="modal-header" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
+                  {/* Line 1: Title & Close Button */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700 }}>📅 일정 상세 수정</h3>
+                    <button className="close-btn" onClick={() => setEditingPlace(null)} style={{ fontSize: '1.8rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', color: 'var(--text-muted)' }}>×</button>
+                  </div>
+                  {/* Line 2: Compact Circular Icons for Copy and Delete Aligned Left */}
+                  {!isGuest && (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '8px', width: '100%' }}>
+                      <button 
+                        type="button" 
+                        className="icon-btn-circle" 
+                        onClick={() => {
+                          const copyTarget = { ...editingPlace };
+                          setEditingPlace(null);
+                          setNewPlace({
+                            day: copyTarget.day || 1,
+                            time: copyTarget.time || '',
+                            duration: copyTarget.duration || 0,
+                            name: `${copyTarget.name || ''} (복사)`,
+                            address: copyTarget.address || '',
+                            category: copyTarget.category || '관광',
+                            description: copyTarget.description || '',
+                            tip: copyTarget.tip || '',
+                            needsReservation: copyTarget.needsReservation || false,
+                            isReservationCompleted: copyTarget.isReservationCompleted || false,
+                            estimatedCost: copyTarget.estimatedCost || copyTarget.cost || 0,
+                            currency: copyTarget.currency || planCurrency,
+                            payer: copyTarget.payer || '미지정',
+                            transportType: copyTarget.transportType || '',
+                            transportDuration: copyTarget.transportDuration || '',
+                            images: copyTarget.images ? [...copyTarget.images] : [],
+                            mapImages: copyTarget.mapImages ? [...copyTarget.mapImages] : []
+                          });
+                          setShowModal(true);
+                        }}
+                        title="일정에 장소 복사"
+                      >
+                        📋
+                      </button>
+                      <button 
+                        type="button" 
+                        className="icon-btn-circle" 
+                        style={{ color: '#dc2626', borderColor: '#fca5a5', backgroundColor: '#fef2f2' }}
+                        onClick={() => {
+                          if (window.confirm(`'${editingPlace.name}' 장소를 정말로 삭제하시겠습니까?`)) {
+                            handleDeletePlace(editingPlace.id);
+                            setEditingPlace(null);
+                          }
+                        }}
+                        title="장소 삭제"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <form onSubmit={handleEditItinerary} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
                   <div className="modal-body">
@@ -5679,7 +5774,19 @@ function App() {
                       {editingPlace.images && editingPlace.images.length > 0 && (
                         <div className="image-preview-container" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
                           {editingPlace.images.map((url, index) => (
-                            <div key={index} className="image-preview-wrapper" style={{ position: 'relative', width: '70px', height: '70px' }}>
+                            <div 
+                              key={index} 
+                              className="image-preview-wrapper" 
+                              draggable={true}
+                              onDragStart={() => setDraggedImgIdx(index)}
+                              onDragOver={(e) => e.preventDefault()}
+                              onDrop={() => {
+                                handleReorderImages(draggedImgIdx, index, true, false);
+                                setDraggedImgIdx(null);
+                              }}
+                              style={{ position: 'relative', width: '70px', height: '70px', cursor: 'grab' }}
+                              title="드래그하여 순서 변경"
+                            >
                               <img 
                                 src={url} 
                                 alt="preview" 
@@ -5905,7 +6012,19 @@ function App() {
                     {editingPlace.mapImages && editingPlace.mapImages.length > 0 && (
                       <div className="image-preview-container" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
                         {editingPlace.mapImages.map((url, index) => (
-                          <div key={index} className="image-preview-wrapper" style={{ position: 'relative', width: '80px', height: '60px' }}>
+                          <div 
+                            key={index} 
+                            className="image-preview-wrapper" 
+                            draggable={true}
+                            onDragStart={() => setDraggedMapImgIdx(index)}
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={() => {
+                              handleReorderImages(draggedMapImgIdx, index, true, true);
+                              setDraggedMapImgIdx(null);
+                            }}
+                            style={{ position: 'relative', width: '80px', height: '60px', cursor: 'grab' }}
+                            title="드래그하여 순서 변경"
+                          >
                             <img 
                               src={url} 
                               alt="map preview" 
@@ -5942,33 +6061,8 @@ function App() {
                   </div> {/* Close form-group of map images */}
                 </div> {/* Close modal-body */}
                   <div className="modal-footer" style={{ display: 'flex', gap: '8px', padding: '12px 16px' }}>
-                    <button type="button" className="btn-secondary-sm" onClick={() => setEditingPlace(null)} style={{ flex: 2, margin: 0, padding: '12px' }}>취소</button>
-                    <button type="button" className="btn-secondary-sm" onClick={() => {
-                      const copyTarget = { ...editingPlace };
-                      setEditingPlace(null);
-                      setNewPlace({
-                        day: copyTarget.day || 1,
-                        time: copyTarget.time || '',
-                        duration: copyTarget.duration || 0,
-                        name: `${copyTarget.name || ''} (복사)`,
-                        address: copyTarget.address || '',
-                        category: copyTarget.category || '관광',
-                        description: copyTarget.description || '',
-                        tip: copyTarget.tip || '',
-                        needsReservation: copyTarget.needsReservation || false,
-                        isReservationCompleted: copyTarget.isReservationCompleted || false,
-                        estimatedCost: copyTarget.estimatedCost || copyTarget.cost || 0,
-                        currency: copyTarget.currency || planCurrency,
-                        payer: copyTarget.payer || '미지정',
-                        transportType: copyTarget.transportType || '',
-                        transportDuration: copyTarget.transportDuration || '',
-                        images: copyTarget.images ? [...copyTarget.images] : [],
-                        mapImages: copyTarget.mapImages ? [...copyTarget.mapImages] : []
-                      });
-                      setShowModal(true);
-                    }} style={{ flex: 1, margin: 0, padding: '12px 4px', background: 'var(--bg-main)', border: '1px solid var(--border)', color: 'var(--text)', whiteSpace: 'nowrap' }}>📋 복사</button>
-                    <button type="button" className="delete-btn-danger" onClick={() => handleDeletePlace(editingPlace.id)} style={{ flex: 1, width: 'auto', marginTop: 0, padding: '12px 4px' }}>삭제</button>
-                    <button type="submit" className="submit-btn" style={{ flex: 3, margin: 0, padding: '12px' }}>수정 완료</button>
+                    <button type="button" className="btn-secondary-sm btn-auto-width" onClick={() => setEditingPlace(null)} style={{ flex: 1, margin: 0, padding: '12px' }}>취소</button>
+                    <button type="submit" className="submit-btn" style={{ flex: 2, margin: 0, padding: '12px' }}>수정 완료</button>
                   </div>
                 </form>
               </div>
