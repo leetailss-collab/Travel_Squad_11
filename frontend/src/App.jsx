@@ -5999,9 +5999,9 @@ function App() {
                 </button>
               </div>
 
-              {/* Row 2: Management Action Icons (Edit, Copy, Delete) Aligned Right */}
+              {/* Row 2: Management Action Icons (Edit, Copy, Delete) Aligned Left */}
               {!isGuest && (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '8px', width: '100%' }}>
                   <button 
                     type="button" 
                     className="icon-btn-circle" 
