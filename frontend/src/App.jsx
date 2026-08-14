@@ -5592,7 +5592,7 @@ function App() {
 
           {/* Edit Place Modal */}
           {editingPlace && (
-            <div className="modal-overlay" onClick={() => setEditingPlace(null)}>
+            <div className="modal-overlay" onClick={() => setEditingPlace(null)} style={{ zIndex: 1250 }}>
               <div className="modal-content modal-content-scrollable" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                   <h3>📅 일정 상세 수정</h3>
@@ -6702,7 +6702,7 @@ function App() {
 
       {/* 2.7 ALTERNATIVE ADD/EDIT MODAL */}
       {alternativeForm && (
-        <div className="modal-overlay" onClick={() => setAlternativeForm(null)}>
+        <div className="modal-overlay" onClick={() => setAlternativeForm(null)} style={{ zIndex: 1250 }}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>{alternativeForm.mode === 'add' ? '🔀 대안 일정 추가' : '✏️ 대안 일정 수정'}</h3>
@@ -7594,7 +7594,7 @@ function App() {
         <div 
           className="modal-overlay" 
           onClick={() => setLightboxImagesList([])}
-          style={{ zIndex: 1200, backgroundColor: 'rgba(0, 0, 0, 0.9)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          style={{ zIndex: 3000, backgroundColor: 'rgba(0, 0, 0, 0.9)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
         >
           <ZoomableImage 
             images={lightboxImagesList} 
