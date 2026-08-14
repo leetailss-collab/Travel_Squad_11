@@ -5980,76 +5980,87 @@ function App() {
         <div className="modal-overlay" onClick={() => setSelectedDetailPlace(null)} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1100 }}>
           <div className="detail-modal-content" onClick={(e) => e.stopPropagation()}>
             
-            {/* Sticky Fixed Header */}
-            <div className="detail-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
-                <span className={`category-badge category-${selectedDetailPlace.category}`}>{selectedDetailPlace.category}</span>
-                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{selectedDetailPlace.name}</h3>
+            {/* Sticky Fixed Header (2-Row Compact Layout) */}
+            <div className="detail-modal-header" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
+              {/* Row 1: Category Badge + Full Title + Close Button (×) */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
+                  <span className={`category-badge category-${selectedDetailPlace.category}`} style={{ flexShrink: 0 }}>{selectedDetailPlace.category}</span>
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, wordBreak: 'break-word', lineHeight: '1.3', color: 'var(--text)' }}>
+                    {selectedDetailPlace.name}
+                  </h3>
+                </div>
+                <button 
+                  className="close-btn" 
+                  onClick={() => setSelectedDetailPlace(null)} 
+                  style={{ fontSize: '1.8rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', color: 'var(--text-muted)', flexShrink: 0, lineHeight: 1 }}
+                >
+                  ×
+                </button>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
-                {!isGuest && (
-                  <>
-                    <button 
-                      type="button" 
-                      className="btn-secondary-sm" 
-                      style={{ padding: '5px 9px', fontSize: '0.75rem', margin: 0, display: 'inline-flex', alignItems: 'center', gap: '3px' }}
-                      onClick={() => {
-                        setEditingPlace(prepareEditingPlace(selectedDetailPlace));
+
+              {/* Row 2: Management Action Buttons (Edit, Copy, Delete) Aligned Right */}
+              {!isGuest && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px', width: '100%' }}>
+                  <button 
+                    type="button" 
+                    className="btn-secondary-sm" 
+                    style={{ padding: '4px 8px', fontSize: '0.75rem', margin: 0, display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                    onClick={() => {
+                      setEditingPlace(prepareEditingPlace(selectedDetailPlace));
+                      setSelectedDetailPlace(null);
+                    }}
+                    title="장소 정보 수정"
+                  >
+                    ✏️ 수정
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn-secondary-sm" 
+                    style={{ padding: '4px 8px', fontSize: '0.75rem', margin: 0, display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                    onClick={() => {
+                      setNewPlace({
+                        day: selectedDetailPlace.day || 1,
+                        time: selectedDetailPlace.time,
+                        duration: selectedDetailPlace.duration || 0,
+                        name: `${selectedDetailPlace.name} (복사)`,
+                        address: selectedDetailPlace.address || '',
+                        category: selectedDetailPlace.category || '관광',
+                        description: selectedDetailPlace.description || '',
+                        tip: selectedDetailPlace.tip || '',
+                        needsReservation: selectedDetailPlace.needsReservation || false,
+                        isReservationCompleted: selectedDetailPlace.isReservationCompleted || false,
+                        estimatedCost: selectedDetailPlace.estimatedCost || selectedDetailPlace.cost || 0,
+                        currency: selectedDetailPlace.currency || planCurrency,
+                        payer: selectedDetailPlace.payer || '미지정',
+                        transportType: selectedDetailPlace.transportType || '',
+                        transportDuration: selectedDetailPlace.transportDuration || '',
+                        images: selectedDetailPlace.images ? [...selectedDetailPlace.images] : [],
+                        mapImages: selectedDetailPlace.mapImages ? [...selectedDetailPlace.mapImages] : []
+                      });
+                      setSelectedDetailPlace(null);
+                      setShowModal(true);
+                    }}
+                    title="일정에 장소 복사"
+                  >
+                    📋 복사
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn-secondary-sm" 
+                    style={{ padding: '4px 8px', fontSize: '0.75rem', margin: 0, color: '#dc2626', borderColor: '#fca5a5', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                    onClick={() => {
+                      if (window.confirm(`'${selectedDetailPlace.name}' 장소를 정말로 삭제하시겠습니까?`)) {
+                        handleDeletePlace(selectedDetailPlace.id);
                         setSelectedDetailPlace(null);
-                      }}
-                      title="장소 정보 수정"
-                    >
-                      ✏️ 수정
-                    </button>
-                    <button 
-                      type="button" 
-                      className="btn-secondary-sm" 
-                      style={{ padding: '5px 9px', fontSize: '0.75rem', margin: 0, display: 'inline-flex', alignItems: 'center', gap: '3px' }}
-                      onClick={() => {
-                        setNewPlace({
-                          day: selectedDetailPlace.day || 1,
-                          time: selectedDetailPlace.time,
-                          duration: selectedDetailPlace.duration || 0,
-                          name: `${selectedDetailPlace.name} (복사)`,
-                          address: selectedDetailPlace.address || '',
-                          category: selectedDetailPlace.category || '관광',
-                          description: selectedDetailPlace.description || '',
-                          tip: selectedDetailPlace.tip || '',
-                          needsReservation: selectedDetailPlace.needsReservation || false,
-                          isReservationCompleted: selectedDetailPlace.isReservationCompleted || false,
-                          estimatedCost: selectedDetailPlace.estimatedCost || selectedDetailPlace.cost || 0,
-                          currency: selectedDetailPlace.currency || planCurrency,
-                          payer: selectedDetailPlace.payer || '미지정',
-                          transportType: selectedDetailPlace.transportType || '',
-                          transportDuration: selectedDetailPlace.transportDuration || '',
-                          images: selectedDetailPlace.images ? [...selectedDetailPlace.images] : [],
-                          mapImages: selectedDetailPlace.mapImages ? [...selectedDetailPlace.mapImages] : []
-                        });
-                        setSelectedDetailPlace(null);
-                        setShowModal(true);
-                      }}
-                      title="일정에 장소 복사"
-                    >
-                      📋 복사
-                    </button>
-                    <button 
-                      type="button" 
-                      className="btn-secondary-sm" 
-                      style={{ padding: '5px 9px', fontSize: '0.75rem', margin: 0, color: '#dc2626', borderColor: '#fca5a5', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
-                      onClick={() => {
-                        if (window.confirm(`'${selectedDetailPlace.name}' 장소를 정말로 삭제하시겠습니까?`)) {
-                          handleDeletePlace(selectedDetailPlace.id);
-                          setSelectedDetailPlace(null);
-                        }
-                      }}
-                      title="장소 삭제"
-                    >
-                      🗑️ 삭제
-                    </button>
-                  </>
-                )}
-                <button className="close-btn" onClick={() => setSelectedDetailPlace(null)} style={{ fontSize: '1.8rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', color: 'var(--text-muted)' }}>×</button>
-              </div>
+                      }
+                    }}
+                    title="장소 삭제"
+                  >
+                    🗑️ 삭제
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Scrollable Body (Vertical Column) */}
