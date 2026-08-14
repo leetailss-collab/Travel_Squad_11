@@ -5635,65 +5635,31 @@ function App() {
           {editingPlace && (
             <div className="modal-overlay" onClick={() => setEditingPlace(null)} style={{ zIndex: 1250 }}>
               <div className="modal-content modal-content-scrollable" onClick={(e) => e.stopPropagation()}>
-                {/* Fixed Header (2-Row Compact Layout) */}
-                <div className="modal-header" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
-                  {/* Line 1: Title & Close Button */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                    <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700 }}>📅 일정 상세 수정</h3>
-                    <button className="close-btn" onClick={() => setEditingPlace(null)} style={{ fontSize: '1.8rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', color: 'var(--text-muted)' }}>×</button>
+                {/* Header with Title and Save Check (✓) & Close (×) Buttons */}
+                <div className="modal-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700 }}>📅 일정 상세 수정</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <button 
+                      type="submit" 
+                      form="edit-place-form" 
+                      className="submit-btn" 
+                      style={{ padding: '6px 14px', fontSize: '0.85rem', fontWeight: 700, borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px', cursor: 'pointer', margin: 0 }}
+                      title="수정 내용 저장"
+                    >
+                      ✓ 완료
+                    </button>
+                    <button 
+                      type="button" 
+                      className="close-btn" 
+                      onClick={() => setEditingPlace(null)} 
+                      style={{ fontSize: '1.8rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', color: 'var(--text-muted)', lineHeight: 1 }}
+                      title="닫기 (취소)"
+                    >
+                      ×
+                    </button>
                   </div>
-                  {/* Line 2: Compact Circular Icons for Copy and Delete Aligned Left */}
-                  {!isGuest && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '8px', width: '100%' }}>
-                      <button 
-                        type="button" 
-                        className="icon-btn-circle" 
-                        onClick={() => {
-                          const copyTarget = { ...editingPlace };
-                          setEditingPlace(null);
-                          setNewPlace({
-                            day: copyTarget.day || 1,
-                            time: copyTarget.time || '',
-                            duration: copyTarget.duration || 0,
-                            name: `${copyTarget.name || ''} (복사)`,
-                            address: copyTarget.address || '',
-                            category: copyTarget.category || '관광',
-                            description: copyTarget.description || '',
-                            tip: copyTarget.tip || '',
-                            needsReservation: copyTarget.needsReservation || false,
-                            isReservationCompleted: copyTarget.isReservationCompleted || false,
-                            estimatedCost: copyTarget.estimatedCost || copyTarget.cost || 0,
-                            currency: copyTarget.currency || planCurrency,
-                            payer: copyTarget.payer || '미지정',
-                            transportType: copyTarget.transportType || '',
-                            transportDuration: copyTarget.transportDuration || '',
-                            images: copyTarget.images ? [...copyTarget.images] : [],
-                            mapImages: copyTarget.mapImages ? [...copyTarget.mapImages] : []
-                          });
-                          setShowModal(true);
-                        }}
-                        title="일정에 장소 복사"
-                      >
-                        📋
-                      </button>
-                      <button 
-                        type="button" 
-                        className="icon-btn-circle" 
-                        style={{ color: '#dc2626', borderColor: '#fca5a5', backgroundColor: '#fef2f2' }}
-                        onClick={() => {
-                          if (window.confirm(`'${editingPlace.name}' 장소를 정말로 삭제하시겠습니까?`)) {
-                            handleDeletePlace(editingPlace.id);
-                            setEditingPlace(null);
-                          }
-                        }}
-                        title="장소 삭제"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  )}
                 </div>
-                <form onSubmit={handleEditItinerary} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+                <form id="edit-place-form" onSubmit={handleEditItinerary} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
                   <div className="modal-body">
                     <div className="form-group">
                       <label>카테고리</label>
@@ -6060,10 +6026,6 @@ function App() {
                     )}
                   </div> {/* Close form-group of map images */}
                 </div> {/* Close modal-body */}
-                  <div className="modal-footer" style={{ display: 'flex', gap: '8px', padding: '12px 16px' }}>
-                    <button type="button" className="btn-secondary-sm btn-auto-width" onClick={() => setEditingPlace(null)} style={{ flex: 1, margin: 0, padding: '12px' }}>취소</button>
-                    <button type="submit" className="submit-btn" style={{ flex: 2, margin: 0, padding: '12px' }}>수정 완료</button>
-                  </div>
                 </form>
               </div>
             </div>
