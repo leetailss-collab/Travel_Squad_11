@@ -6004,21 +6004,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', width: '100%' }}>
                   <button 
                     type="button" 
-                    className="btn-secondary-sm" 
-                    style={{ 
-                      width: '30px', 
-                      height: '30px', 
-                      borderRadius: '50%', 
-                      padding: 0, 
-                      fontSize: '0.85rem', 
-                      margin: 0, 
-                      display: 'inline-flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      border: '1px solid var(--border)',
-                      backgroundColor: 'var(--bg-app, #f3f4f6)',
-                      cursor: 'pointer'
-                    }}
+                    className="icon-btn-circle" 
                     onClick={() => {
                       setEditingPlace(prepareEditingPlace(selectedDetailPlace));
                       setSelectedDetailPlace(null);
@@ -6029,21 +6015,7 @@ function App() {
                   </button>
                   <button 
                     type="button" 
-                    className="btn-secondary-sm" 
-                    style={{ 
-                      width: '30px', 
-                      height: '30px', 
-                      borderRadius: '50%', 
-                      padding: 0, 
-                      fontSize: '0.85rem', 
-                      margin: 0, 
-                      display: 'inline-flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      border: '1px solid var(--border)',
-                      backgroundColor: 'var(--bg-app, #f3f4f6)',
-                      cursor: 'pointer'
-                    }}
+                    className="icon-btn-circle" 
                     onClick={() => {
                       setNewPlace({
                         day: selectedDetailPlace.day || 1,
@@ -6073,22 +6045,8 @@ function App() {
                   </button>
                   <button 
                     type="button" 
-                    className="btn-secondary-sm" 
-                    style={{ 
-                      width: '30px', 
-                      height: '30px', 
-                      borderRadius: '50%', 
-                      padding: 0, 
-                      fontSize: '0.85rem', 
-                      margin: 0, 
-                      color: '#dc2626', 
-                      borderColor: '#fca5a5', 
-                      backgroundColor: '#fef2f2',
-                      display: 'inline-flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      cursor: 'pointer'
-                    }}
+                    className="icon-btn-circle" 
+                    style={{ color: '#dc2626', borderColor: '#fca5a5', backgroundColor: '#fef2f2' }}
                     onClick={() => {
                       if (window.confirm(`'${selectedDetailPlace.name}' 장소를 정말로 삭제하시겠습니까?`)) {
                         handleDeletePlace(selectedDetailPlace.id);
@@ -6217,15 +6175,11 @@ function App() {
                 <button
                   type="button"
                   onClick={(e) => handleMapSearch(e, selectedDetailPlace.address || selectedDetailPlace.name, planCurrency)}
-                  className="btn-secondary-sm"
+                  className="btn-secondary-sm btn-auto-width"
                   style={{ 
-                    width: 'auto', 
                     padding: '8px 14px', 
                     fontSize: '0.82rem', 
                     fontWeight: '600',
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
                     gap: '6px', 
                     cursor: 'pointer',
                     backgroundColor: 'var(--primary-light, #e0e7ff)',
@@ -6239,7 +6193,7 @@ function App() {
                 {selectedDetailPlace.needsReservation && (
                   <button 
                     type="button"
-                    className="btn-secondary-sm"
+                    className="btn-secondary-sm btn-auto-width"
                     style={{ 
                       width: 'auto',
                       padding: '8px 14px', 

@@ -1265,6 +1265,39 @@ body {
   background: var(--border);
 }
 
+/* Circular Icon Button (Header actions) */
+.icon-btn-circle {
+  flex: none !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-app, #f3f4f6);
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+
+.icon-btn-circle:hover {
+  background: var(--border);
+  transform: scale(1.05);
+}
+
+/* Auto Width Button (Overrides flex: 1) */
+.btn-auto-width {
+  flex: none !important;
+  width: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 /* Checkbox group for member selection */
 .members-checkbox-group {
   display: grid;
