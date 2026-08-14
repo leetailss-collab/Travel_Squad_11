@@ -5999,25 +5999,51 @@ function App() {
                 </button>
               </div>
 
-              {/* Row 2: Management Action Buttons (Edit, Copy, Delete) Aligned Right */}
+              {/* Row 2: Management Action Icons (Edit, Copy, Delete) Aligned Right */}
               {!isGuest && (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', width: '100%' }}>
                   <button 
                     type="button" 
                     className="btn-secondary-sm" 
-                    style={{ padding: '4px 8px', fontSize: '0.75rem', margin: 0, display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                    style={{ 
+                      width: '30px', 
+                      height: '30px', 
+                      borderRadius: '50%', 
+                      padding: 0, 
+                      fontSize: '0.85rem', 
+                      margin: 0, 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      border: '1px solid var(--border)',
+                      backgroundColor: 'var(--bg-app, #f3f4f6)',
+                      cursor: 'pointer'
+                    }}
                     onClick={() => {
                       setEditingPlace(prepareEditingPlace(selectedDetailPlace));
                       setSelectedDetailPlace(null);
                     }}
                     title="장소 정보 수정"
                   >
-                    ✏️ 수정
+                    ✏️
                   </button>
                   <button 
                     type="button" 
                     className="btn-secondary-sm" 
-                    style={{ padding: '4px 8px', fontSize: '0.75rem', margin: 0, display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                    style={{ 
+                      width: '30px', 
+                      height: '30px', 
+                      borderRadius: '50%', 
+                      padding: 0, 
+                      fontSize: '0.85rem', 
+                      margin: 0, 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      border: '1px solid var(--border)',
+                      backgroundColor: 'var(--bg-app, #f3f4f6)',
+                      cursor: 'pointer'
+                    }}
                     onClick={() => {
                       setNewPlace({
                         day: selectedDetailPlace.day || 1,
@@ -6043,12 +6069,26 @@ function App() {
                     }}
                     title="일정에 장소 복사"
                   >
-                    📋 복사
+                    📋
                   </button>
                   <button 
                     type="button" 
                     className="btn-secondary-sm" 
-                    style={{ padding: '4px 8px', fontSize: '0.75rem', margin: 0, color: '#dc2626', borderColor: '#fca5a5', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                    style={{ 
+                      width: '30px', 
+                      height: '30px', 
+                      borderRadius: '50%', 
+                      padding: 0, 
+                      fontSize: '0.85rem', 
+                      margin: 0, 
+                      color: '#dc2626', 
+                      borderColor: '#fca5a5', 
+                      backgroundColor: '#fef2f2',
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      cursor: 'pointer'
+                    }}
                     onClick={() => {
                       if (window.confirm(`'${selectedDetailPlace.name}' 장소를 정말로 삭제하시겠습니까?`)) {
                         handleDeletePlace(selectedDetailPlace.id);
@@ -6057,7 +6097,7 @@ function App() {
                     }}
                     title="장소 삭제"
                   >
-                    🗑️ 삭제
+                    🗑️
                   </button>
                 </div>
               )}
