@@ -5092,11 +5092,12 @@ function App() {
                           </button>
                           <button 
                             type="button" 
-                            className="delete-btn-danger" 
-                            style={{ padding: '6px 12px', fontSize: '0.75rem', width: 'auto', marginTop: 0, marginLeft: 'auto' }}
+                            className="btn-secondary-sm" 
+                            style={{ padding: '6px 12px', fontSize: '0.75rem', width: 'auto', margin: 0 }}
                             onClick={() => handleDeleteSavedPlace(sp.id)}
+                            title="장소 삭제"
                           >
-                            🗑️
+                            🗑️ 삭제
                           </button>
                         </div>
                       </div>
