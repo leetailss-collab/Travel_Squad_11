@@ -5638,21 +5638,25 @@ function App() {
                 {/* Header with Title and Save Check (✓) & Close (×) Buttons */}
                 <div className="modal-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
                   <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700 }}>📅 일정 상세 수정</h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <button 
                       type="submit" 
                       form="edit-place-form" 
-                      className="submit-btn" 
-                      style={{ padding: '6px 14px', fontSize: '0.85rem', fontWeight: 700, borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px', cursor: 'pointer', margin: 0 }}
+                      className="icon-btn-circle" 
+                      style={{ 
+                        backgroundColor: 'var(--primary)', 
+                        color: '#ffffff', 
+                        borderColor: 'var(--primary)',
+                        fontWeight: 'bold'
+                      }}
                       title="수정 내용 저장"
                     >
-                      ✓ 완료
+                      ✓
                     </button>
                     <button 
                       type="button" 
-                      className="close-btn" 
+                      className="icon-btn-circle" 
                       onClick={() => setEditingPlace(null)} 
-                      style={{ fontSize: '1.8rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', color: 'var(--text-muted)', lineHeight: 1 }}
                       title="닫기 (취소)"
                     >
                       ×
