@@ -6213,15 +6213,15 @@ function App() {
               )}
 
               {/* Primary Content Actions (Map View & Reservation Status) */}
-              <div style={{ display: 'flex', gap: '8px', paddingBottom: '12px', marginBottom: '8px', borderBottom: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', paddingBottom: '12px', marginBottom: '8px', borderBottom: '1px solid var(--border)' }}>
                 <button
                   type="button"
                   onClick={(e) => handleMapSearch(e, selectedDetailPlace.address || selectedDetailPlace.name, planCurrency)}
                   className="btn-secondary-sm"
                   style={{ 
-                    flex: 1, 
-                    padding: '10px 14px', 
-                    fontSize: '0.85rem', 
+                    width: 'auto', 
+                    padding: '8px 14px', 
+                    fontSize: '0.82rem', 
                     fontWeight: '600',
                     display: 'inline-flex', 
                     alignItems: 'center', 
@@ -6241,9 +6241,9 @@ function App() {
                     type="button"
                     className="btn-secondary-sm"
                     style={{ 
-                      flex: 1,
-                      padding: '10px 14px', 
-                      fontSize: '0.85rem', 
+                      width: 'auto',
+                      padding: '8px 14px', 
+                      fontSize: '0.82rem', 
                       backgroundColor: selectedDetailPlace.isReservationCompleted ? '#d1fae5' : '#fee2e2',
                       color: selectedDetailPlace.isReservationCompleted ? '#065f46' : '#991b1b',
                       border: `1px solid ${selectedDetailPlace.isReservationCompleted ? '#a7f3d0' : '#fca5a5'}`,
