@@ -1,16 +1,176 @@
 [
   {
     "id": 3,
-    "title": "토끼가족 강릉 여름휴가",
+    "title": "토끼부부 가족 강릉 여름휴가",
     "startDate": "2026-07-28",
     "endDate": "2026-07-30",
     "members": [
       "이현수",
       "양슬기",
-      "이하성",
-      "이주성"
+      "이준성",
+      "이은성",
+      "이해성"
     ],
-    "itinerary": [],
+    "manager": "이현수",
+    "currency": "KRW",
+    "itinerary": [
+      {
+        "day": 1,
+        "date": "2026-07-28",
+        "title": "1일차: 출발 및 숙소 체크인",
+        "places": [
+          {
+            "id": 1784643024218,
+            "time": "10:00",
+            "name": "다이소/용품구매",
+            "description": "",
+            "category": "이동",
+            "comments": [],
+            "images": [],
+            "duration": 60
+          },
+          {
+            "id": 1786340218398,
+            "time": "10:00",
+            "name": "집으로돌아오는길",
+            "description": "",
+            "category": "이동",
+            "comments": [],
+            "images": [],
+            "duration": 60
+          },
+          {
+            "id": 1786341863258,
+            "time": "10:00",
+            "name": "우리집/출발",
+            "description": "",
+            "category": "이동",
+            "comments": [],
+            "images": [],
+            "duration": 60
+          },
+          {
+            "id": 1784670549338,
+            "time": "10:00",
+            "name": "여주휴게소",
+            "description": "",
+            "category": "식사",
+            "comments": [],
+            "images": [],
+            "duration": 60
+          },
+          {
+            "id": 1785070638630,
+            "time": "10:00",
+            "name": "연화마을",
+            "description": "",
+            "category": "관광",
+            "comments": [],
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1785069047859-298087683-profile.jpg",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1785069082054-40595480-profile.jpg",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1785072202305-337442644-profile.jpg",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1785072234300-959947367-profile.jpg"
+            ],
+            "duration": 60
+          }
+        ]
+      },
+      {
+        "day": 2,
+        "date": "2026-07-29",
+        "title": "2일차: 강릉 관광 & 중앙시장",
+        "places": [
+          {
+            "id": 1784708672730,
+            "time": "10:00",
+            "name": "조식/메이플비치 호텔",
+            "description": "",
+            "category": "숙소",
+            "comments": [],
+            "images": [],
+            "duration": 60
+          },
+          {
+            "id": 1785246141724,
+            "time": "10:00",
+            "name": "잠옷.기저귀.마트등",
+            "description": "",
+            "category": "쇼핑",
+            "comments": [],
+            "images": [],
+            "duration": 60
+          },
+          {
+            "id": 1785245686925,
+            "time": "10:00",
+            "name": "안인해수욕장",
+            "description": "",
+            "category": "관광",
+            "comments": [],
+            "images": [],
+            "duration": 60
+          },
+          {
+            "id": 1785334250248,
+            "time": "10:00",
+            "name": "초당애순두부",
+            "description": "",
+            "category": "식사",
+            "comments": [],
+            "images": [],
+            "duration": 60
+          }
+        ]
+      },
+      {
+        "day": 3,
+        "date": "2026-07-30",
+        "title": "3일차: 복귀",
+        "places": [
+          {
+            "id": 1786342462088,
+            "time": "10:00",
+            "name": "문막휴게소(인천방향)/휴",
+            "description": "",
+            "category": "식사",
+            "comments": [],
+            "images": [],
+            "duration": 60
+          },
+          {
+            "id": 1784640645364,
+            "time": "10:00",
+            "name": "체크인/메이플비치 호텔",
+            "description": "",
+            "category": "숙소",
+            "comments": [],
+            "images": [],
+            "duration": 60
+          },
+          {
+            "id": 1784709257059,
+            "time": "10:00",
+            "name": "강릉중앙시장",
+            "description": "",
+            "category": "쇼핑",
+            "comments": [],
+            "images": [],
+            "duration": 60
+          },
+          {
+            "id": 1784708395113,
+            "time": "10:00",
+            "name": "취침/메이플비치 호텔",
+            "description": "",
+            "category": "숙소",
+            "comments": [],
+            "images": [],
+            "duration": 60
+          }
+        ]
+      }
+    ],
     "expenses": [],
     "checklists": []
   },
@@ -66,66 +226,73 @@
             "description": "출국심사",
             "category": "이동",
             "comments": [],
-            "duration": 165
+            "duration": 165,
+            "images": []
           },
           {
             "id": 4002,
             "time": "07:45",
-            "name": "인천공항 이륙",
+            "name": "인천공항/출국심사/이륙",
             "description": "나리타행 출발",
             "category": "이동",
             "comments": [],
-            "duration": 185
+            "duration": 185,
+            "images": []
           },
           {
             "id": 4003,
             "time": "10:50",
-            "name": "나리타공항 착륙",
+            "name": "나리타공항/착륙",
             "description": "입국심사",
             "category": "이동",
             "comments": [],
-            "duration": 40
+            "duration": 40,
+            "images": []
           },
           {
             "id": 4004,
             "time": "11:30",
-            "name": "리무진 버스 탑승",
+            "name": "나리타공항/호텔로 이동",
             "description": "공항에서 구입(신용카드 가능)",
             "category": "이동",
             "estimatedCost": 1500,
             "currency": "JPY",
             "comments": [],
-            "duration": 90
+            "duration": 90,
+            "images": []
           },
           {
             "id": 4005,
             "time": "13:00",
-            "name": "숙소 도착",
+            "name": "토부호텔 레반트 도쿄/짐맡기기",
             "description": "토부호텔 레반트 도쿄, 짐 맡기기",
             "category": "숙소",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           },
           {
             "id": 4006,
             "time": "14:00",
-            "name": "점심 - 이로도리쓰키지",
+            "name": "점심식사(장소미정/후보지3)",
             "description": "오마카세 런치 (우니 추가)",
             "category": "식사",
             "estimatedCost": 3500,
             "currency": "JPY",
             "tip": "시겐 카이센동 2600엔도 추천. 츠키지 시장 구경(도둑 조심). 터렛커피 라떼맛집",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           },
           {
             "id": 4007,
             "time": "15:00",
-            "name": "호텔 체크인",
+            "name": "토부호텔 레반트 도쿄/호텔 체크인",
             "description": "토부호텔 레반트 도쿄",
             "category": "숙소",
             "comments": [],
-            "duration": 10
+            "duration": 10,
+            "images": []
           },
           {
             "id": 4008,
@@ -135,7 +302,8 @@
             "category": "관광",
             "tip": "지하철 이동 30분",
             "comments": [],
-            "duration": 50
+            "duration": 50,
+            "images": []
           },
           {
             "id": 4009,
@@ -144,7 +312,8 @@
             "description": "가장 오래된 상점가. 아사히 스카이룸 옥상에 황금 거품",
             "category": "관광",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           },
           {
             "id": 4010,
@@ -154,7 +323,10 @@
             "category": "관광",
             "needsReservation": true,
             "comments": [],
-            "duration": 120
+            "duration": 120,
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784777630704-140100111-1000009251.jpg"
+            ]
           },
           {
             "id": 4011,
@@ -166,7 +338,8 @@
             "currency": "JPY",
             "tip": "몬자거리 산책도 함께 추천",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           },
           {
             "id": 4012,
@@ -176,7 +349,8 @@
             "category": "쇼핑",
             "tip": "게스트카드 발급 가능. 라이프베케이션에서 일본 사케·위스키 구입",
             "comments": [],
-            "duration": 120
+            "duration": 120,
+            "images": []
           },
           {
             "id": 4013,
@@ -188,7 +362,62 @@
             "currency": "JPY",
             "tip": "새벽 4시까지 영업",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
+          },
+          {
+            "id": 1784893967240,
+            "time": "06:00",
+            "name": "인천국제공항 제2여객터미널 예약주차장",
+            "description": "",
+            "category": "이동",
+            "comments": [],
+            "images": []
+          },
+          {
+            "id": 1784894204161,
+            "time": "06:00",
+            "name": "인천공항/출국심사",
+            "description": "",
+            "category": "이동",
+            "comments": [],
+            "images": []
+          },
+          {
+            "id": 1786408554046,
+            "time": "06:00",
+            "name": "인천공항/착륙",
+            "description": "",
+            "category": "이동",
+            "comments": [],
+            "images": []
+          },
+          {
+            "id": 1786409021645,
+            "time": "06:00",
+            "name": "인천공항 제2터미널 주차장/집으로",
+            "description": "",
+            "category": "이동",
+            "comments": [],
+            "images": []
+          },
+          {
+            "id": 1786449515623,
+            "time": "06:00",
+            "name": "항공권 성인8명",
+            "description": "",
+            "category": "이동",
+            "comments": [],
+            "images": []
+          },
+          {
+            "id": 1786449564885,
+            "time": "06:00",
+            "name": "항공권 소아3명",
+            "description": "",
+            "category": "이동",
+            "comments": [],
+            "images": []
           }
         ]
       },
@@ -204,7 +433,8 @@
             "description": "숙소에서 간단히 식사",
             "category": "식사",
             "comments": [],
-            "duration": 90
+            "duration": 90,
+            "images": []
           },
           {
             "id": 4015,
@@ -214,7 +444,8 @@
             "category": "관광",
             "tip": "지하철 이동 40분",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           },
           {
             "id": 4016,
@@ -223,7 +454,8 @@
             "description": "400미터 길거리, 도쿄 10대 소녀들로 붐비는 곳. 마리온 크레페 유명(호객행위 조심)",
             "category": "관광",
             "comments": [],
-            "duration": 90
+            "duration": 90,
+            "images": []
           },
           {
             "id": 4017,
@@ -234,7 +466,8 @@
             "estimatedCost": 2000,
             "currency": "JPY",
             "comments": [],
-            "duration": 90
+            "duration": 90,
+            "images": []
           },
           {
             "id": 4018,
@@ -243,7 +476,8 @@
             "description": "도쿄의 샹젤리제",
             "category": "관광",
             "comments": [],
-            "duration": 90
+            "duration": 90,
+            "images": []
           },
           {
             "id": 4019,
@@ -252,7 +486,8 @@
             "description": "에스컬레이터 사진은 내려갈 때 찍어야 배경이 잘 담김",
             "category": "관광",
             "comments": [],
-            "duration": 120
+            "duration": 120,
+            "images": []
           },
           {
             "id": 4020,
@@ -263,7 +498,8 @@
             "estimatedCost": 2500,
             "currency": "JPY",
             "comments": [],
-            "duration": 90
+            "duration": 90,
+            "images": []
           },
           {
             "id": 4021,
@@ -276,7 +512,8 @@
             "currency": "JPY",
             "tip": "줄서기 2시간 예상. 미리 예약 필수 (¥2,450~)",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           }
         ]
       },
@@ -294,7 +531,10 @@
             "estimatedCost": 1000,
             "currency": "JPY",
             "comments": [],
-            "duration": 90
+            "duration": 90,
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795034022-824207922-1000009350.jpg"
+            ]
           },
           {
             "id": 4023,
@@ -303,7 +543,8 @@
             "description": "긴자역→긴자 식스→중앙거리(주오도리) 산책→유니클로 긴자점→이토야→미츠코시 지하 식품관",
             "category": "쇼핑",
             "comments": [],
-            "duration": 180
+            "duration": 180,
+            "images": []
           },
           {
             "id": 4024,
@@ -314,7 +555,8 @@
             "estimatedCost": 1500,
             "currency": "JPY",
             "comments": [],
-            "duration": 120
+            "duration": 120,
+            "images": []
           },
           {
             "id": 4025,
@@ -327,7 +569,8 @@
             "currency": "JPY",
             "tip": "예약 필수 (¥1,850~)",
             "comments": [],
-            "duration": 180
+            "duration": 180,
+            "images": []
           },
           {
             "id": 4026,
@@ -339,7 +582,8 @@
             "currency": "JPY",
             "tip": "롯폰기 힐스 전망대 360도 도심 풍경과 후지산 감상 (¥1,230~)",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           }
         ]
       },
@@ -355,7 +599,8 @@
             "description": "숙소에서 간단히 식사",
             "category": "식사",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           },
           {
             "id": 4028,
@@ -364,7 +609,8 @@
             "description": "지하철 이동 40분",
             "category": "숙소",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           },
           {
             "id": 4029,
@@ -375,7 +621,8 @@
             "estimatedCost": 3000,
             "currency": "JPY",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           },
           {
             "id": 4030,
@@ -384,7 +631,8 @@
             "description": "센캬쿠반라이 산책 및 족욕",
             "category": "관광",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           },
           {
             "id": 4031,
@@ -394,7 +642,8 @@
             "category": "관광",
             "tip": "유리카모메 탑승",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           },
           {
             "id": 4032,
@@ -403,7 +652,8 @@
             "description": "뉴욕의 자유의 여신상을 본떠 만든 축소 복제품. 바다와 도시가 어우러진 개방감",
             "category": "관광",
             "comments": [],
-            "duration": 150
+            "duration": 150,
+            "images": []
           },
           {
             "id": 4033,
@@ -414,7 +664,8 @@
             "estimatedCost": 1500,
             "currency": "JPY",
             "comments": [],
-            "duration": 90
+            "duration": 90,
+            "images": []
           },
           {
             "id": 4034,
@@ -425,7 +676,8 @@
             "estimatedCost": 2000,
             "currency": "JPY",
             "comments": [],
-            "duration": 180
+            "duration": 180,
+            "images": []
           },
           {
             "id": 4035,
@@ -434,7 +686,8 @@
             "description": "출국심사 후 탑승",
             "category": "이동",
             "comments": [],
-            "duration": 150
+            "duration": 150,
+            "images": []
           },
           {
             "id": 4036,
@@ -443,7 +696,8 @@
             "description": "입국심사 후 귀가. 약 24:00 집 도착",
             "category": "이동",
             "comments": [],
-            "duration": 60
+            "duration": 60,
+            "images": []
           }
         ]
       }
@@ -452,12 +706,14 @@
       {
         "id": 1786449515623,
         "title": "항공권 성인8명",
+        "amount": 0,
         "payer": "이정우",
         "date": "2026-08-11"
       },
       {
         "id": 1786449564885,
         "title": "항공권 소아3명",
+        "amount": 0,
         "payer": "이정우",
         "date": "2026-08-11"
       }
