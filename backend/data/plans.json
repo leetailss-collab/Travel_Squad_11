@@ -1,104 +1,18 @@
 [
   {
-    "id": 1,
-    "title": "여름 가족 제주도 여행",
-    "startDate": "2026-08-15",
-    "endDate": "2026-08-18",
+    "id": 3,
+    "title": "토끼가족 강릉 여름휴가",
+    "startDate": "2026-07-28",
+    "endDate": "2026-07-30",
     "members": [
       "이현수",
       "양슬기",
-      "이준성",
-      "이은성",
-      "이해성",
-      "이정우",
-      "홍영숙",
-      "이아름",
-      "이진수"
+      "이하성",
+      "이주성"
     ],
-    "itinerary": [
-      {
-        "day": 1,
-        "date": "2026-08-15",
-        "places": [
-          {
-            "id": 1001,
-            "time": "10:00",
-            "name": "제주공항 도착",
-            "description": "렌터카 수령 및 출발",
-            "comments": [
-              {
-                "id": 1,
-                "author": "이현수",
-                "text": "도착해서 게이트 5번 앞으로 모여주세요!",
-                "time": "오전 10:05"
-              }
-            ],
-            "duration": 150
-          },
-          {
-            "id": 1002,
-            "time": "12:30",
-            "name": "자매국수",
-            "description": "점심 식사 (고기국수)",
-            "comments": [],
-            "duration": 150
-          },
-          {
-            "id": 1003,
-            "time": "15:00",
-            "name": "함덕해수욕장",
-            "description": "바다 구경 및 카페 휴식",
-            "comments": [
-              {
-                "id": 2,
-                "author": "양슬기",
-                "text": "아이들 돗자리랑 여벌 옷 챙겨갈게요.",
-                "time": "오후 1:15"
-              }
-            ],
-            "duration": 180
-          },
-          {
-            "id": 1004,
-            "time": "18:00",
-            "name": "숙소 체크인",
-            "description": "서귀포 가족 펜션",
-            "comments": [],
-            "duration": 60
-          }
-        ]
-      }
-    ],
-    "expenses": [
-      {
-        "id": 101,
-        "title": "항공권 예약",
-        "amount": 450000,
-        "payer": "이현수",
-        "date": "2026-07-10"
-      },
-      {
-        "id": 102,
-        "title": "렌터카 4일",
-        "amount": 180000,
-        "payer": "양슬기",
-        "date": "2026-07-12"
-      }
-    ],
-    "checklists": [
-      {
-        "id": 201,
-        "title": "신분증 및 등본 (아이들 동반 확인)",
-        "checked": true,
-        "assignee": "양슬기"
-      },
-      {
-        "id": 202,
-        "title": "비상약 (멀미약, 소화제, 밴드)",
-        "checked": false,
-        "assignee": "홍영숙"
-      }
-    ]
+    "itinerary": [],
+    "expenses": [],
+    "checklists": []
   },
   {
     "id": 4,
@@ -534,7 +448,20 @@
         ]
       }
     ],
-    "expenses": [],
+    "expenses": [
+      {
+        "id": 1786449515623,
+        "title": "항공권 성인8명",
+        "payer": "이정우",
+        "date": "2026-08-11"
+      },
+      {
+        "id": 1786449564885,
+        "title": "항공권 소아3명",
+        "payer": "이정우",
+        "date": "2026-08-11"
+      }
+    ],
     "checklists": [
       {
         "id": 501,
@@ -1166,6 +1093,377 @@
         "title": "양우산, 모자, 선글라스, 손수건, 선크림",
         "checked": false,
         "assignee": "양슬기"
+      }
+    ]
+  },
+  {
+    "startDate": "2026-09-25",
+    "endDate": "2026-09-29",
+    "members": [
+      "이현수",
+      "양슬기",
+      "이주성",
+      "이하성"
+    ],
+    "manager": "이현수",
+    "currency": "KRW",
+    "checklists": [],
+    "id": 7,
+    "accommodation": {
+      "name": "양영민,이정희의 홈",
+      "location": "제주 서귀포시 대청로25번길 9"
+    },
+    "title": "추석 제주도여행",
+    "transportation": [
+      {
+        "type": "장모님 차?",
+        "route": "",
+        "cost": 0,
+        "currency": "KRW"
+      }
+    ],
+    "isEvent": false,
+    "expenses": [
+      {
+        "id": "1786335516673_c0",
+        "placeId": 1786335516673,
+        "title": "[일정] 김포공항/비행기이륙 - 김포공항/비행기이륙",
+        "amount": 498000,
+        "originalAmount": 498000,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-09-25",
+        "category": "교통"
+      },
+      {
+        "id": "1786335574290_c0",
+        "placeId": 1786335574290,
+        "title": "[일정] 제주공항/비행기이륙 - 제주공항/비행기이륙",
+        "amount": 346000,
+        "originalAmount": 346000,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-09-29",
+        "category": "교통"
+      },
+      {
+        "id": 1786747888105.5193,
+        "placeId": 1786337405819,
+        "title": "[일정] 김포공항주차타워 - 발렛비",
+        "amount": 20000,
+        "originalAmount": 20000,
+        "currency": "KRW",
+        "payer": "미지정",
+        "date": "2026-09-25",
+        "category": "교통"
+      },
+      {
+        "id": 1786747907450.4382,
+        "placeId": 1786337405819,
+        "title": "[일정] 김포공항주차타워 - 주차비",
+        "amount": 61000,
+        "originalAmount": 61000,
+        "currency": "KRW",
+        "payer": "미지정",
+        "date": "2026-09-25",
+        "category": "교통"
+      }
+    ],
+    "itinerary": [
+      {
+        "day": 1,
+        "date": "2026-09-25",
+        "places": [
+          {
+            "id": 1786337658628,
+            "time": "12:00",
+            "name": "우리집/출발",
+            "address": "경기도 수원시 정자로42번길 52",
+            "description": "최소 출발시간/ 막힐지도 몰라서 1시간 내외 이나 1시간30분으로 설정",
+            "category": "이동",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 90,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "자차",
+            "transportDuration": "90"
+          },
+          {
+            "id": 1786337405819,
+            "time": "13:45",
+            "name": "김포공항주차타워",
+            "address": "서울 강서구 공항동 80-7",
+            "description": "8월 15일 예약가능함. 안되면 발렛 해야함",
+            "category": "이동",
+            "estimatedCost": 81000,
+            "currency": "KRW",
+            "needsReservation": true,
+            "isReservationCompleted": true,
+            "tip": "발렛으로 예약함",
+            "payer": "미지정",
+            "duration": 15,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "도보",
+            "transportDuration": "15",
+            "costs": [
+              {
+                "id": 1786747888105.5193,
+                "title": "발렛비",
+                "amount": "20000",
+                "category": "교통",
+                "payer": "미지정"
+              },
+              {
+                "id": 1786747907450.4382,
+                "title": "주차비",
+                "amount": "61000",
+                "category": "교통",
+                "payer": "미지정"
+              }
+            ]
+          },
+          {
+            "id": 1786337228241,
+            "time": "14:00",
+            "name": "김포공항/체크인",
+            "address": "서울 강서구 공항동 1373",
+            "description": "1시간 전 체크인",
+            "category": "이동",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 10,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 1786339571544,
+            "time": "14:10",
+            "name": "김포공항/간단하게 군것질",
+            "address": "서울 강서구 공항동 1373",
+            "description": "뭘먹어야하나?",
+            "category": "식사",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 20,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 1786335516673,
+            "time": "15:10",
+            "name": "김포공항/비행기이륙",
+            "address": "서울 강서구 공항동 1373",
+            "description": "아시아나 항공",
+            "category": "이동",
+            "estimatedCost": 498000,
+            "currency": "KRW",
+            "needsReservation": true,
+            "isReservationCompleted": true,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 75,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "비행기",
+            "transportDuration": "75",
+            "costs": [
+              {
+                "id": "1786335516673_c0",
+                "title": "김포공항/비행기이륙",
+                "amount": 498000,
+                "category": "교통",
+                "payer": "이현수"
+              }
+            ]
+          },
+          {
+            "id": 1786336808880,
+            "time": "16:25",
+            "name": "제주공항/비행기착륙",
+            "address": "제주 제주시 공항로 2 제주국제공항",
+            "description": "아시아나 항공",
+            "category": "이동",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 10,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          }
+        ]
+      },
+      {
+        "day": 2,
+        "date": "2026-09-26",
+        "places": []
+      },
+      {
+        "day": 3,
+        "date": "2026-09-27",
+        "places": []
+      },
+      {
+        "day": 4,
+        "date": "2026-09-28",
+        "places": []
+      },
+      {
+        "day": 5,
+        "date": "2026-09-29",
+        "places": [
+          {
+            "id": 1786335574290,
+            "time": "17:20",
+            "name": "제주공항/비행기이륙",
+            "address": "제주 제주시 공항로 2 제주국제공항",
+            "description": "아시아나 항공",
+            "category": "이동",
+            "estimatedCost": 346000,
+            "currency": "KRW",
+            "needsReservation": true,
+            "isReservationCompleted": true,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 75,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "비행기",
+            "transportDuration": "75",
+            "costs": [
+              {
+                "id": "1786335574290_c0",
+                "title": "제주공항/비행기이륙",
+                "amount": 346000,
+                "category": "교통",
+                "payer": "이현수"
+              }
+            ]
+          },
+          {
+            "id": 1786335626934,
+            "time": "18:35",
+            "name": "김포공항/비행기착륙",
+            "address": "서울 강서구 공항동 1373",
+            "description": "집에가야지",
+            "category": "이동",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 10,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": "0"
+          },
+          {
+            "id": 1786339455155,
+            "time": "18:45",
+            "name": "김포공항/저녁식사",
+            "address": "서울 강서구 공항동 1373",
+            "description": "공항에서 먹어야 할듯",
+            "category": "식사",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 30,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "도보",
+            "transportDuration": "15"
+          },
+          {
+            "id": 1786339168067,
+            "time": "19:35",
+            "name": "김포공항주차장/집으로 출발",
+            "address": "",
+            "description": "",
+            "category": "이동",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 80,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "자차",
+            "transportDuration": "80"
+          },
+          {
+            "id": 1786339383293,
+            "time": "20:55",
+            "name": "우리집/도착",
+            "address": "경기도 수원시 장안구 정자로42번길 52",
+            "description": "",
+            "category": "이동",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 60,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          }
+        ]
+      }
+    ],
+    "savedPlaces": [
+      {
+        "id": "sp-1786763370312-154210247",
+        "name": "슬기 부모님댁",
+        "category": "숙소",
+        "address": "제주 서귀포시 대청로25번길 9",
+        "description": "양영민,이정희 하우스",
+        "tip": "",
+        "url": "https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EC%84%9C%EA%B7%80%ED%8F%AC%EC%8B%9C%20%EB%8C%80%EC%B2%AD%EB%A1%9C25%EB%B2%88%EA%B8%B8%209",
+        "images": [],
+        "lat": 33.253807,
+        "lng": 126.5035353
       }
     ]
   }
