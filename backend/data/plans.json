@@ -1,178 +1,1014 @@
 [
   {
     "id": 3,
-    "title": "토끼부부 가족 강릉 여름휴가",
     "startDate": "2026-07-28",
     "endDate": "2026-07-30",
     "members": [
       "이현수",
       "양슬기",
-      "이준성",
-      "이은성",
-      "이해성"
+      "이하성",
+      "이주성"
     ],
-    "manager": "이현수",
+    "manager": "",
     "currency": "KRW",
+    "isEvent": false,
+    "accommodation": {
+      "name": "메이플비치 호텔",
+      "location": "강원특별자치도 강릉시 강동면 염전길 255"
+    },
+    "transportation": [
+      {
+        "type": "자가용(포포) : 가솔린/하이브리드",
+        "route": "",
+        "cost": 0,
+        "currency": "KRW"
+      }
+    ],
+    "title": "토끼부부 가족 강릉 여름휴가",
+    "checklists": [
+      {
+        "id": 1785064911418,
+        "title": "여벌옷, 속옷, 기저귀, 소변통, 비상약, 체온계, 물놀이용품, 선크림, 충전기, 세면도구및로션, 아기수저세트, 모래놀이세트",
+        "checked": true,
+        "assignee": "양슬기",
+        "category": "공통"
+      }
+    ],
     "itinerary": [
       {
         "day": 1,
         "date": "2026-07-28",
-        "title": "1일차: 출발 및 숙소 체크인",
         "places": [
           {
-            "id": 1784643024218,
-            "time": "10:00",
-            "name": "다이소/용품구매",
-            "description": "",
-            "category": "이동",
-            "comments": [],
-            "images": [],
-            "duration": 60
-          },
-          {
-            "id": 1786340218398,
-            "time": "10:00",
-            "name": "집으로돌아오는길",
-            "description": "",
-            "category": "이동",
-            "comments": [],
-            "images": [],
-            "duration": 60
-          },
-          {
             "id": 1786341863258,
-            "time": "10:00",
+            "time": "11:00",
             "name": "우리집/출발",
-            "description": "",
+            "address": "경기도 수원시 장안구 정자로42번길 52",
+            "description": "톨비 발생",
             "category": "이동",
+            "estimatedCost": 13000,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 10,
+            "costs": [
+              {
+                "id": 1786341968051.5042,
+                "title": "가는톨비",
+                "amount": "13000",
+                "category": "교통",
+                "payer": "이현수"
+              }
+            ],
             "comments": [],
             "images": [],
-            "duration": 60
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 1784643024218,
+            "time": "11:20",
+            "name": "다이소/용품구매",
+            "address": "경기 수원시 팔달구 수성로 102",
+            "description": "파라솔,물안경 등",
+            "category": "이동",
+            "estimatedCost": 22000,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 10,
+            "comments": [],
+            "isReservationCompleted": false,
+            "images": [],
+            "transportType": "자차",
+            "transportDuration": "0",
+            "mapImages": [],
+            "costs": [
+              {
+                "id": "1784643024218_c0",
+                "title": "다이소",
+                "amount": "22000",
+                "category": "쇼핑",
+                "payer": "이현수"
+              }
+            ]
           },
           {
             "id": 1784670549338,
-            "time": "10:00",
+            "time": "12:00",
             "name": "여주휴게소",
-            "description": "",
-            "category": "식사",
+            "address": "경기도 여주시 여주남로 722",
+            "description": "점심먹기 우동이랑 돈가스 / 편의점 기타등",
+            "category": "이동",
+            "estimatedCost": 32300,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
             "comments": [],
             "images": [],
-            "duration": 60
+            "isReservationCompleted": false,
+            "transportType": "자차",
+            "transportDuration": "120",
+            "mapImages": [],
+            "costs": [
+              {
+                "id": 1786342011867.928,
+                "title": "식사",
+                "amount": "19000",
+                "category": "식비",
+                "payer": "이현수"
+              },
+              {
+                "id": 1786342012113.1497,
+                "title": "스티커",
+                "amount": "9600",
+                "category": "쇼핑",
+                "payer": "이현수"
+              },
+              {
+                "id": 1786342012349.2664,
+                "title": "간식",
+                "amount": "3700",
+                "category": "식비",
+                "payer": "이현수"
+              }
+            ]
           },
           {
-            "id": 1785070638630,
-            "time": "10:00",
-            "name": "연화마을",
+            "id": 1784709462989,
+            "time": "13:30",
+            "name": "경포호/강문해수욕장",
+            "address": "강원특별자치도 강릉시 강문동 182-37",
             "description": "",
             "category": "관광",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
             "comments": [],
-            "images": [
-              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1785069047859-298087683-profile.jpg",
-              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1785069082054-40595480-profile.jpg",
-              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1785072202305-337442644-profile.jpg",
-              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1785072234300-959947367-profile.jpg"
+            "images": [],
+            "isReservationCompleted": false,
+            "transportType": "자차",
+            "transportDuration": "30"
+          },
+          {
+            "id": 1784640645364,
+            "time": "15:00",
+            "name": "체크인/메이플비치 호텔",
+            "description": "체크인, 2박 숙소",
+            "category": "숙소",
+            "estimatedCost": 515200,
+            "currency": "KRW",
+            "needsReservation": true,
+            "tip": "예약 완료, 수영장 무료, 조식 별도",
+            "payer": "이현수",
+            "duration": 60,
+            "comments": [
+              {
+                "id": 1784762341887,
+                "author": "양슬기",
+                "text": "우와 쩐당!! 😍 현뚜 쵝오",
+                "time": "PM 11:19"
+              }
             ],
-            "duration": 60
+            "address": "강원특별자치도 강릉시 강동면 염전길 255",
+            "images": [],
+            "isReservationCompleted": true,
+            "costs": [
+              {
+                "id": "1784640645364_c0",
+                "title": "체크인/메이플비치 호텔",
+                "amount": 515200,
+                "category": "숙박",
+                "payer": "이현수"
+              }
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 1784709222325,
+            "time": "16:00",
+            "name": "수영/메이플비치 호텔",
+            "address": "강원특별자치도 강릉시 강동면 염전길 255",
+            "description": "",
+            "category": "관광",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
+            "comments": [],
+            "images": [],
+            "isReservationCompleted": false,
+            "transportType": "자차",
+            "transportDuration": "20"
+          },
+          {
+            "id": 1784709257059,
+            "time": "17:00",
+            "name": "강릉중앙시장",
+            "address": "강원 강릉시 금성로 21",
+            "description": "저녁을 먹던 여기서 사던 어쩌던",
+            "category": "관광",
+            "estimatedCost": 9500,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
+            "comments": [
+              {
+                "id": 1785066076617,
+                "author": "양슬기",
+                "text": "오징어순대. 닭강정.길감자",
+                "time": "오후 08:41"
+              }
+            ],
+            "images": [],
+            "isReservationCompleted": false,
+            "transportType": "자차",
+            "transportDuration": "20",
+            "costs": [
+              {
+                "id": 1786343139569.1882,
+                "title": "박종주호빵",
+                "amount": "6000",
+                "category": "식비",
+                "payer": "이현수"
+              },
+              {
+                "id": 1786343156677.194,
+                "title": "음료수",
+                "amount": "3500",
+                "category": "식비",
+                "payer": "이현수"
+              }
+            ],
+            "mapImages": []
+          },
+          {
+            "id": 1784708395113,
+            "time": "21:00",
+            "name": "취침/메이플비치 호텔",
+            "address": "강원특별자치도 강릉시 강동면 염전길 255",
+            "description": "취침시작",
+            "category": "기타",
+            "estimatedCost": 3500,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
+            "comments": [],
+            "images": [],
+            "isReservationCompleted": false,
+            "costs": [
+              {
+                "id": 1786343177236.7688,
+                "title": "맥주",
+                "amount": "3500",
+                "category": "식비",
+                "payer": "이현수"
+              }
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
           }
         ]
       },
       {
         "day": 2,
         "date": "2026-07-29",
-        "title": "2일차: 강릉 관광 & 중앙시장",
         "places": [
           {
-            "id": 1784708672730,
-            "time": "10:00",
-            "name": "조식/메이플비치 호텔",
+            "id": 1784708448734,
+            "time": "07:00",
+            "name": "기상/메이플비치 호텔",
+            "address": "강원특별자치도 강릉시 강동면 염전길 255",
             "description": "",
-            "category": "숙소",
+            "category": "기타",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
             "comments": [],
-            "images": [],
-            "duration": 60
+            "images": []
           },
           {
-            "id": 1785246141724,
-            "time": "10:00",
-            "name": "잠옷.기저귀.마트등",
+            "id": 1784708672730,
+            "time": "08:00",
+            "name": "조식/메이플비치 호텔",
+            "address": "강원특별자치도 강릉시 강동면 염전길 255",
             "description": "",
-            "category": "쇼핑",
+            "category": "식사",
+            "estimatedCost": 46000,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
             "comments": [],
-            "images": [],
-            "duration": 60
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784766061040-733072276-files-1784708670053-298016150.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=LHd%2FpyQZ4346lGYQkbCNYuoXLCQJ2bTeFo00y93ypeUrrydAf1g%2BqiyQjY%2FgLDU0woN3xFpOaUn1WUjNLIJz5wcw8pGXGr06idy6o7KJ8WwEfFAVnRUeWJ3VkluN3CdwGWxi7O2yyZaQ6VK9yp0O5WN000EBWbQaKOR65lgXQ2lR6GpGDtecJz0zcQqvwrPQEaG7Xvpwc7NZQS3ehBAfT6fxbtXbhVL95WINOEYGZgRiEnhsYqS2cQflUuEIJIdH0JmAtawJQJ8WlUST9nKUqodppcB7IZ4hqfIt517%2BfTj20bAN2eFlcOXF93yI9t6tFPvgmLc9z4DMl2xPAOAbyw%3D%3D"
+            ],
+            "isReservationCompleted": false,
+            "transportType": "자차",
+            "transportDuration": "20",
+            "costs": [
+              {
+                "id": 1786342198297.1577,
+                "title": "조식",
+                "amount": "46000",
+                "category": "식비",
+                "payer": "이현수"
+              }
+            ],
+            "mapImages": []
           },
           {
             "id": 1785245686925,
-            "time": "10:00",
+            "time": "09:00",
             "name": "안인해수욕장",
+            "address": "강원 강릉시 강동면",
             "description": "",
             "category": "관광",
+            "estimatedCost": 5000,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
             "comments": [],
             "images": [],
-            "duration": 60
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": "",
+            "costs": [
+              {
+                "id": 1786342338702.25,
+                "title": "음료",
+                "amount": "5000",
+                "category": "식비",
+                "payer": "이현수"
+              }
+            ]
           },
           {
-            "id": 1785334250248,
-            "time": "10:00",
-            "name": "초당애순두부",
-            "description": "",
+            "id": 1785070638630,
+            "time": "14:00",
+            "name": "연화마을",
+            "address": "",
+            "description": "꼬막비빔밥.물회",
             "category": "식사",
+            "estimatedCost": 48000,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
             "comments": [],
             "images": [],
-            "duration": 60
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": "",
+            "costs": [
+              {
+                "id": "1785070638630_c0",
+                "title": "연화마을",
+                "amount": 48000,
+                "category": "식비",
+                "payer": "이현수"
+              }
+            ]
+          },
+          {
+            "id": 1785246141724,
+            "time": "16:00",
+            "name": "잠옷.기저귀.마트등",
+            "address": "",
+            "description": "",
+            "category": "쇼핑",
+            "estimatedCost": 165830,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 60,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": "",
+            "costs": [
+              {
+                "id": 1786342231390.5625,
+                "title": "잠옷(탑텐)",
+                "amount": "25800",
+                "category": "쇼핑",
+                "payer": "이현수"
+              },
+              {
+                "id": 1786342247922.641,
+                "title": "스타벅스",
+                "amount": "8400",
+                "category": "식비",
+                "payer": "이현수"
+              },
+              {
+                "id": 1786342265558.3997,
+                "title": "주유",
+                "amount": "73000",
+                "category": "교통",
+                "payer": "이현수"
+              },
+              {
+                "id": 1786342920501.0745,
+                "title": "기저귀",
+                "amount": "28730",
+                "category": "쇼핑",
+                "payer": "이현수"
+              },
+              {
+                "id": 1786343031537.812,
+                "title": "저녁,아침",
+                "amount": "29900",
+                "category": "식비",
+                "payer": "이현수"
+              }
+            ]
+          },
+          {
+            "id": 1785332818335,
+            "time": "17:00",
+            "name": "숙소수영장",
+            "address": "",
+            "description": "",
+            "category": "숙소",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 120,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 1784716902635,
+            "time": "21:00",
+            "name": "취침/메이플비치 호텔",
+            "address": "강원특별자치도 강릉시 강동면 염전길 255",
+            "description": "",
+            "category": "기타",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
+            "comments": [],
+            "images": []
           }
         ]
       },
       {
         "day": 3,
         "date": "2026-07-30",
-        "title": "3일차: 복귀",
         "places": [
           {
-            "id": 1786342462088,
-            "time": "10:00",
-            "name": "문막휴게소(인천방향)/휴",
+            "id": 1784708883839,
+            "time": "07:00",
+            "name": "기상/메이플비치 호텔",
+            "address": "강원특별자치도 강릉시 강동면 염전길 255",
+            "description": "",
+            "category": "기타",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
+            "comments": [],
+            "images": []
+          },
+          {
+            "id": 1784709004282,
+            "time": "08:00",
+            "name": "아침/메이플비치 호텔",
+            "address": "강원특별자치도 강릉시 강동면 염전길 255",
+            "description": "아침을 편의점 간편식이 될지 조식 또 먹을지?",
+            "category": "식사",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
+            "comments": [
+              {
+                "id": 1785068778004,
+                "author": "양슬기",
+                "text": "전날 빵같은거사서 먹는걸루 조식 비쌈",
+                "time": "오후 09:26"
+              }
+            ],
+            "images": []
+          },
+          {
+            "id": 1784709062980,
+            "time": "09:00",
+            "name": "수영/메이플비치 호텔",
+            "address": "강원특별자치도 강릉시 강동면 염전길 255",
+            "description": "",
+            "category": "관광",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
+            "comments": [],
+            "images": []
+          },
+          {
+            "id": 1784708715313,
+            "time": "11:00",
+            "name": "체크아웃/메이플비치 호텔",
+            "address": "강원특별자치도 강릉시 강동면 염전길 255",
+            "description": "체크아웃하기",
+            "category": "숙소",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "needsReservation": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
+            "comments": [],
+            "images": []
+          },
+          {
+            "id": 1785334250248,
+            "time": "12:00",
+            "name": "초당애순두부",
+            "address": "강원 강릉시 난설헌로 203-18 1층",
             "description": "",
             "category": "식사",
+            "estimatedCost": 35000,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 60,
             "comments": [],
             "images": [],
-            "duration": 60
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": "",
+            "costs": [
+              {
+                "id": "1785334250248_c0",
+                "title": "초당애순두부",
+                "amount": "35000",
+                "category": "식비",
+                "payer": "이현수"
+              }
+            ]
           },
           {
-            "id": 1784640645364,
-            "time": "10:00",
-            "name": "체크인/메이플비치 호텔",
-            "description": "",
-            "category": "숙소",
+            "id": 1786342462088,
+            "time": "13:30",
+            "name": "문막휴게소(인천방향)/휴",
+            "address": "강원 원주시 문막읍 개나루길 13",
+            "description": "간식 먹음 소세지",
+            "category": "관광",
+            "estimatedCost": 8600,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 20,
+            "costs": [
+              {
+                "id": 1786342441397.0916,
+                "title": "소세지",
+                "amount": "5300",
+                "category": "식비",
+                "payer": "이현수"
+              },
+              {
+                "id": 1786342453186.275,
+                "title": "커피",
+                "amount": "3300",
+                "category": "식비",
+                "payer": "이현수"
+              }
+            ],
             "comments": [],
             "images": [],
-            "duration": 60
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
           },
           {
-            "id": 1784709257059,
-            "time": "10:00",
-            "name": "강릉중앙시장",
-            "description": "",
-            "category": "쇼핑",
+            "id": 1786340218398,
+            "time": "15:40",
+            "name": "집으로돌아오는길",
+            "address": "",
+            "description": "톨비 발생",
+            "category": "이동",
+            "estimatedCost": 10500,
+            "currency": "KRW",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "이현수",
+            "duration": 120,
             "comments": [],
             "images": [],
-            "duration": 60
-          },
-          {
-            "id": 1784708395113,
-            "time": "10:00",
-            "name": "취침/메이플비치 호텔",
-            "description": "",
-            "category": "숙소",
-            "comments": [],
-            "images": [],
-            "duration": 60
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": "",
+            "costs": [
+              {
+                "id": "1786340218398_c0",
+                "title": "집으로돌아오는길",
+                "amount": 10500,
+                "category": "교통",
+                "payer": "이현수"
+              }
+            ]
           }
         ]
       }
     ],
-    "expenses": [],
-    "checklists": []
+    "expenses": [
+      {
+        "id": "1784643024218_c0",
+        "placeId": 1784643024218,
+        "title": "[일정] 다이소/용품구매 - 다이소",
+        "amount": 22000,
+        "originalAmount": 22000,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-28",
+        "category": "쇼핑"
+      },
+      {
+        "id": 1786341968051.5042,
+        "placeId": 1786341863258,
+        "title": "[일정] 우리집/출발 - 가는톨비",
+        "amount": 13000,
+        "originalAmount": 13000,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-28",
+        "category": "교통"
+      },
+      {
+        "id": 1786342011867.928,
+        "placeId": 1784670549338,
+        "title": "[일정] 여주휴게소 - 식사",
+        "amount": 19000,
+        "originalAmount": 19000,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-28",
+        "category": "식비"
+      },
+      {
+        "id": 1786342012113.1497,
+        "placeId": 1784670549338,
+        "title": "[일정] 여주휴게소 - 스티커",
+        "amount": 9600,
+        "originalAmount": 9600,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-28",
+        "category": "쇼핑"
+      },
+      {
+        "id": 1786342012349.2664,
+        "placeId": 1784670549338,
+        "title": "[일정] 여주휴게소 - 간식",
+        "amount": 3700,
+        "originalAmount": 3700,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-28",
+        "category": "식비"
+      },
+      {
+        "id": "1785070638630_c0",
+        "placeId": 1785070638630,
+        "title": "[일정] 연화마을 - 연화마을",
+        "amount": 48000,
+        "originalAmount": 48000,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-29",
+        "category": "식비"
+      },
+      {
+        "id": 1786342198297.1577,
+        "placeId": 1784708672730,
+        "title": "[일정] 조식/메이플비치 호텔 - 조식",
+        "amount": 46000,
+        "originalAmount": 46000,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-29",
+        "category": "식비"
+      },
+      {
+        "id": 1786342338702.25,
+        "placeId": 1785245686925,
+        "title": "[일정] 안인해수욕장 - 음료",
+        "amount": 5000,
+        "originalAmount": 5000,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-29",
+        "category": "식비"
+      },
+      {
+        "id": "1785334250248_c0",
+        "placeId": 1785334250248,
+        "title": "[일정] 초당애순두부 - 초당애순두부",
+        "amount": 35000,
+        "originalAmount": 35000,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-30",
+        "category": "식비"
+      },
+      {
+        "id": 1786342441397.0916,
+        "placeId": 1786342462088,
+        "title": "[일정] 문막휴게소(인천방향)/휴 - 소세지",
+        "amount": 5300,
+        "originalAmount": 5300,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-30",
+        "category": "식비"
+      },
+      {
+        "id": 1786342453186.275,
+        "placeId": 1786342462088,
+        "title": "[일정] 문막휴게소(인천방향)/휴 - 커피",
+        "amount": 3300,
+        "originalAmount": 3300,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-30",
+        "category": "식비"
+      },
+      {
+        "id": "1786340218398_c0",
+        "placeId": 1786340218398,
+        "title": "[일정] 집으로돌아오는길 - 집으로돌아오는길",
+        "amount": 10500,
+        "originalAmount": 10500,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-30",
+        "category": "교통"
+      },
+      {
+        "id": "1784640645364_c0",
+        "placeId": 1784640645364,
+        "title": "[일정] 체크인/메이플비치 호텔 - 체크인/메이플비치 호텔",
+        "amount": 515200,
+        "originalAmount": 515200,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-28",
+        "category": "숙박"
+      },
+      {
+        "id": 1786342231390.5625,
+        "placeId": 1785246141724,
+        "title": "[일정] 잠옷.기저귀.마트등 - 잠옷(탑텐)",
+        "amount": 25800,
+        "originalAmount": 25800,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-29",
+        "category": "쇼핑"
+      },
+      {
+        "id": 1786342247922.641,
+        "placeId": 1785246141724,
+        "title": "[일정] 잠옷.기저귀.마트등 - 스타벅스",
+        "amount": 8400,
+        "originalAmount": 8400,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-29",
+        "category": "식비"
+      },
+      {
+        "id": 1786342265558.3997,
+        "placeId": 1785246141724,
+        "title": "[일정] 잠옷.기저귀.마트등 - 주유",
+        "amount": 73000,
+        "originalAmount": 73000,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-29",
+        "category": "교통"
+      },
+      {
+        "id": 1786342920501.0745,
+        "placeId": 1785246141724,
+        "title": "[일정] 잠옷.기저귀.마트등 - 기저귀",
+        "amount": 28730,
+        "originalAmount": 28730,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-29",
+        "category": "쇼핑"
+      },
+      {
+        "id": 1786343031537.812,
+        "placeId": 1785246141724,
+        "title": "[일정] 잠옷.기저귀.마트등 - 저녁,아침",
+        "amount": 29900,
+        "originalAmount": 29900,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-29",
+        "category": "식비"
+      },
+      {
+        "id": 1786343139569.1882,
+        "placeId": 1784709257059,
+        "title": "[일정] 강릉중앙시장 - 박종주호빵",
+        "amount": 6000,
+        "originalAmount": 6000,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-28",
+        "category": "식비"
+      },
+      {
+        "id": 1786343156677.194,
+        "placeId": 1784709257059,
+        "title": "[일정] 강릉중앙시장 - 음료수",
+        "amount": 3500,
+        "originalAmount": 3500,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-28",
+        "category": "식비"
+      },
+      {
+        "id": 1786343177236.7688,
+        "placeId": 1784708395113,
+        "title": "[일정] 취침/메이플비치 호텔 - 맥주",
+        "amount": 3500,
+        "originalAmount": 3500,
+        "currency": "KRW",
+        "payer": "이현수",
+        "date": "2026-07-28",
+        "category": "식비"
+      }
+    ],
+    "savedPlaces": [
+      {
+        "id": "sp-1785066953371-225429464",
+        "name": "여주휴게소",
+        "category": "이동",
+        "address": "경기도 여주시 여주남로 722",
+        "description": "점심먹기",
+        "tip": "",
+        "url": "https://map.naver.com/p/search/%EA%B2%BD%EA%B8%B0%EB%8F%84%20%EC%97%AC%EC%A3%BC%EC%8B%9C%20%EC%97%AC%EC%A3%BC%EB%82%A8%EB%A1%9C%20722",
+        "lat": 37.2376594,
+        "lng": 127.56855
+      },
+      {
+        "id": "sp-1785066954829-119017070",
+        "name": "경포호/강문해수욕장",
+        "category": "관광",
+        "address": "강원특별자치도 강릉시 강문동 182-37",
+        "description": "",
+        "tip": "",
+        "url": "https://map.naver.com/p/search/%EA%B0%95%EC%9B%90%ED%8A%B9%EB%B3%84%EC%9E%90%EC%B9%98%EB%8F%84%20%EA%B0%95%EB%A6%89%EC%8B%9C%20%EA%B0%95%EB%AC%B8%EB%8F%99%20182-37",
+        "lat": 37.7915662,
+        "lng": 128.9190019
+      },
+      {
+        "id": "sp-1785066956137-166863567",
+        "name": "체크인/메이플비치 호텔",
+        "category": "숙소",
+        "address": "강원특별자치도 강릉시 강동면 염전길 255",
+        "description": "체크인, 2박 숙소",
+        "tip": "예약 완료, 수영장 무료, 조식 별도",
+        "url": "https://map.naver.com/p/search/%EA%B0%95%EC%9B%90%ED%8A%B9%EB%B3%84%EC%9E%90%EC%B9%98%EB%8F%84%20%EA%B0%95%EB%A6%89%EC%8B%9C%20%EA%B0%95%EB%8F%99%EB%A9%B4%20%EC%97%BC%EC%A0%84%EA%B8%B8%20255",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066957979-86867468",
+        "name": "강릉중앙시장",
+        "category": "관광",
+        "address": "강원 강릉시 금성로 21",
+        "description": "저녁을 먹던 여기서 사던 어쩌던",
+        "tip": "",
+        "url": "https://map.naver.com/p/search/%EA%B0%95%EC%9B%90%20%EA%B0%95%EB%A6%89%EC%8B%9C%20%EA%B8%88%EC%84%B1%EB%A1%9C%2021",
+        "lat": 37.7540488,
+        "lng": 128.8987017
+      },
+      {
+        "id": "sp-1785066959814-442358172",
+        "name": "정동진",
+        "category": "관광",
+        "address": "강원 강릉시 강동면 정동진리",
+        "description": "",
+        "tip": "",
+        "url": "https://map.naver.com/p/search/%EA%B0%95%EC%9B%90%20%EA%B0%95%EB%A6%89%EC%8B%9C%20%EA%B0%95%EB%8F%99%EB%A9%B4%20%EC%A0%95%EB%8F%99%EC%A7%84%EB%A6%AC",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785069766601-808494496",
+        "name": "천곡황금박쥐동굴",
+        "category": "관광",
+        "address": "강원 동해시 동굴로 50",
+        "description": "",
+        "tip": "",
+        "url": "https://map.naver.com/p/search/%EA%B0%95%EC%9B%90%20%EB%8F%99%ED%95%B4%EC%8B%9C%20%EB%8F%99%EA%B5%B4%EB%A1%9C%2050",
+        "lat": 37.5151017,
+        "lng": 129.1041214
+      },
+      {
+        "id": "sp-1785070435432-513290261",
+        "name": "강릉솔향수목원",
+        "category": "관광",
+        "address": "강원 강릉시 구정면 수목원길 156 강릉솔향수목원",
+        "description": "",
+        "tip": "",
+        "url": "https://map.naver.com/p/search/%EA%B0%95%EC%9B%90%20%EA%B0%95%EB%A6%89%EC%8B%9C%20%EA%B5%AC%EC%A0%95%EB%A9%B4%20%EC%88%98%EB%AA%A9%EC%9B%90%EA%B8%B8%20156%20%EA%B0%95%EB%A6%89%EC%86%94%ED%96%A5%EC%88%98%EB%AA%A9%EC%9B%90",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785070485589-124875115",
+        "name": "하슬라이머시브아트쇼",
+        "category": "관광",
+        "address": "강원특별자치도 강릉시 초당동 474",
+        "description": "https://blog.naver.com/raonism2019/224274116618",
+        "tip": "",
+        "url": "https://map.naver.com/p/search/%EA%B0%95%EC%9B%90%ED%8A%B9%EB%B3%84%EC%9E%90%EC%B9%98%EB%8F%84%20%EA%B0%95%EB%A6%89%EC%8B%9C%20%EC%B4%88%EB%8B%B9%EB%8F%99%20474",
+        "lat": 37.7975733,
+        "lng": 128.9286885
+      },
+      {
+        "id": "sp-1785072751634-429305247",
+        "name": "강릉초당두부정동진본점",
+        "category": "식사",
+        "address": "강원 강릉시 강동면 헌화로 1003 1층",
+        "description": "",
+        "tip": "",
+        "url": "https://map.naver.com/p/search/%EA%B0%95%EC%9B%90%20%EA%B0%95%EB%A6%89%EC%8B%9C%20%EA%B0%95%EB%8F%99%EB%A9%B4%20%ED%97%8C%ED%99%94%EB%A1%9C%201003%201%EC%B8%B5",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785072798944-177534504",
+        "name": "큰기와집",
+        "category": "식사",
+        "address": "강원 강릉시 강동면 정동등명길 3",
+        "description": "",
+        "tip": "",
+        "url": "https://map.naver.com/p/search/%EA%B0%95%EC%9B%90%20%EA%B0%95%EB%A6%89%EC%8B%9C%20%EA%B0%95%EB%8F%99%EB%A9%B4%20%EC%A0%95%EB%8F%99%EB%93%B1%EB%AA%85%EA%B8%B8%203",
+        "lat": null,
+        "lng": null
+      }
+    ]
   },
   {
     "id": 4,
