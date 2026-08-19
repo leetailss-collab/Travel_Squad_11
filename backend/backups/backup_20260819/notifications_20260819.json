@@ -1,0 +1,1828 @@
+[
+  {
+    "id": "notif-1786335516685-390106193",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786335516673",
+    "targetName": "김포공항/비행기이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '김포공항/비행기이륙'을(를) 추가했습니다.",
+    "createdAt": 1786335516675,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786335516685-390106193"
+  },
+  {
+    "id": "notif-1786335574301-80657029",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786335574290",
+    "targetName": "제주공항/비행기이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '제주공항/비행기이륙'을(를) 추가했습니다.",
+    "createdAt": 1786335574291,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786335574301-80657029"
+  },
+  {
+    "id": "notif-1786335626947-204025206",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786335626934",
+    "targetName": "김포공항/비행기착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '김포공항/비행기착륙'을(를) 추가했습니다.",
+    "createdAt": 1786335626935,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786335626947-204025206"
+  },
+  {
+    "id": "notif-1786336808891-54304110",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786336808880",
+    "targetName": "제주공항/비행기착",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '제주공항/비행기착'을(를) 추가했습니다.",
+    "createdAt": 1786336808881,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786336808891-54304110"
+  },
+  {
+    "id": "notif-1786336821956-128602317",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786335516673",
+    "targetName": "김포공항/비행기이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항/비행기이륙'을(를) 수정했습니다.",
+    "createdAt": 1786336821944,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786336821956-128602317"
+  },
+  {
+    "id": "notif-1786336830923-63687763",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786335574290",
+    "targetName": "제주공항/비행기이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '제주공항/비행기이륙'을(를) 수정했습니다.",
+    "createdAt": 1786336830911,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786336830923-63687763"
+  },
+  {
+    "id": "notif-1786337071183-288204912",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786335516673",
+    "targetName": "김포공항/비행기이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항/비행기이륙'을(를) 수정했습니다.",
+    "createdAt": 1786337071173,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786337071183-288204912"
+  },
+  {
+    "id": "notif-1786337090052-154121281",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786335574290",
+    "targetName": "제주공항/비행기이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '제주공항/비행기이륙'을(를) 수정했습니다.",
+    "createdAt": 1786337090043,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786337090052-154121281"
+  },
+  {
+    "id": "notif-1786337110734-957548486",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786336808880",
+    "targetName": "제주공항/비행기착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '제주공항/비행기착륙'을(를) 수정했습니다.",
+    "createdAt": 1786337110722,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786337110734-957548486"
+  },
+  {
+    "id": "notif-1786337228252-254039263",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786337228241",
+    "targetName": "김포공항/체크인",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '김포공항/체크인'을(를) 추가했습니다.",
+    "createdAt": 1786337228242,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786337228252-254039263"
+  },
+  {
+    "id": "notif-1786337405829-865794346",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786337405819",
+    "targetName": "김포공항주차타워",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '김포공항주차타워'을(를) 추가했습니다.",
+    "createdAt": 1786337405819,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786337405829-865794346"
+  },
+  {
+    "id": "notif-1786337415636-652658615",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786337405819",
+    "targetName": "김포공항주차타워",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항주차타워'을(를) 수정했습니다.",
+    "createdAt": 1786337415624,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786337415636-652658615"
+  },
+  {
+    "id": "notif-1786337556726-44052083",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786337405819",
+    "targetName": "김포공항주차타워",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항주차타워'을(를) 수정했습니다.",
+    "createdAt": 1786337556715,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786337556726-44052083"
+  },
+  {
+    "id": "notif-1786337658638-786337878",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786337658628",
+    "targetName": "우리집/출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '우리집/출발'을(를) 추가했습니다.",
+    "createdAt": 1786337658629,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786337658638-786337878"
+  },
+  {
+    "id": "notif-1786337667143-810587746",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786337658628",
+    "targetName": "우리집/출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '우리집/출발'을(를) 수정했습니다.",
+    "createdAt": 1786337667133,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786337667143-810587746"
+  },
+  {
+    "id": "notif-1786337680901-918057737",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786337658628",
+    "targetName": "우리집/출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '우리집/출발'을(를) 수정했습니다.",
+    "createdAt": 1786337680889,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786337680901-918057737"
+  },
+  {
+    "id": "notif-1786338920427-391789071",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786337658628",
+    "targetName": "우리집/출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '우리집/출발'을(를) 수정했습니다.",
+    "createdAt": 1786338920415,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786338920427-391789071"
+  },
+  {
+    "id": "notif-1786338992473-596688800",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786335626934",
+    "targetName": "김포공항/비행기착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항/비행기착륙'을(를) 수정했습니다.",
+    "createdAt": 1786338992460,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786338992473-596688800"
+  },
+  {
+    "id": "notif-1786339168077-212608020",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786339168067",
+    "targetName": "김포공항주차장/집으로 출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '김포공항주차장/집으로 출발'을(를) 추가했습니다.",
+    "createdAt": 1786339168069,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339168077-212608020"
+  },
+  {
+    "id": "notif-1786339180150-775978460",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786339168067",
+    "targetName": "김포공항주차장/집으로 출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항주차장/집으로 출발'을(를) 수정했습니다.",
+    "createdAt": 1786339180138,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339180150-775978460"
+  },
+  {
+    "id": "notif-1786339191840-307371167",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786339168067",
+    "targetName": "김포공항주차장/집으로 출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항주차장/집으로 출발'을(를) 수정했습니다.",
+    "createdAt": 1786339191831,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339191840-307371167"
+  },
+  {
+    "id": "notif-1786339330468-24594747",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786339168067",
+    "targetName": "김포공항주차장/집으로 출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항주차장/집으로 출발'을(를) 수정했습니다.",
+    "createdAt": 1786339330458,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339330468-24594747"
+  },
+  {
+    "id": "notif-1786339337125-374552854",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786339168067",
+    "targetName": "김포공항주차장/집으로 출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항주차장/집으로 출발'을(를) 수정했습니다.",
+    "createdAt": 1786339337115,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339337125-374552854"
+  },
+  {
+    "id": "notif-1786339383308-278659234",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786339383293",
+    "targetName": "우리집/도착",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '우리집/도착'을(를) 추가했습니다.",
+    "createdAt": 1786339383295,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339383308-278659234"
+  },
+  {
+    "id": "notif-1786339393997-106858807",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786335626934",
+    "targetName": "김포공항/비행기착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항/비행기착륙'을(를) 수정했습니다.",
+    "createdAt": 1786339393987,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339393997-106858807"
+  },
+  {
+    "id": "notif-1786339455167-636191759",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786339455155",
+    "targetName": "김포공항/저녁식사",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '김포공항/저녁식사'을(를) 추가했습니다.",
+    "createdAt": 1786339455157,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339455167-636191759"
+  },
+  {
+    "id": "notif-1786339466645-143958920",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786335626934",
+    "targetName": "김포공항/비행기착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항/비행기착륙'을(를) 수정했습니다.",
+    "createdAt": 1786339466636,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339466645-143958920"
+  },
+  {
+    "id": "notif-1786339482416-346386788",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786335626934",
+    "targetName": "김포공항/비행기착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항/비행기착륙'을(를) 수정했습니다.",
+    "createdAt": 1786339482405,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339482416-346386788"
+  },
+  {
+    "id": "notif-1786339498058-21896183",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786339455155",
+    "targetName": "김포공항/저녁식사",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항/저녁식사'을(를) 수정했습니다.",
+    "createdAt": 1786339498047,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339498058-21896183"
+  },
+  {
+    "id": "notif-1786339571560-816769867",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786339571544",
+    "targetName": "김포공항/간단하게 군것질",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '김포공항/간단하게 군것질'을(를) 추가했습니다.",
+    "createdAt": 1786339571546,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339571560-816769867"
+  },
+  {
+    "id": "notif-1786339626801-214246399",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786337228241",
+    "targetName": "김포공항/체크인",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항/체크인'을(를) 수정했습니다.",
+    "createdAt": 1786339626792,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339626801-214246399"
+  },
+  {
+    "id": "notif-1786339643943-607136389",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786339571544",
+    "targetName": "김포공항/간단하게 군것질",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항/간단하게 군것질'을(를) 수정했습니다.",
+    "createdAt": 1786339643930,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339643943-607136389"
+  },
+  {
+    "id": "notif-1786339654748-761010096",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786335516673",
+    "targetName": "김포공항/비행기이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항/비행기이륙'을(를) 수정했습니다.",
+    "createdAt": 1786339654735,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339654748-761010096"
+  },
+  {
+    "id": "notif-1786339682037-240079828",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786336808880",
+    "targetName": "제주공항/비행기착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '제주공항/비행기착륙'을(를) 수정했습니다.",
+    "createdAt": 1786339682027,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786339682037-240079828"
+  },
+  {
+    "id": "notif-1786340144810-427418016",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784643024218",
+    "targetName": "우리집/출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '우리집/출발'을(를) 수정했습니다.",
+    "createdAt": 1786340144797,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786340144810-427418016"
+  },
+  {
+    "id": "notif-1786340218411-194821205",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786340218398",
+    "targetName": "집으로돌아오는길",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '집으로돌아오는길'을(를) 추가했습니다.",
+    "createdAt": 1786340218400,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786340218411-194821205"
+  },
+  {
+    "id": "notif-1786340230629-86516080",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786340218398",
+    "targetName": "집으로돌아오는길",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '집으로돌아오는길'을(를) 수정했습니다.",
+    "createdAt": 1786340230616,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786340230629-86516080"
+  },
+  {
+    "id": "notif-1786341468580-988304061",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786335516673",
+    "targetName": "김포공항/비행기이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항/비행기이륙'을(를) 수정했습니다.",
+    "createdAt": 1786341468568,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786341468580-988304061"
+  },
+  {
+    "id": "notif-1786341487285-716151309",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786335574290",
+    "targetName": "제주공항/비행기이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '제주공항/비행기이륙'을(를) 수정했습니다.",
+    "createdAt": 1786341487271,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786341487285-716151309"
+  },
+  {
+    "id": "notif-1786341709323-155157301",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784643024218",
+    "targetName": "우리집/출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '우리집/출발'을(를) 수정했습니다.",
+    "createdAt": 1786341709311,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786341709323-155157301"
+  },
+  {
+    "id": "notif-1786341813130-956151159",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784643024218",
+    "targetName": "다이소/용품구",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '다이소/용품구'을(를) 수정했습니다.",
+    "createdAt": 1786341813121,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786341813130-956151159"
+  },
+  {
+    "id": "notif-1786341863275-540390837",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786341863258",
+    "targetName": "우리집/출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '우리집/출발'을(를) 추가했습니다.",
+    "createdAt": 1786341863260,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786341863275-540390837"
+  },
+  {
+    "id": "notif-1786341885565-509079072",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784643024218",
+    "targetName": "다이소/용품구매",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '다이소/용품구매'을(를) 수정했습니다.",
+    "createdAt": 1786341885552,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786341885565-509079072"
+  },
+  {
+    "id": "notif-1786341982808-276393228",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786341863258",
+    "targetName": "우리집/출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '우리집/출발'을(를) 수정했습니다.",
+    "createdAt": 1786341982796,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786341982808-276393228"
+  },
+  {
+    "id": "notif-1786342050049-147079224",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784670549338",
+    "targetName": "여주휴게소",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '여주휴게소'을(를) 수정했습니다.",
+    "createdAt": 1786342050037,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786342050049-147079224"
+  },
+  {
+    "id": "notif-1786342117730-526197395",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1785070638630",
+    "targetName": "연화마을",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '연화마을'을(를) 수정했습니다.",
+    "createdAt": 1786342117719,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786342117730-526197395"
+  },
+  {
+    "id": "notif-1786342208956-386024589",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784708672730",
+    "targetName": "조식/메이플비치 호텔",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '조식/메이플비치 호텔'을(를) 수정했습니다.",
+    "createdAt": 1786342208944,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786342208956-386024589"
+  },
+  {
+    "id": "notif-1786342294657-370879751",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1785246141724",
+    "targetName": "잠옷.기저귀.마트등",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '잠옷.기저귀.마트등'을(를) 수정했습니다.",
+    "createdAt": 1786342294645,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786342294657-370879751"
+  },
+  {
+    "id": "notif-1786342346304-203878693",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1785245686925",
+    "targetName": "안인해수욕장",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '안인해수욕장'을(를) 수정했습니다.",
+    "createdAt": 1786342346290,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786342346304-203878693"
+  },
+  {
+    "id": "notif-1786342378014-137053455",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1785334250248",
+    "targetName": "초당애순두부",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '초당애순두부'을(를) 수정했습니다.",
+    "createdAt": 1786342378000,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786342378014-137053455"
+  },
+  {
+    "id": "notif-1786342462100-356571397",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786342462088",
+    "targetName": "문막휴게소(인천방향)/휴",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '문막휴게소(인천방향)/휴'을(를) 추가했습니다.",
+    "createdAt": 1786342462090,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786342462100-356571397"
+  },
+  {
+    "id": "notif-1786342524548-893300222",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786340218398",
+    "targetName": "집으로돌아오는길",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '집으로돌아오는길'을(를) 수정했습니다.",
+    "createdAt": 1786342524536,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786342524548-893300222"
+  },
+  {
+    "id": "notif-1786342710607-416836023",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784640645364",
+    "targetName": "체크인/메이플비치 호텔",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '체크인/메이플비치 호텔'을(를) 수정했습니다.",
+    "createdAt": 1786342710597,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786342710607-416836023"
+  },
+  {
+    "id": "notif-1786343075411-838439056",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1785246141724",
+    "targetName": "잠옷.기저귀.마트등",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '잠옷.기저귀.마트등'을(를) 수정했습니다.",
+    "createdAt": 1786343075400,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786343075411-838439056"
+  },
+  {
+    "id": "notif-1786343169557-3997316",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784709257059",
+    "targetName": "강릉중앙시장",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '강릉중앙시장'을(를) 수정했습니다.",
+    "createdAt": 1786343169545,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786343169557-3997316"
+  },
+  {
+    "id": "notif-1786343193741-585259354",
+    "planId": 3,
+    "planTitle": "토끼부부 가족 강릉 여름휴가",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784708395113",
+    "targetName": "취침/메이플비치 호텔",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '취침/메이플비치 호텔'을(를) 수정했습니다.",
+    "createdAt": 1786343193730,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786343193741-585259354"
+  },
+  {
+    "id": "notif-1786348300253-359728148",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4001",
+    "targetName": "집 출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '집 출발'을(를) 수정했습니다.",
+    "createdAt": 1786348298327,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786348300253-359728148"
+  },
+  {
+    "id": "notif-1786348315492-144763713",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4001",
+    "targetName": "집 출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '집 출발'을(를) 수정했습니다.",
+    "createdAt": 1786348315152,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786348315492-144763713"
+  },
+  {
+    "id": "notif-1786348329518-443676696",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784893967240",
+    "targetName": "인천국제공항 제2여객터미널 예약주차장",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천국제공항 제2여객터미널 예약주차장'을(를) 수정했습니다.",
+    "createdAt": 1786348329346,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786348329518-443676696"
+  },
+  {
+    "id": "notif-1786348594749-935721805",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4002",
+    "targetName": "인천공항/출국심사/이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항/출국심사/이륙'을(를) 수정했습니다.",
+    "createdAt": 1786348593462,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786348594749-935721805"
+  },
+  {
+    "id": "notif-1786348644252-535438657",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4002",
+    "targetName": "인천공항/출국심사/이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항/출국심사/이륙'을(를) 수정했습니다.",
+    "createdAt": 1786348643882,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786348644252-535438657"
+  },
+  {
+    "id": "notif-1786348662756-457611741",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4002",
+    "targetName": "인천공항/출국심사/이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항/출국심사/이륙'을(를) 수정했습니다.",
+    "createdAt": 1786348662351,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786348662756-457611741"
+  },
+  {
+    "id": "notif-1786348677493-434917045",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784894204161",
+    "targetName": "인천공항/출국심사",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항/출국심사'을(를) 수정했습니다.",
+    "createdAt": 1786348676700,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786348677493-434917045"
+  },
+  {
+    "id": "notif-1786348699994-945830164",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4002",
+    "targetName": "인천공항/출국심사/이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항/출국심사/이륙'을(를) 수정했습니다.",
+    "createdAt": 1786348699598,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786348699994-945830164"
+  },
+  {
+    "id": "notif-1786348763747-888781444",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4002",
+    "targetName": "인천공항/출국심사/이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항/출국심사/이륙'을(를) 수정했습니다.",
+    "createdAt": 1786348763395,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786348763747-888781444"
+  },
+  {
+    "id": "notif-1786349263744-873538459",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4007",
+    "targetName": "호텔 체크인/토부호텔 레반트 도쿄",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '호텔 체크인/토부호텔 레반트 도쿄'을(를) 수정했습니다.",
+    "createdAt": 1786349263383,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786349263744-873538459"
+  },
+  {
+    "id": "notif-1786407776758-866186437",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4003",
+    "targetName": "나리타공항 착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '나리타공항 착륙'을(를) 수정했습니다.",
+    "createdAt": 1786407776373,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786407776758-866186437"
+  },
+  {
+    "id": "notif-1786408482243-538461276",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4035",
+    "targetName": "나리타공항 이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '나리타공항 이륙'을(를) 수정했습니다.",
+    "createdAt": 1786408481204,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786408482243-538461276"
+  },
+  {
+    "id": "notif-1786408504251-406973708",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4034",
+    "targetName": "저녁 - 나리타 카와토요",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '저녁 - 나리타 카와토요'을(를) 수정했습니다.",
+    "createdAt": 1786408503772,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786408504251-406973708"
+  },
+  {
+    "id": "notif-1786408515515-719743182",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4035",
+    "targetName": "나리타공항 이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '나리타공항 이륙'을(를) 수정했습니다.",
+    "createdAt": 1786408514663,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786408515515-719743182"
+  },
+  {
+    "id": "notif-1786408554500-377006090",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786408554046",
+    "targetName": "인천공항/착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '인천공항/착륙'을(를) 추가했습니다.",
+    "createdAt": 1786408554051,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786408554500-377006090"
+  },
+  {
+    "id": "notif-1786409022000-613298659",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_add",
+    "targetId": "1786409021645",
+    "targetName": "인천공항 제2터미널 주차장/집으로",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]에 '인천공항 제2터미널 주차장/집으로'을(를) 추가했습니다.",
+    "createdAt": 1786409021649,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786409022000-613298659"
+  },
+  {
+    "id": "notif-1786409037500-817581534",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786409021645",
+    "targetName": "인천공항 제2터미널 주차장/집으로",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항 제2터미널 주차장/집으로'을(를) 수정했습니다.",
+    "createdAt": 1786409037121,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786409037500-817581534"
+  },
+  {
+    "id": "notif-1786409049009-78228849",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786409021645",
+    "targetName": "인천공항 제2터미널 주차장/집으로",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항 제2터미널 주차장/집으로'을(를) 수정했습니다.",
+    "createdAt": 1786409048206,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786409049009-78228849"
+  },
+  {
+    "id": "notif-1786409062493-398536372",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786409021645",
+    "targetName": "인천공항 제2터미널 주차장/집으로",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항 제2터미널 주차장/집으로'을(를) 수정했습니다.",
+    "createdAt": 1786409062074,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786409062493-398536372"
+  },
+  {
+    "id": "notif-1786409120995-865129027",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4036",
+    "targetName": "인천공항 착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항 착륙'을(를) 수정했습니다.",
+    "createdAt": 1786409120620,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786409120995-865129027"
+  },
+  {
+    "id": "notif-1786409147244-974509575",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786409021645",
+    "targetName": "인천공항 제2터미널 주차장/집으로",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항 제2터미널 주차장/집으로'을(를) 수정했습니다.",
+    "createdAt": 1786409146763,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786409147244-974509575"
+  },
+  {
+    "id": "notif-1786409291998-414150081",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784893967240",
+    "targetName": "인천국제공항 제2여객터미널 예약주차장",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천국제공항 제2여객터미널 예약주차장'을(를) 수정했습니다.",
+    "createdAt": 1786409291432,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786409291998-414150081"
+  },
+  {
+    "id": "notif-1786409612998-480524362",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4001",
+    "targetName": "집 출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '집 출발'을(를) 수정했습니다.",
+    "createdAt": 1786409612632,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786409612998-480524362"
+  },
+  {
+    "id": "notif-1786409621748-778646276",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4001",
+    "targetName": "집 출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '집 출발'을(를) 수정했습니다.",
+    "createdAt": 1786409621315,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786409621748-778646276"
+  },
+  {
+    "id": "notif-1786409631498-784405124",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784893967240",
+    "targetName": "인천국제공항 제2여객터미널 예약주차장",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천국제공항 제2여객터미널 예약주차장'을(를) 수정했습니다.",
+    "createdAt": 1786409630956,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786409631498-784405124"
+  },
+  {
+    "id": "notif-1786409941500-236362522",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4003",
+    "targetName": "나리타공항 착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '나리타공항 착륙'을(를) 수정했습니다.",
+    "createdAt": 1786409940911,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786409941500-236362522"
+  },
+  {
+    "id": "notif-1786409993493-951905307",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4003",
+    "targetName": "나리타공항 착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '나리타공항 착륙'을(를) 수정했습니다.",
+    "createdAt": 1786409993028,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786409993493-951905307"
+  },
+  {
+    "id": "notif-1786410820495-140159424",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4004",
+    "targetName": "나리타공항/호텔로 이동",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '나리타공항/호텔로 이동'을(를) 수정했습니다.",
+    "createdAt": 1786410819906,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786410820495-140159424"
+  },
+  {
+    "id": "notif-1786410844748-363074522",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4004",
+    "targetName": "나리타공항/호텔로 이동",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '나리타공항/호텔로 이동'을(를) 수정했습니다.",
+    "createdAt": 1786410843855,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786410844748-363074522"
+  },
+  {
+    "id": "notif-1786411787003-24316433",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4003",
+    "targetName": "나리타공항/착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '나리타공항/착륙'을(를) 수정했습니다.",
+    "createdAt": 1786411786509,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786411787003-24316433"
+  },
+  {
+    "id": "notif-1786411810492-829228240",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4002",
+    "targetName": "인천공항/출국심사/이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항/출국심사/이륙'을(를) 수정했습니다.",
+    "createdAt": 1786411810073,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786411810492-829228240"
+  },
+  {
+    "id": "notif-1786411817498-443936380",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1784894204161",
+    "targetName": "인천공항/출국심사",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항/출국심사'을(를) 수정했습니다.",
+    "createdAt": 1786411817326,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786411817498-443936380"
+  },
+  {
+    "id": "notif-1786411822006-987915570",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4002",
+    "targetName": "인천공항/출국심사/이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항/출국심사/이륙'을(를) 수정했습니다.",
+    "createdAt": 1786411821898,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786411822006-987915570"
+  },
+  {
+    "id": "notif-1786411842243-956596013",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4002",
+    "targetName": "인천공항/출국심사/이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항/출국심사/이륙'을(를) 수정했습니다.",
+    "createdAt": 1786411841640,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786411842243-956596013"
+  },
+  {
+    "id": "notif-1786411851748-62357607",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4002",
+    "targetName": "인천공항/출국심사/이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항/출국심사/이륙'을(를) 수정했습니다.",
+    "createdAt": 1786411851252,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786411851748-62357607"
+  },
+  {
+    "id": "notif-1786411964507-763190833",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4004",
+    "targetName": "나리타공항/호텔로 이동",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '나리타공항/호텔로 이동'을(를) 수정했습니다.",
+    "createdAt": 1786411964032,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786411964507-763190833"
+  },
+  {
+    "id": "notif-1786411993745-122676044",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4005",
+    "targetName": "짐맡기기/토부호텔 레반트 도쿄",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '짐맡기기/토부호텔 레반트 도쿄'을(를) 수정했습니다.",
+    "createdAt": 1786411993293,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786411993745-122676044"
+  },
+  {
+    "id": "notif-1786412008504-127186903",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4005",
+    "targetName": "토부호텔 레반트 도쿄/짐맡기기",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '토부호텔 레반트 도쿄/짐맡기기'을(를) 수정했습니다.",
+    "createdAt": 1786412008060,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786412008504-127186903"
+  },
+  {
+    "id": "notif-1786420812759-909658459",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4005",
+    "targetName": "토부호텔 레반트 도쿄/짐맡기기",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '토부호텔 레반트 도쿄/짐맡기기'을(를) 수정했습니다.",
+    "createdAt": 1786420812086,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786420812759-909658459"
+  },
+  {
+    "id": "notif-1786423819567-722572959",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4006",
+    "targetName": "점심식사(장소미정)",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '점심식사(장소미정)'을(를) 수정했습니다.",
+    "createdAt": 1786423819373,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786423819567-722572959"
+  },
+  {
+    "id": "notif-1786423861556-853270371",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4006",
+    "targetName": "점심식사(장소미정/후보지3)",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '점심식사(장소미정/후보지3)'을(를) 수정했습니다.",
+    "createdAt": 1786423861543,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786423861556-853270371"
+  },
+  {
+    "id": "notif-1786423907027-419290080",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4007",
+    "targetName": "토부호텔 레반트 도쿄/호텔 체크인",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '토부호텔 레반트 도쿄/호텔 체크인'을(를) 수정했습니다.",
+    "createdAt": 1786423907016,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786423907027-419290080"
+  },
+  {
+    "id": "notif-1786449516288-219375239",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이정우",
+    "type": "expense_add",
+    "targetId": "1786449515623",
+    "targetName": "항공권 성인8명",
+    "tab": "expense",
+    "message": "이정우님이 [경비]에 '항공권 성인8명' 내역을 추가했습니다.",
+    "createdAt": 1786449515627,
+    "readBy": [
+      "이정우",
+      "이현수"
+    ],
+    "_id": "notif-1786449516288-219375239"
+  },
+  {
+    "id": "notif-1786449565495-700322498",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이정우",
+    "type": "expense_add",
+    "targetId": "1786449564885",
+    "targetName": "항공권 소아3명",
+    "tab": "expense",
+    "message": "이정우님이 [경비]에 '항공권 소아3명' 내역을 추가했습니다.",
+    "createdAt": 1786449564889,
+    "readBy": [
+      "이정우",
+      "이현수"
+    ],
+    "_id": "notif-1786449565495-700322498"
+  },
+  {
+    "id": "notif-1786491166992-788498468",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4002",
+    "targetName": "인천공항/출국심사/이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항/출국심사/이륙'을(를) 수정했습니다.",
+    "createdAt": 1786491165988,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786491166992-788498468"
+  },
+  {
+    "id": "notif-1786597457553-684430227",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4036",
+    "targetName": "인천공항 착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항 착륙'을(를) 수정했습니다.",
+    "createdAt": 1786597456493,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786597457553-684430227"
+  },
+  {
+    "id": "notif-1786597468555-353777443",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4036",
+    "targetName": "인천공항 착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항 착륙'을(를) 수정했습니다.",
+    "createdAt": 1786597467916,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786597468555-353777443"
+  },
+  {
+    "id": "notif-1786597485300-461616192",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4035",
+    "targetName": "나리타공항 이륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '나리타공항 이륙'을(를) 수정했습니다.",
+    "createdAt": 1786597484615,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786597485300-461616192"
+  },
+  {
+    "id": "notif-1786597504057-681016152",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4036",
+    "targetName": "인천공항 착륙",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '인천공항 착륙'을(를) 수정했습니다.",
+    "createdAt": 1786597503332,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786597504057-681016152"
+  },
+  {
+    "id": "notif-1786668489959-515994859",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4006",
+    "targetName": "점심식사(장소미정/후보지3)",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '점심식사(장소미정/후보지3)'을(를) 수정했습니다.",
+    "createdAt": 1786668489942,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786668489959-515994859"
+  },
+  {
+    "id": "notif-1786673074155-541635225",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4005",
+    "targetName": "토부호텔 레반트 도쿄/짐맡기기",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '토부호텔 레반트 도쿄/짐맡기기'을(를) 수정했습니다.",
+    "createdAt": 1786673074141,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786673074155-541635225"
+  },
+  {
+    "id": "notif-1786673137439-322488701",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4006",
+    "targetName": "점심식사(장소미정/후보지3)",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '점심식사(장소미정/후보지3)'을(를) 수정했습니다.",
+    "createdAt": 1786673137424,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786673137439-322488701"
+  },
+  {
+    "id": "notif-1786673144039-774048004",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4007",
+    "targetName": "토부호텔 레반트 도쿄/호텔 체크인",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '토부호텔 레반트 도쿄/호텔 체크인'을(를) 수정했습니다.",
+    "createdAt": 1786673144027,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786673144039-774048004"
+  },
+  {
+    "id": "notif-1786673216621-316446697",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4004",
+    "targetName": "나리타공항/호텔로 이동",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '나리타공항/호텔로 이동'을(를) 수정했습니다.",
+    "createdAt": 1786673216609,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786673216621-316446697"
+  },
+  {
+    "id": "notif-1786673284024-111072146",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "comment_add",
+    "targetId": "4006",
+    "targetName": "점심식사(장소미정/후보지3)",
+    "tab": "itinerary",
+    "message": "이현수님이 '점심식사(장소미정/후보지3)'에 댓글을 남겼습니다.",
+    "createdAt": 1786673284010,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786673284024-111072146"
+  },
+  {
+    "id": "notif-1786673457898-439531097",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4008",
+    "targetName": "아사쿠사 센소지",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '아사쿠사 센소지'을(를) 수정했습니다.",
+    "createdAt": 1786673457882,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786673457898-439531097"
+  },
+  {
+    "id": "notif-1786674461737-375420263",
+    "planId": 4,
+    "planTitle": "일본 도쿄 가족여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "4001",
+    "targetName": "집 출발",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '집 출발'을(를) 수정했습니다.",
+    "createdAt": 1786674461710,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786674461737-375420263"
+  },
+  {
+    "id": "notif-1786747926146-258997545",
+    "planId": 7,
+    "planTitle": "추석 제주도여행",
+    "actor": "이현수",
+    "type": "place_edit",
+    "targetId": "1786337405819",
+    "targetName": "김포공항주차타워",
+    "tab": "itinerary",
+    "message": "이현수님이 [일정]의 '김포공항주차타워'을(를) 수정했습니다.",
+    "createdAt": 1786747924954,
+    "readBy": [
+      "이현수"
+    ],
+    "_id": "notif-1786747926146-258997545"
+  }
+]
