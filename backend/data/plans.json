@@ -1013,8 +1013,6 @@
   {
     "id": 4,
     "title": "일본 도쿄 가족여행",
-    "startDate": "2026-09-18",
-    "endDate": "2026-09-21",
     "members": [
       "이현수",
       "양슬기",
@@ -1030,542 +1028,28 @@
     ],
     "manager": "이현수",
     "currency": "JPY",
+    "isEvent": false,
+    "endDate": "2026-10-18",
+    "startDate": "2026-10-15",
     "accommodation": {
       "name": "토부호텔 레반트 도쿄",
-      "location": "긴시초역",
-      "highlight": "스카이트리 전망뷰"
+      "highlight": "긴시초역, 스카이트리 전망뷰",
+      "location": "1 Chome-2-2 Kinshi, Sumida City, Tokyo 130-0013 일본"
     },
-    "transportation": [
-      {
-        "type": "리무진 버스",
-        "route": "나리타공항 ↔ 숙소",
-        "cost": 1500,
-        "currency": "JPY"
-      },
-      {
-        "type": "도쿄 메트로 72시간 패스",
-        "cost": 13900,
-        "currency": "KRW",
-        "note": "지하철 위주 동선, 주요역 무인발권기에서 QR코드 스캔"
-      }
-    ],
-    "itinerary": [
-      {
-        "day": 1,
-        "date": "2026-09-18",
-        "title": "출국, 전통과 현대",
-        "places": [
-          {
-            "id": 4001,
-            "time": "05:00",
-            "name": "집 출발",
-            "description": "출국심사",
-            "category": "이동",
-            "comments": [],
-            "duration": 165,
-            "images": []
-          },
-          {
-            "id": 4002,
-            "time": "07:45",
-            "name": "인천공항/출국심사/이륙",
-            "description": "나리타행 출발",
-            "category": "이동",
-            "comments": [],
-            "duration": 185,
-            "images": []
-          },
-          {
-            "id": 4003,
-            "time": "10:50",
-            "name": "나리타공항/착륙",
-            "description": "입국심사",
-            "category": "이동",
-            "comments": [],
-            "duration": 40,
-            "images": []
-          },
-          {
-            "id": 4004,
-            "time": "11:30",
-            "name": "나리타공항/호텔로 이동",
-            "description": "공항에서 구입(신용카드 가능)",
-            "category": "이동",
-            "estimatedCost": 1500,
-            "currency": "JPY",
-            "comments": [],
-            "duration": 90,
-            "images": []
-          },
-          {
-            "id": 4005,
-            "time": "13:00",
-            "name": "토부호텔 레반트 도쿄/짐맡기기",
-            "description": "토부호텔 레반트 도쿄, 짐 맡기기",
-            "category": "숙소",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          },
-          {
-            "id": 4006,
-            "time": "14:00",
-            "name": "점심식사(장소미정/후보지3)",
-            "description": "오마카세 런치 (우니 추가)",
-            "category": "식사",
-            "estimatedCost": 3500,
-            "currency": "JPY",
-            "tip": "시겐 카이센동 2600엔도 추천. 츠키지 시장 구경(도둑 조심). 터렛커피 라떼맛집",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          },
-          {
-            "id": 4007,
-            "time": "15:00",
-            "name": "토부호텔 레반트 도쿄/호텔 체크인",
-            "description": "토부호텔 레반트 도쿄",
-            "category": "숙소",
-            "comments": [],
-            "duration": 10,
-            "images": []
-          },
-          {
-            "id": 4008,
-            "time": "15:10",
-            "name": "아사쿠사 센소지",
-            "description": "도쿄에서 가장 오래된 절. 규모, 볼거리, 먹거리 풍성",
-            "category": "관광",
-            "tip": "지하철 이동 30분",
-            "comments": [],
-            "duration": 50,
-            "images": []
-          },
-          {
-            "id": 4009,
-            "time": "16:00",
-            "name": "나카미세도리 거리",
-            "description": "가장 오래된 상점가. 아사히 스카이룸 옥상에 황금 거품",
-            "category": "관광",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          },
-          {
-            "id": 4010,
-            "time": "17:00",
-            "name": "도쿄 스카이트리 전망대",
-            "description": "전망대 예약은 온라인 구매가 저렴. 해질 무렵 올라가면 낮과 야경 동시 감상",
-            "category": "관광",
-            "needsReservation": true,
-            "comments": [],
-            "duration": 120,
-            "images": [
-              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784777630704-140100111-1000009251.jpg"
-            ]
-          },
-          {
-            "id": 4011,
-            "time": "19:00",
-            "name": "저녁 - 츠키시마 몬자 타마토야",
-            "description": "명란+떡+치즈 몬자(멘타이모치치즈) 추천, 2명 5000엔 정도",
-            "category": "식사",
-            "estimatedCost": 5000,
-            "currency": "JPY",
-            "tip": "몬자거리 산책도 함께 추천",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          },
-          {
-            "id": 4012,
-            "time": "20:00",
-            "name": "긴자 쇼핑",
-            "description": "마츠야 백화점(디올,화장품), HOKA매장, OK긴자(다이소,GU,유니클로), MUJI, LOFT, ABC마트, 세리아, 긴자식스",
-            "category": "쇼핑",
-            "tip": "게스트카드 발급 가능. 라이프베케이션에서 일본 사케·위스키 구입",
-            "comments": [],
-            "duration": 120,
-            "images": []
-          },
-          {
-            "id": 4013,
-            "time": "22:00",
-            "name": "야식 - 아부라소바 긴자구미",
-            "description": "마제소바·아부라소바. 면사리 추가 약 340엔",
-            "category": "식사",
-            "estimatedCost": 1000,
-            "currency": "JPY",
-            "tip": "새벽 4시까지 영업",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          },
-          {
-            "id": 1784893967240,
-            "time": "06:00",
-            "name": "인천국제공항 제2여객터미널 예약주차장",
-            "description": "",
-            "category": "이동",
-            "comments": [],
-            "images": []
-          },
-          {
-            "id": 1784894204161,
-            "time": "06:00",
-            "name": "인천공항/출국심사",
-            "description": "",
-            "category": "이동",
-            "comments": [],
-            "images": []
-          },
-          {
-            "id": 1786408554046,
-            "time": "06:00",
-            "name": "인천공항/착륙",
-            "description": "",
-            "category": "이동",
-            "comments": [],
-            "images": []
-          },
-          {
-            "id": 1786409021645,
-            "time": "06:00",
-            "name": "인천공항 제2터미널 주차장/집으로",
-            "description": "",
-            "category": "이동",
-            "comments": [],
-            "images": []
-          },
-          {
-            "id": 1786449515623,
-            "time": "06:00",
-            "name": "항공권 성인8명",
-            "description": "",
-            "category": "이동",
-            "comments": [],
-            "images": []
-          },
-          {
-            "id": 1786449564885,
-            "time": "06:00",
-            "name": "항공권 소아3명",
-            "description": "",
-            "category": "이동",
-            "comments": [],
-            "images": []
-          }
-        ]
-      },
-      {
-        "day": 2,
-        "date": "2026-09-19",
-        "title": "도쿄 감성",
-        "places": [
-          {
-            "id": 4014,
-            "time": "08:00",
-            "name": "아침 - 숙소 간편식",
-            "description": "숙소에서 간단히 식사",
-            "category": "식사",
-            "comments": [],
-            "duration": 90,
-            "images": []
-          },
-          {
-            "id": 4015,
-            "time": "09:30",
-            "name": "메이지 진구",
-            "description": "메이지 신궁→하라주쿠→오모테산도→캣스트리트→시부야→시부야 스카이",
-            "category": "관광",
-            "tip": "지하철 이동 40분",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          },
-          {
-            "id": 4016,
-            "time": "10:30",
-            "name": "하라주쿠 다케시타도리",
-            "description": "400미터 길거리, 도쿄 10대 소녀들로 붐비는 곳. 마리온 크레페 유명(호객행위 조심)",
-            "category": "관광",
-            "comments": [],
-            "duration": 90,
-            "images": []
-          },
-          {
-            "id": 4017,
-            "time": "12:00",
-            "name": "점심 - 규카츠 모토무라",
-            "description": "위드 하라주쿠점, 길거리 맛집",
-            "category": "식사",
-            "estimatedCost": 2000,
-            "currency": "JPY",
-            "comments": [],
-            "duration": 90,
-            "images": []
-          },
-          {
-            "id": 4018,
-            "time": "13:30",
-            "name": "오모테산도 카페거리",
-            "description": "도쿄의 샹젤리제",
-            "category": "관광",
-            "comments": [],
-            "duration": 90,
-            "images": []
-          },
-          {
-            "id": 4019,
-            "time": "15:00",
-            "name": "시부야 스크램블 교차로",
-            "description": "에스컬레이터 사진은 내려갈 때 찍어야 배경이 잘 담김",
-            "category": "관광",
-            "comments": [],
-            "duration": 120,
-            "images": []
-          },
-          {
-            "id": 4020,
-            "time": "17:00",
-            "name": "저녁 - 시부야 돈카츠 아키라",
-            "description": "연어카츠 추천",
-            "category": "식사",
-            "estimatedCost": 2500,
-            "currency": "JPY",
-            "comments": [],
-            "duration": 90,
-            "images": []
-          },
-          {
-            "id": 4021,
-            "time": "18:30",
-            "name": "시부야 스카이 야경",
-            "description": "시부야스크램블스퀘어 1층 엘베→14층→루프탑. 모서리 사진 먼저(직원 있음)→가운데 사진",
-            "category": "관광",
-            "needsReservation": true,
-            "estimatedCost": 2450,
-            "currency": "JPY",
-            "tip": "줄서기 2시간 예상. 미리 예약 필수 (¥2,450~)",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          }
-        ]
-      },
-      {
-        "day": 3,
-        "date": "2026-09-20",
-        "title": "먹거리, 사진명소",
-        "places": [
-          {
-            "id": 4022,
-            "time": "07:30",
-            "name": "아침 - 츠키지 시장",
-            "description": "야마초 계란말이(웨이팅 많음)",
-            "category": "식사",
-            "estimatedCost": 1000,
-            "currency": "JPY",
-            "comments": [],
-            "duration": 90,
-            "images": [
-              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795034022-824207922-1000009350.jpg"
-            ]
-          },
-          {
-            "id": 4023,
-            "time": "09:00",
-            "name": "긴자 쇼핑",
-            "description": "긴자역→긴자 식스→중앙거리(주오도리) 산책→유니클로 긴자점→이토야→미츠코시 지하 식품관",
-            "category": "쇼핑",
-            "comments": [],
-            "duration": 180,
-            "images": []
-          },
-          {
-            "id": 4024,
-            "time": "12:00",
-            "name": "점심 - 도쿄역 라멘 스트리트",
-            "description": "마루노우치 역사와 광장 사진 촬영, 캐릭터 스트리트 구경, KITTE 6층 전망테라스(무료)",
-            "category": "식사",
-            "estimatedCost": 1500,
-            "currency": "JPY",
-            "comments": [],
-            "duration": 120,
-            "images": []
-          },
-          {
-            "id": 4025,
-            "time": "14:00",
-            "name": "팀립 보더리스",
-            "description": "디지털 아트 미술관. 빛, 음악, 거울, 프로젝션이 결합된 공간",
-            "category": "관광",
-            "needsReservation": true,
-            "estimatedCost": 1850,
-            "currency": "JPY",
-            "tip": "예약 필수 (¥1,850~)",
-            "comments": [],
-            "duration": 180,
-            "images": []
-          },
-          {
-            "id": 4026,
-            "time": "17:00",
-            "name": "도쿄 야경",
-            "description": "아자부다이 힐즈나 롯폰기 힐즈에서 바라보는 도쿄타워",
-            "category": "관광",
-            "estimatedCost": 1230,
-            "currency": "JPY",
-            "tip": "롯폰기 힐스 전망대 360도 도심 풍경과 후지산 감상 (¥1,230~)",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          }
-        ]
-      },
-      {
-        "day": 4,
-        "date": "2026-09-21",
-        "title": "편안함, 마무리, 입국",
-        "places": [
-          {
-            "id": 4027,
-            "time": "08:00",
-            "name": "아침 - 숙소 간편식",
-            "description": "숙소에서 간단히 식사",
-            "category": "식사",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          },
-          {
-            "id": 4028,
-            "time": "09:00",
-            "name": "호텔 체크아웃",
-            "description": "지하철 이동 40분",
-            "category": "숙소",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          },
-          {
-            "id": 4029,
-            "time": "10:00",
-            "name": "도요스 시장",
-            "description": "도요스 시장에서 초밥, 현지분위기",
-            "category": "식사",
-            "estimatedCost": 3000,
-            "currency": "JPY",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          },
-          {
-            "id": 4030,
-            "time": "11:00",
-            "name": "센카쿠반라이",
-            "description": "센캬쿠반라이 산책 및 족욕",
-            "category": "관광",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          },
-          {
-            "id": 4031,
-            "time": "12:00",
-            "name": "오다이바",
-            "description": "모래사장을 걸으며 도쿄만과 레인보우브리지 감상",
-            "category": "관광",
-            "tip": "유리카모메 탑승",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          },
-          {
-            "id": 4032,
-            "time": "13:00",
-            "name": "자유여신상 & 레인보우브리지",
-            "description": "뉴욕의 자유의 여신상을 본떠 만든 축소 복제품. 바다와 도시가 어우러진 개방감",
-            "category": "관광",
-            "comments": [],
-            "duration": 150,
-            "images": []
-          },
-          {
-            "id": 4033,
-            "time": "15:30",
-            "name": "리무진 버스 탑승",
-            "description": "나리타공항으로 이동",
-            "category": "이동",
-            "estimatedCost": 1500,
-            "currency": "JPY",
-            "comments": [],
-            "duration": 90,
-            "images": []
-          },
-          {
-            "id": 4034,
-            "time": "17:00",
-            "name": "저녁 - 나리타 카와토요",
-            "description": "장어덮밥. 더라운지 바우처 공짜 + 생맥주추가",
-            "category": "식사",
-            "estimatedCost": 2000,
-            "currency": "JPY",
-            "comments": [],
-            "duration": 180,
-            "images": []
-          },
-          {
-            "id": 4035,
-            "time": "20:00",
-            "name": "나리타공항 이륙",
-            "description": "출국심사 후 탑승",
-            "category": "이동",
-            "comments": [],
-            "duration": 150,
-            "images": []
-          },
-          {
-            "id": 4036,
-            "time": "22:30",
-            "name": "인천공항 착륙",
-            "description": "입국심사 후 귀가. 약 24:00 집 도착",
-            "category": "이동",
-            "comments": [],
-            "duration": 60,
-            "images": []
-          }
-        ]
-      }
-    ],
-    "expenses": [
-      {
-        "id": 1786449515623,
-        "title": "항공권 성인8명",
-        "amount": 0,
-        "payer": "이정우",
-        "date": "2026-08-11"
-      },
-      {
-        "id": 1786449564885,
-        "title": "항공권 소아3명",
-        "amount": 0,
-        "payer": "이정우",
-        "date": "2026-08-11"
-      }
-    ],
     "checklists": [
       {
         "id": 501,
         "title": "여권",
         "checked": false,
-        "assignee": "이현수"
+        "assignee": "미지정",
+        "category": "공통"
       },
       {
         "id": 502,
         "title": "충전기 (멀티어댑터)",
         "checked": false,
-        "assignee": "이현수"
+        "assignee": "미지정",
+        "category": "공통"
       },
       {
         "id": 503,
@@ -1606,14 +1090,15 @@
       {
         "id": 509,
         "title": "항공권 예매 확인",
-        "checked": false,
+        "checked": true,
         "assignee": "이현수"
       },
       {
         "id": 510,
         "title": "숙소 예약 확인 (토부호텔 레반트 도쿄)",
-        "checked": false,
-        "assignee": "이현수"
+        "checked": true,
+        "assignee": "이아름",
+        "category": "공통"
       },
       {
         "id": 511,
@@ -1632,6 +1117,1344 @@
         "title": "스카이트리 전망대 온라인 예약",
         "checked": false,
         "assignee": "이현수"
+      }
+    ],
+    "transportation": [
+      {
+        "type": "고속버스(나리타공항-긴시초-스카이트리 셔틀) 나리타공항1터미널(10:45)->긴시초역(11:55)",
+        "route": "",
+        "cost": 0,
+        "currency": "JPY"
+      },
+      {
+        "type": "리무진 버스",
+        "route": "나리타공항 ↔ 숙소",
+        "cost": 1500,
+        "currency": "JPY"
+      },
+      {
+        "type": "도쿄 메트로 72시간 패스",
+        "route": "13900",
+        "cost": 0,
+        "currency": "JPY"
+      }
+    ],
+    "savedPlaces": [
+      {
+        "id": "sp-1785066965079-981345306",
+        "name": "인천공항/출국심사",
+        "category": "이동",
+        "address": "인천광역시 영종구 공항로 271 인천국제공항역",
+        "description": "",
+        "tip": "",
+        "url": "https://www.google.com/maps/search/?api=1&query=%EC%9D%B8%EC%B2%9C%EA%B4%91%EC%97%AD%EC%8B%9C%20%EC%98%81%EC%A2%85%EA%B5%AC%20%EA%B3%B5%ED%95%AD%EB%A1%9C%20271%20%EC%9D%B8%EC%B2%9C%EA%B5%AD%EC%A0%9C%EA%B3%B5%ED%95%AD%EC%97%AD",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066966915-817744560",
+        "name": "나리타공항 착륙",
+        "category": "이동",
+        "address": "1-1 Furugome, Narita, Chiba 282-0004 일본",
+        "description": "입국심사",
+        "tip": "",
+        "url": "https://www.google.com/maps/search/?api=1&query=1-1%20Furugome%2C%20Narita%2C%20Chiba%20282-0004%20%EC%9D%BC%EB%B3%B8",
+        "lat": 35.772587,
+        "lng": 140.389487
+      },
+      {
+        "id": "sp-1785066968869-207244530",
+        "name": "짐맡기기/토부호텔 레반트 도쿄",
+        "category": "기타",
+        "address": "1 Chome-2-2 Kinshi, Sumida City, Tokyo 130-0013 일본",
+        "description": "숙소 예약시 요청",
+        "tip": "",
+        "url": "https://www.google.com/maps/search/?api=1&query=1%20Chome-2-2%20Kinshi%2C%20Sumida%20City%2C%20Tokyo%20130-0013%20%EC%9D%BC%EB%B3%B8",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066970709-370136944",
+        "name": "점심 - 이로도리쓰키지",
+        "category": "식사",
+        "address": "일본 〒104-0045 Tokyo, Chuo City, Tsukiji, 4 Chome−11−10 場외",
+        "description": "오마카세 런치 (우니 추가)",
+        "tip": "시겐 카이센동 2600엔도 추천. 츠키지 시장 구경(도둑 조심). 터렛커피 라떼맛집",
+        "url": "https://www.google.com/maps/search/?api=1&query=%EC%9D%BC%EB%B3%B8%20%E3%80%92104-0045%20Tokyo%2C%20Chuo%20City%2C%20Tsukiji%2C%204%20Chome%E2%88%9211%E2%88%9210%20%E5%A0%B4%EC%99%B8",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066972746-997827361",
+        "name": "아사쿠사 센소지",
+        "category": "관광",
+        "address": "2 Chome-3-1 Asakusa, Taito City, Tokyo 111-0032 일본",
+        "description": "도쿄에서 가장 오래된 절. 규모, 볼거리, 먹거리 풍성",
+        "tip": "지하철 이동 30분",
+        "url": "https://www.google.com/maps/search/?api=1&query=2%20Chome-3-1%20Asakusa%2C%20Taito%20City%2C%20Tokyo%20111-0032%20%EC%9D%BC%EB%B3%B8",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066974782-650229696",
+        "name": "나카미세도리 거리",
+        "category": "관광",
+        "address": "1 Chome-36-3 Asakusa, Taito City, Tokyo 111-0032 일본",
+        "description": "가장 오래된 상점가. 아사히 스카이룸 옥상에 황금 거품",
+        "tip": "",
+        "url": "https://www.google.com/maps/search/?api=1&query=1%20Chome-36-3%20Asakusa%2C%20Taito%20City%2C%20Tokyo%20111-0032%20%EC%9D%BC%EB%B3%B8",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066976726-926309789",
+        "name": "도쿄 스카이트리 전망대",
+        "category": "관광",
+        "address": "1 Chome-1-2 Oshiage, Sumida City, Tokyo 131-0045 일본",
+        "description": "전망대 예약은 온라인 구매가 저렴. 해질 무렵 올라가면 낮과 야경 동시 감상",
+        "tip": "예약 입장료 차이 있음",
+        "url": "https://www.google.com/maps/search/?api=1&query=1%20Chome-1-2%20Oshiage%2C%20Sumida%20City%2C%20Tokyo%20131-0045%20%EC%9D%BC%EB%B3%B8",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066978570-750889724",
+        "name": "메이지 진구",
+        "category": "관광",
+        "address": "1-1 Yoyogikamizonocho, Shibuya, Tokyo 151-8557 일본",
+        "description": "",
+        "tip": "메이지 신궁→하라주쿠→오모테산도→캣스트리트→시부야→시부야 스카이",
+        "url": "https://www.google.com/maps/search/?api=1&query=1-1%20Yoyogikamizonocho%2C%20Shibuya%2C%20Tokyo%20151-8557%20%EC%9D%BC%EB%B3%B8",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066980198-390508212",
+        "name": "하라주쿠 다케시타도리",
+        "category": "관광",
+        "address": "일본 〒150-0001 도쿄도 시부야구 진구마에 1 조메",
+        "description": "400미터 길거리, 도쿄 10대 소녀들로 붐비는 곳. ",
+        "tip": "마리온 크레페 유명(호객행위 조심)",
+        "url": "https://www.google.com/maps/search/?api=1&query=%EC%9D%BC%EB%B3%B8%20%E3%80%92150-0001%20%EB%8F%84%EC%BF%84%EB%8F%84%20%EC%8B%9C%EB%B6%80%EC%95%BC%EA%B5%AC%20%EC%A7%84%EA%B5%AC%EB%A7%88%EC%97%90%201%20%EC%A1%B0%EB%A9%94",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066982041-581475164",
+        "name": "점심 - 규카츠 모토무라",
+        "category": "식사",
+        "address": "일본 〒150-0001 Tokyo, Shibuya, Jingumae, 1 Chome−14−30 ウィズ原宿 B1F B106区画",
+        "description": "위드 하라주쿠점, 길거리 맛집",
+        "tip": "",
+        "url": "https://www.google.com/maps/search/?api=1&query=%EC%9D%BC%EB%B3%B8%20%E3%80%92150-0001%20Tokyo%2C%20Shibuya%2C%20Jingumae%2C%201%20Chome%E2%88%9214%E2%88%9230%20%E3%82%A6%E3%82%A3%E3%82%BA%E5%8E%9F%E5%AE%BF%20B1F%20B106%E5%8C%BA%E7%94%BB",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066984089-445124093",
+        "name": "도요스 시장",
+        "category": "식사",
+        "address": "6 Chome-6-1 Toyosu, Koto City, Tokyo 135-0061 일본",
+        "description": "도요스 시장에서 초밥, 현지분위기",
+        "tip": "",
+        "url": "https://www.google.com/maps/search/?api=1&query=6%20Chome-6-1%20Toyosu%2C%20Koto%20City%2C%20Tokyo%20135-0061%20%EC%9D%BC%EB%B3%B8",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066985733-200730781",
+        "name": "센카쿠반라이",
+        "category": "관광",
+        "address": "6 Chome-5-1 Toyosu, Koto City, Tokyo 135-0061 일본",
+        "description": "센캬쿠반라이 산책 및 족욕",
+        "tip": "개인수건 챙기기",
+        "url": "https://www.google.com/maps/search/?api=1&query=6%20Chome-5-1%20Toyosu%2C%20Koto%20City%2C%20Tokyo%20135-0061%20%EC%9D%BC%EB%B3%B8",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066987265-471413401",
+        "name": "오다이바/다이바역",
+        "category": "이동",
+        "address": "2-chōme-6 Daiba, Minato City, Tokyo 135-0091 일본",
+        "description": "",
+        "tip": "",
+        "url": "https://www.google.com/maps/search/?api=1&query=2-ch%C5%8Dme-6%20Daiba%2C%20Minato%20City%2C%20Tokyo%20135-0091%20%EC%9D%BC%EB%B3%B8",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066989107-453128248",
+        "name": "오다이바/실물 건담",
+        "category": "관광",
+        "address": "일본 〒135-0064 Tokyo, Koto City, Aomi, 1 Chome−1−10 ダイバーシティ東京プラザ内 2Fフェスティバル広場",
+        "description": "",
+        "tip": "",
+        "url": "https://www.google.com/maps/search/?api=1&query=%EC%9D%BC%EB%B3%B8%20%E3%80%92135-0064%20Tokyo%2C%20Koto%20City%2C%20Aomi%2C%201%20Chome%E2%88%921%E2%88%9210%20%E3%83%80%E3%82%A4%E3%83%90%E3%83%BC%E3%82%B7%E3%83%86%E3%82%A3%E6%9D%B1%E4%BA%AC%E3%83%97%E3%83%A9%E3%82%B6%E5%86%85%202F%E3%83%95%E3%82%A7%E3%82%B9%E3%83%86%E3%82%A3%E3%83%90%E3%83%AB%E5%BA%83%E5%A0%B4",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1785066991145-607494305",
+        "name": "저녁 - 나리타 카와토요",
+        "category": "식사",
+        "address": "일본 〒286-0111 Chiba, Narita, Sanrizuka, 御料牧場1-1 第1ターミナル 新中央棟4階",
+        "description": "장어덮밥. 더라운지 바우처 공짜 + 생맥주추가",
+        "tip": "",
+        "url": "https://www.google.com/maps/search/?api=1&query=%EC%9D%BC%EB%B3%B8%20%E3%80%92286-0111%20Chiba%2C%20Narita%2C%20Sanrizuka%2C%20%E5%BE%A1%E6%96%99%E7%89%A7%E5%A0%B41-1%20%E7%AC%AC1%E3%82%BF%E3%83%BC%E3%83%9F%E3%83%8A%E3%83%AB%20%E6%96%B0%E4%B8%AD%E5%A4%AE%E6%A3%9F4%E9%9A%8E",
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1786413075184-541988622",
+        "name": "키친 오리진 긴시초점",
+        "category": "식사",
+        "address": "3 Chome-6-1 Taihei, Sumida City, Tokyo 130-0012 일본",
+        "description": "https://blog.naver.com/54hyuk/224330842030",
+        "tip": "일본 도시락 키친 오리 (500m, 도보7분)",
+        "url": "https://www.google.com/maps/place/%ED%82%A4%EC%B9%9C+%EC%98%A4%EB%A6%AC%EC%A7%84+%EA%B8%B4%EC%8B%9C%EC%B4%88%EC%A0%90/@35.6999692,139.8134159,17z/data=!3m1!4b1!4m6!3m5!1s0x601889ea8898df2f:0xe9c22ca749cbf36f!8m2!3d35.6999692!4d139.8134159!16s%2Fg%2F11kjlknzs1?entry=ttu&g_ep=EgoyMDI2MDgwNS4xIKXMDSoASAFQAw%3D%3D",
+        "lat": null,
+        "lng": null,
+        "images": [
+          "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786668017444-92793899-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350905200&Signature=cL%2FdfZcZAwPIWLwfYpxM9GYo4ceYllVOgj8tDW%2BwdL%2FhmS7RKdUbDlqqjOICN0S9FiT836wL25FihaidJa%2BT4RrJHeT6AJx0ybxNv63kEJMAJBBouEhtjJxnxFlIYkTfqPdC0UX97rF8T96363KS2Z5A5x0%2FjJ5GUAuopJdjkRGjjpm19fX%2B2avld05XmjMne%2Bnk3OSqcG7lX%2FmFyJ4tO7%2F%2BiAogqTZ4Jf%2BPt%2BA5c4tE%2Blsq6e0DwE7qLRh1lXUNFf0QCV2jc8%2B%2F5kgUF51BocdcJD%2BFujKt9mo2wiwXz5VJCmtYc%2FrnEA1ykvtm6jdD%2ByUdF80XnxTM3J9ZhsFl6A%3D%3D"
+        ]
+      },
+      {
+        "id": "sp-1786668147812-526266629",
+        "name": "야요이켄 도쿄 긴시초점",
+        "category": "식사",
+        "address": "일본 〒130-0013 Tokyo, Sumida City, Kinshi, 1 Chome−5−17 メゾンドール錦糸町 １Ｆ",
+        "description": "일본 가정식 백반 맛집\nhttps://m.blog.naver.com/zenzang75/223448052577\n",
+        "tip": "130m, 도보 2",
+        "url": "https://www.google.com/maps/search/?api=1&query=%EC%9D%BC%EB%B3%B8%20%E3%80%92130-0013%20Tokyo%2C%20Sumida%20City%2C%20Kinshi%2C%201%20Chome%E2%88%925%E2%88%9217%20%E3%83%A1%E3%82%BE%E3%83%B3%E3%83%89%E3%83%BC%E3%83%AB%E9%8C%A6%E7%B3%B8%E7%94%BA%20%EF%BC%91%EF%BC%A6",
+        "images": [
+          "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786668141656-121639313-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350905200&Signature=WDL%2Fs3VxjFWPdn9ANed9lyzsDBwb%2F%2FPR1TZMBzDUDBV8SGausU%2FzOXyJa8TF1BXjOFQ%2FFlRxtfwcCInvKzZL53FB6Md9bEHGRWjL4tUBX7t4ADH831KHUlxi6sAC8Pl0XgIrEo0Bb8qFzYy%2BWiMT%2Bt3DxKUULgm%2FOjM7RfZOGjD0xv5f1ui%2B14OroAFur%2BFN08EjDWbyT7LqEwECuFhZUe0VkHUkvtAW4wiAs9qjxaRelGGUH12G95no%2FVHNbGqcecTEQ9w7BOOdLABEAkX0o9hK60l1ACC8HB6skb6j3d9ULELTZTquprXZpiRAMN7BKb3UPEcsFpUMOlNOMIGQbg%3D%3D"
+        ],
+        "lat": null,
+        "lng": null
+      },
+      {
+        "id": "sp-1786668277582-306457705",
+        "name": "코마치 쇼쿠도",
+        "category": "식사",
+        "address": "일본 〒130-0013 Tokyo, Sumida City, Kinshi, 2 Chome−2−1 ｱﾙｶｷｯﾄ錦糸町 地下 1階",
+        "description": "일본 가정시 맛집\nhttps://blog.naver.com/l0gadak/224318541066",
+        "tip": "210m, 도보3",
+        "url": "https://www.google.com/maps/search/?api=1&query=%EC%9D%BC%EB%B3%B8%20%E3%80%92130-0013%20Tokyo%2C%20Sumida%20City%2C%20Kinshi%2C%202%20Chome%E2%88%922%E2%88%921%20%EF%BD%B1%EF%BE%99%EF%BD%B6%EF%BD%B7%EF%BD%AF%EF%BE%84%E9%8C%A6%E7%B3%B8%E7%94%BA%20%E5%9C%B0%E4%B8%8B%201%E9%9A%8E",
+        "images": [
+          "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786668271660-337599381-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350905200&Signature=CmWbRjmWVBFjvHNaeyonUR4K9jwpC6kNT2x3KDfxoG5VxmYglYUSfudiqYiyGREdahHA4bDDs8CfTR1akweRvJnsEvM%2BRGSr55HfIKMmGPd2T7J2NECpEOxpyB%2B1XdMDI5A3u0HeKN2n9xdPLui9FXPl0hl%2Fd5uBB480pnu%2FM9jRRgvJ7GVn3vM8L3Z2f5GoANeec%2BnViYikIQvvmH8qBPgoU4%2FfPgDfmCv71RZSGXhlqzCoG5xhCZyOwKlPzBVxqlmt4jS6ocvFoGasEEusy7R4lrCc%2FMo95YXcEoyfi%2BJMWas%2BSwC5XbfIFAf28xyDZAaGBLAQUx0azUDNfoqIUQ%3D%3D"
+        ],
+        "lat": null,
+        "lng": null
+      }
+    ],
+    "expenses": [
+      {
+        "id": 4017,
+        "placeId": 4017,
+        "title": "[일정] 점심 - 규카츠 모토무라",
+        "amount": 18140,
+        "originalAmount": 2000,
+        "currency": "JPY",
+        "payer": "미지정",
+        "date": "2026-10-16"
+      },
+      {
+        "id": 4021,
+        "placeId": 4021,
+        "title": "[일정] 시부야 스카이 야경",
+        "amount": 22222,
+        "originalAmount": 2450,
+        "currency": "JPY",
+        "payer": "미지정",
+        "date": "2026-10-16"
+      },
+      {
+        "id": 4022,
+        "placeId": 4022,
+        "title": "[일정] 아침 - 츠키지 시장",
+        "amount": 9070,
+        "originalAmount": 1000,
+        "currency": "JPY",
+        "payer": "미지정",
+        "date": "2026-10-17"
+      },
+      {
+        "id": 4024,
+        "placeId": 4024,
+        "title": "[일정] 점심 - 도쿄역 라멘 스트리트",
+        "amount": 13605,
+        "originalAmount": 1500,
+        "currency": "JPY",
+        "payer": "미지정",
+        "date": "2026-10-17"
+      },
+      {
+        "id": 4025,
+        "placeId": 4025,
+        "title": "[일정] 팀립 보더리스",
+        "amount": 16780,
+        "originalAmount": 1850,
+        "currency": "JPY",
+        "payer": "미지정",
+        "date": "2026-10-17"
+      },
+      {
+        "id": 4026,
+        "placeId": 4026,
+        "title": "[일정] 도쿄 야경",
+        "amount": 11156,
+        "originalAmount": 1230,
+        "currency": "JPY",
+        "payer": "미지정",
+        "date": "2026-10-17"
+      },
+      {
+        "id": 4029,
+        "placeId": 4029,
+        "title": "[일정] 도요스 시장",
+        "amount": 27211,
+        "originalAmount": 3000,
+        "currency": "JPY",
+        "payer": "미지정",
+        "date": "2026-10-18"
+      },
+      {
+        "id": 4033,
+        "placeId": 4033,
+        "title": "[일정] 리무진 버스 탑승",
+        "amount": 13605,
+        "originalAmount": 1500,
+        "currency": "JPY",
+        "payer": "미지정",
+        "date": "2026-10-18"
+      },
+      {
+        "id": "4034_c0",
+        "placeId": 4034,
+        "title": "[일정] 저녁 - 나리타 카와토요 - 저녁 - 나리타 카와토요",
+        "amount": 17850,
+        "originalAmount": 2000,
+        "currency": "JPY",
+        "payer": "미지정",
+        "date": "2026-10-18",
+        "category": "식사"
+      },
+      {
+        "id": 1786449515623,
+        "title": "항공권 성인8명",
+        "amount": 3779300,
+        "payer": "이정우",
+        "date": "2026-07-24",
+        "category": "교통"
+      },
+      {
+        "id": 1786449564885,
+        "title": "항공권 소아3명",
+        "amount": 1854200,
+        "payer": "이정우",
+        "date": "2026-07-24",
+        "category": "교통"
+      },
+      {
+        "id": "4002_c0",
+        "placeId": 4002,
+        "title": "[일정] 인천공항/출국심사/이륙 - 인천공항/출국심사/이륙",
+        "amount": 20000,
+        "originalAmount": 20000,
+        "currency": "KRW",
+        "payer": "미지정",
+        "date": "2026-10-15",
+        "category": "이동"
+      },
+      {
+        "id": "4007_c0",
+        "placeId": 4007,
+        "title": "[일정] 토부호텔 레반트 도쿄/호텔 체크인 - 호텔 체크인/토부호텔 레반트 도쿄",
+        "amount": 4247736,
+        "originalAmount": 4247736,
+        "currency": "KRW",
+        "payer": "이아름",
+        "date": "2026-10-15",
+        "category": "숙박"
+      }
+    ],
+    "itinerary": [
+      {
+        "day": 1,
+        "date": "2026-10-15",
+        "title": "출국, 전통과 현대",
+        "places": [
+          {
+            "id": 4001,
+            "time": "04:00",
+            "name": "집 출발",
+            "description": "개인차량, 진수차, 현수차",
+            "category": "이동",
+            "comments": [],
+            "duration": 10,
+            "address": "경기도 수원시 장안구 만석로20번길 25",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784796801571-30721537-1000009416.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=dNM41iiUY2oC%2BB2QwwxBcMGHpc3Sy67iFrmka1Lq%2FxdjTNr53gcbxdfmQ9no8amixG6TYmQ1Cpg8HcM1oZ4TbK5wLnZST0%2F9ex6%2BfPYVAoGWAxFsQdeJSaqSxd%2BI5MpxSMOnnIHdf0DLytB5iiw5NOL9geaeocJv2MdI7hJsHQ2CVpb%2FGZ4KfhfPOnjnmMDDXHNADYY2mtY%2BUsByyqpJqan2pScw5ewr3q2NR6n%2Bb2nNu%2F99ndsvJVW4vwCxU6mnpl46O81xxayYk%2BuuBCQOsEx0iHQfwD38yuQktHa3VkmduJLX2F6Flva6kzXZDej5w%2BaAz1BjEgM5C4r3w%2F%2B%2BnA%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784809557989-981884416-1000009431.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=uzyLnnmUIn4idfKsV85e5nKztr4zRKnxUT191hsftW4AsHyUuL2cUx%2BWHOeDWXcDnjhmxjQX6onrmgar1njFk8IrAWMDuRyMUtLbbS1if9n9LqBW0wch3DXAaQ3wY6NmN5fZtdhUbMmlLFOnhGQqjUsnPuYRQvTpVkD52pzYVVx9wd57bQAjfaq2BOyHfE7pJskzR%2FGwiIGOenfNHkwFCgsLgdsIX6r7PMfSsAE4ruDhQ1BnYyZlHEIVboJoXuMzE3ZbrYawFOfkNJqBm5ZkmqZZnX82XbPI%2BoKVLP7czU445fEKmvjFWx7cdUosP6rPtZRlVVFgsrHpjCPLLyeIiA%3D%3D"
+            ],
+            "isReservationCompleted": false,
+            "mapImages": [],
+            "transportType": "자차",
+            "transportDuration": "60",
+            "tip": "",
+            "needsReservation": false,
+            "costs": []
+          },
+          {
+            "id": 1784893967240,
+            "time": "05:00",
+            "name": "인천국제공항 제2여객터미널 예약주차장",
+            "address": "인천 영종구 운서동 3233-52",
+            "description": "인천국제공항 제2여객터미널 예약주차장",
+            "category": "이동",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "needsReservation": true,
+            "isReservationCompleted": false,
+            "tip": "출발은 인천공항 제2터미널\n인천공항 주차장 예약 일정확인하기 (8월31일 예약)",
+            "payer": "미지정",
+            "duration": 30,
+            "comments": [],
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786409263247-188072685-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=YKtQqU2WdRoCAkyue%2BkiMbKqrFmQXPOEo4KsbrA6EOwrMvnAVlEnb93OkMxeasaWvyIh76ksNKSXZPa1t5JSG6%2F5D%2FUHkuUfvUbEqoI6q6y%2BD1sJk0jpvpxCj4tKPjUiJ8HQMgxRwmKYLp%2FgYCFVFAQPT1p3NfTIY%2BPc%2By5C%2FXWDRqhjseABKGjqhVsDrHBVpjwUujZXhIsq8goHjqWRg1NW1gYZxixDb6Zo6dp7DXMVRMUUNrdrC%2FVlv8moRrNC48ryQ0Tfxmbbck7u%2F%2FFgaJKi8xZJzWG6ecMLCSIUZvQR%2BaKhpZHcdKobO9b3u%2BfFjBdr%2Fcrpjaf8jzMQ3Y5bVg%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786409287520-45166131-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=VsF2JfZ21sYC%2FzdsyCeNROQ%2FFAP6jfJoCHdviIXluR%2FvrDfKGLbztnbvChqP25IJrZcb5oZ1L9pYxtIXC%2FifeGeXOOFFm13d1KKZC%2BmjmXp2jvC77zv%2FWpZcDfbMr6pWqaGdegeLXbudH0VhgE20MzJeQp3VGQ13M3XpA7uN%2FV25JZ%2Bc8%2FHTLBzsnXtQO5HjusZKc4iGOO%2FJhLYCkUrdKMAQJmh07gdhh7CHevMNuuQc5yzSo64LKyYePfdQzBRUee33essZ4InkXvHFPCWfh%2Fdn1CM5jD%2F16jHANA7wMkRQZojNE8ySFxILr2aQirCe5HwX7DEEegGn2Suj0UKD1g%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "도보",
+            "transportDuration": "",
+            "costs": []
+          },
+          {
+            "id": 1784894204161,
+            "time": "05:30",
+            "name": "인천공항/출국심사",
+            "address": "인천광역시 영종구 공항로 271 인천국제공항역",
+            "description": "",
+            "category": "이동",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 115,
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "도보",
+            "transportDuration": "",
+            "costs": []
+          },
+          {
+            "id": 4002,
+            "time": "07:25",
+            "name": "인천공항/출국심사/이륙",
+            "description": "나리타행 출발",
+            "category": "이동",
+            "comments": [],
+            "duration": 120,
+            "address": "인천광역시 영종구 공항로 271 인천국제공항역",
+            "estimatedCost": 20000,
+            "currency": "KRW",
+            "payer": "미지정",
+            "needsReservation": true,
+            "isReservationCompleted": true,
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784796902591-709053762-1000009418.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=dGihrdbvLkIOsF4GFpxheLlfetevUeL57295glt7zm2slUqraNFhisvw54aF9yvWEWR2sJuLXM52U8XHFmU6F3xlAIF5Hu066hI5H3xqeT1wW74QDqAQNZe4UmCwR2UlsA8ye2dp2Q40JrUv%2BrDfB6xWX62v7sBAAozkoeN9P6rPj1IQS9DMmwrcoWbH39pmKZHOqL%2F%2Ft%2FDx0Bdm33k1RV6sTqa77m5PyeL7kqb9eT96SFlAJMtwS8K5l1nSkawb0Fz5njqYss8AB1WzRdS2Ni7EigscqZ843CT46hcV0KKsd1ypdQE%2Flwjuq0T%2B5DPgWP3oC%2BONzkYE3NoF3xDZaQ%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786348640745-996570865-1000010125.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=DRzR3OHsscBH6iSLLhsHJlowfqpcsekplYO3dpbEvrHM2S%2BF81Ko1s39KsT%2B8s5KJ2defaU6dfBCCRx0PXPpflrW5LA7SnCDYsX1jZJqE%2FZXlXZPTu%2BxOgTPk9zol%2FcKVyBwky%2BknOXJy%2B3ehd7vXY7odxkcahP0Ellb1z2aG56pz63%2BP6%2FJs%2B9dhb5FyOWfhbjK4V6HJ5bw%2FtNybl%2Fpw3r91WMUDoJUnehUCPgE3bkOHoD6DYOdvxgZUZf38HMcw167Mb%2BzmKv%2Fk5HykYZMkDhpoE%2FhpnH1cZyg4E4tuu%2BWMY6wjUthcaG3Q21YQrOfKrm6kW15M3zdQU0zVfyK%2BQ%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "비행기",
+            "transportDuration": "150",
+            "costs": [
+              {
+                "id": "4002_c0",
+                "title": "인천공항/출국심사/이륙",
+                "amount": 20000,
+                "category": "이동",
+                "payer": "미지정"
+              }
+            ]
+          },
+          {
+            "id": 4003,
+            "time": "09:55",
+            "name": "나리타공항/착륙",
+            "description": "입국카드 작성\n모두 영어로 작성해야하며,\n이름 : 성_LEE, 이름_JUNG WOO (여권 표기와 동일하게)\n현주소 : 나라명_KOREA, 도시명_Gyeonggi-do/SUWON\n도항목적 : 관광, 항공기 편명_ KE5741, 여행기간_4 DAYS\n일본의 연락처 : 토부호텔 레반트 도쿄(긴시초)\n전화번호 : 81-3-5611-5511 (개인휴대폰번호 쓰면 안된다고함)\n질문사항 3개 : 모두 아니오에 체크\n서명 : 서명필수",
+            "category": "이동",
+            "comments": [],
+            "duration": 10,
+            "address": "1-1 Furugome, Narita, Chiba 282-0004 일본",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786409828992-343042433-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=NNI4iyjZSa8cz9kpdk1yNaycxE%2Bl2Bjv81jf%2F7FQP28%2F2xP%2FvfiPmB7l%2F8zoMdRWG608lhAxe1omLd%2BcbMr9ioocUOSM%2FVLdntzQ16qqtRUqeaLHZHiTiO1jXbRrNSW8ojsWWS%2F37vACp81zcBKt6uT5xM3eCIHxYiS%2B3RkfUW3oRFTmqoMAmlJIb3bwAZElWkhiIGLUPXbCDuidBf2MULagFIXiMgxxUuP9I94iNUHv2EZy4j2g4Bf%2Bnik5m1p2v%2FLoOfpLXd1VOYc63nURg43cb0V7v8Bb6beU8z9HInwQ9PjdQnGR7av3TCW41jtv5NUt5ZP1ZBNIHRoFkIE9nw%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786409929993-184153313-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=jc5sB52vFYnwd%2BOVilU3ymioqRpo5Yglv3jfIhHIVYXDa3YHVpGGP5x%2B%2B6Aj5SMXLHQzIIboR2nG0v4hmkaWfeWMbj4WjrdxIooqBHsZnrOeOL5xf1BEcTwhK3o6WZSZ%2BseKK8B1DDb28StJShBdeLeb%2FCMDvtQNK0nXaYzLJBjhruy8v4nJ8KOODb2NtOuWND0d17w7gjVm8tC5DbGdA7HzEFfGL2PmK7qVSiErpuCK2W76PTuoMdSRuqjXpzipHcdsQO8gkbHkuRWEUZVBRgAad9%2F2J3sJzGwJOv7TmgFBWFyRkDAqZpuRyMTcWfTOOD%2Fh11UXU04pgdk6r5sdpA%3D%3D"
+            ],
+            "isReservationCompleted": false,
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": "",
+            "costs": [],
+            "tip": "온라인으로 사전에 작성 가능함\nhttps://services.digital.go.jp/ko/visit-japan-web/"
+          },
+          {
+            "id": 4004,
+            "time": "10:45",
+            "name": "나리타공항/호텔로 이동",
+            "description": "공항에서 구입(신용카드 가능)",
+            "category": "이동",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "comments": [],
+            "duration": 0,
+            "address": "1-1 Furugome, Narita, Chiba 282-0004 일본",
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784766061948-887686536-files-1784704359760-744394526.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=E57QmaXHbVV2HiKjd0Q%2B6O2EXoOMBmV%2Bl9Zqq2AqXODctdbF6y0SslQI7eD%2BANMyCCdTIBuZaJc3Folm%2F9C3TrkZfUKZEo6NWCqgJDoq%2B8SUCa7XYyvNrD0fZIRzFj8EYF4S2ILx%2Fcsq1hARBrv0WK%2FDOYkZg1tvaFVlO71f1o1ZMWrhKE48qP0WY%2Bk1kvdG%2BiR6Podj2GsUvtBRuJrMqQg23oU5Kh9OQMSo799R8dsMDxFnnQZYSjkqUab7sW7btt3IKibP2gOWwu6fm%2BIuGyT2xem4M2%2FQ4rRduz9b23mpg8tXaF6iTPQrwcWt8LwJO7BpfAFXH6gMPCVAhAwG4w%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786410717498-177144122-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=RfZmXHL5fB0XUiAwFu0CBBSPrMvnnTFJgUeIAGsJy7oueQYJEV8RRt2G%2BslQyfgMOIGrlzMnzfGKjHiOwVDOf5%2BYXH1YjVBDWZmd93bBxPfS9uoPV5X3vDhlNP5t8WlwpcpiXs0BW55g%2F6qoFZIycjr2MwIGA4gMyxXWSZnEUYb%2BtjgjZb2xV8agQn%2BBGda%2B1pfJLqmXrhxgnyc3PYkKz1aQsakOkwVK1KIpVG84SpqJHQW6ntD8jKkXmB9iRJzcHS7LNg9KiMVnW%2F1s%2FZDIiYRMXKyTuJ1be0R5nc40jUzaei%2FZevS%2FaJTvTeguXhUExC3rVCGjJD7%2Fz3nrJwroyw%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786411958745-385102818-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=slDIk%2FNo1GgQFGWTDTa2MIbJGxiHgVfMgysw00m0SAZwBuTNDQWpUSJtc64fH%2FbAbf5mi53Y2%2Fj2cG8trCFafTkZoMchichCLJ5VSk2MLfu9VMqGdlPj%2F8QO3OYUdO7Dcy7gJqzBwc6P1zwDT7gt1NYGKcOVKxzxHXzehf5u84SzJHlp49UxNdASb06CdULmKaY%2BXdMQbnw2Sj0%2FBYoQXhd0bGDiX2v9LtBORLydoqoH0MIbluVvPUXbNzPxxcKWvoJFq83TK%2FH7KAnTtL8GP9SFhbbImc4FL53bPZhXix92CgFuN8gMB%2FXD03aB11UQVF5CCX8WBbaSE%2BvEPF1b8w%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786673181065-704891203-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350905200&Signature=TKllKV4JoESHsswiKHFdwvnUpIrAMgwem%2B4d4r3fCJxL%2Bfc1LH9cJKtFd%2FeyhZvKqmL1frMyijeetx4z9a8fMTMeQLSpBuR10Mvwuhu%2BmXylik%2BrOT3BBG91ZYdOXmK2ZWHD4UYtJZFDTFPdyJtFcd8voc7y5rxBhlwIP8sxZl7lZLpqShkpdEsUBHmbij7ppAJZrG0ERWJMPH8VDVIWZuzbAT97th80%2BjOEimMO4G2mO9WjpAvVZ%2Bs5aX5%2BfO%2BRyDGbHD6zYYuh3ZkfW7g8tRycyT7%2B3BG7hs1%2FlltQinTdcFJQwySTt4tLqfY5IBPht%2FcCCq6uZ4O42qmMd0KbgQ%3D%3D"
+            ],
+            "needsReservation": true,
+            "isReservationCompleted": false,
+            "tip": "여권검사>세관검사>수화물수령 등의 절차로 30분~90까지 소요 (변수 많음)",
+            "costs": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4005,
+            "time": "12:00",
+            "name": "토부호텔 레반트 도쿄/짐맡기기",
+            "description": "숙소 예약시 요청",
+            "category": "기타",
+            "comments": [],
+            "duration": 30,
+            "address": "1 Chome-2-2 Kinshi, Sumida City, Tokyo 130-0013 일본",
+            "estimatedCost": 0,
+            "currency": "KRW",
+            "payer": "이아름",
+            "images": [],
+            "isReservationCompleted": false,
+            "costs": [],
+            "mapImages": [],
+            "transportType": "도보",
+            "transportDuration": ""
+          },
+          {
+            "id": 4006,
+            "time": "12:30",
+            "name": "점심식사(장소미정/후보지3)",
+            "description": "키친오리진 / 야요이켄 / 코마치쇼쿠도",
+            "category": "식사",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "tip": "3개 대안 중에 상황에 맞게 선택",
+            "comments": [
+              {
+                "id": 1786673284006,
+                "author": "이현수",
+                "text": "체크인 까지 시간이 조금 남는거 같네요",
+                "time": "오전 11:08"
+              }
+            ],
+            "duration": 60,
+            "address": "",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [],
+            "alternatives": [
+              {
+                "id": "alt-1786668445975-220685910",
+                "name": "야요이켄 도쿄 긴시초점",
+                "category": "식사",
+                "address": "일본 〒130-0013 Tokyo, Sumida City, Kinshi, 1 Chome−5−17 メゾンドール錦糸町 １Ｆ",
+                "description": "일본 가정식 백반 맛집\nhttps://m.blog.naver.com/zenzang75/223448052577\n",
+                "tip": "130m, 도보 2",
+                "estimatedCost": 0,
+                "currency": "JPY",
+                "payer": "미지정",
+                "needsReservation": false,
+                "isReservationCompleted": false,
+                "images": [
+                  "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786668141656-121639313-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350905200&Signature=WDL%2Fs3VxjFWPdn9ANed9lyzsDBwb%2F%2FPR1TZMBzDUDBV8SGausU%2FzOXyJa8TF1BXjOFQ%2FFlRxtfwcCInvKzZL53FB6Md9bEHGRWjL4tUBX7t4ADH831KHUlxi6sAC8Pl0XgIrEo0Bb8qFzYy%2BWiMT%2Bt3DxKUULgm%2FOjM7RfZOGjD0xv5f1ui%2B14OroAFur%2BFN08EjDWbyT7LqEwECuFhZUe0VkHUkvtAW4wiAs9qjxaRelGGUH12G95no%2FVHNbGqcecTEQ9w7BOOdLABEAkX0o9hK60l1ACC8HB6skb6j3d9ULELTZTquprXZpiRAMN7BKb3UPEcsFpUMOlNOMIGQbg%3D%3D"
+                ],
+                "mapImages": []
+              },
+              {
+                "id": "alt-1786668447974-239014035",
+                "name": "코마치 쇼쿠도",
+                "category": "식사",
+                "address": "일본 〒130-0013 Tokyo, Sumida City, Kinshi, 2 Chome−2−1 ｱﾙｶｷｯﾄ錦糸町 地下 1階",
+                "description": "일본 가정시 맛집\nhttps://blog.naver.com/l0gadak/224318541066",
+                "tip": "210m, 도보3",
+                "estimatedCost": 0,
+                "currency": "JPY",
+                "payer": "미지정",
+                "needsReservation": false,
+                "isReservationCompleted": false,
+                "images": [
+                  "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786668271660-337599381-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350905200&Signature=CmWbRjmWVBFjvHNaeyonUR4K9jwpC6kNT2x3KDfxoG5VxmYglYUSfudiqYiyGREdahHA4bDDs8CfTR1akweRvJnsEvM%2BRGSr55HfIKMmGPd2T7J2NECpEOxpyB%2B1XdMDI5A3u0HeKN2n9xdPLui9FXPl0hl%2Fd5uBB480pnu%2FM9jRRgvJ7GVn3vM8L3Z2f5GoANeec%2BnViYikIQvvmH8qBPgoU4%2FfPgDfmCv71RZSGXhlqzCoG5xhCZyOwKlPzBVxqlmt4jS6ocvFoGasEEusy7R4lrCc%2FMo95YXcEoyfi%2BJMWas%2BSwC5XbfIFAf28xyDZAaGBLAQUx0azUDNfoqIUQ%3D%3D"
+                ],
+                "mapImages": []
+              },
+              {
+                "id": "alt-1786669145581-547754006",
+                "name": "키친 오리진 긴시초점",
+                "category": "식사",
+                "address": "3 Chome-6-1 Taihei, Sumida City, Tokyo 130-0012 일본",
+                "description": "https://blog.naver.com/54hyuk/224330842030",
+                "tip": "일본 도시락 키친 오리 (500m, 도보7분)",
+                "estimatedCost": 0,
+                "currency": "JPY",
+                "payer": "미지정",
+                "needsReservation": false,
+                "isReservationCompleted": false,
+                "images": [
+                  "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786668017444-92793899-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350905200&Signature=cL%2FdfZcZAwPIWLwfYpxM9GYo4ceYllVOgj8tDW%2BwdL%2FhmS7RKdUbDlqqjOICN0S9FiT836wL25FihaidJa%2BT4RrJHeT6AJx0ybxNv63kEJMAJBBouEhtjJxnxFlIYkTfqPdC0UX97rF8T96363KS2Z5A5x0%2FjJ5GUAuopJdjkRGjjpm19fX%2B2avld05XmjMne%2Bnk3OSqcG7lX%2FmFyJ4tO7%2F%2BiAogqTZ4Jf%2BPt%2BA5c4tE%2Blsq6e0DwE7qLRh1lXUNFf0QCV2jc8%2B%2F5kgUF51BocdcJD%2BFujKt9mo2wiwXz5VJCmtYc%2FrnEA1ykvtm6jdD%2ByUdF80XnxTM3J9ZhsFl6A%3D%3D"
+                ],
+                "mapImages": []
+              }
+            ],
+            "costs": [],
+            "mapImages": [],
+            "transportType": "도보",
+            "transportDuration": "",
+            "needsReservation": false
+          },
+          {
+            "id": 4007,
+            "time": "15:00",
+            "name": "토부호텔 레반트 도쿄/호텔 체크인",
+            "description": "방 3개",
+            "category": "숙소",
+            "comments": [],
+            "duration": 10,
+            "address": "1 Chome-2-2 Kinshi, Sumida City, Tokyo 130-0013 일본",
+            "estimatedCost": 4247736,
+            "currency": "KRW",
+            "payer": "이아름",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784766062329-584237075-files-1784717841456-102683860.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=S1vyJoquUAR4di2qE%2BIO4FPpDiMl7QsoZAYIoPG3i3CIAWnk50iq1JYi0B8a8N5x6gm28BmSRV%2BdVB2AMuawgg2Rp1tl90OprsK4jjXdLATJfVlYSkHTYDYjZ8yFj9TBCzMEOFxeQ%2FCkBWo36X171vp5dwPY0oWp1msUYgflaCoHY0t4K3rwAg80N%2B%2Ba0f7FCeaw1Zo%2BzaiOiohmPhO12Vf0965ijGP7LQBlUX7N1OmQUK2fq4owRv%2Bqrl7Ra8o97jghlnnNbrIAQ%2F1R5kbts5nIfGBmFpQLuhtIs5zUGEG9hfinC%2FVh%2F7hgih29E25SIi68iIbtKx%2Bx3yd3oMzbhQ%3D%3D"
+            ],
+            "needsReservation": true,
+            "isReservationCompleted": true,
+            "mapImages": [],
+            "transportType": "도보",
+            "transportDuration": "",
+            "costs": [
+              {
+                "id": "4007_c0",
+                "title": "호텔 체크인/토부호텔 레반트 도쿄",
+                "amount": 4247736,
+                "category": "숙박",
+                "payer": "이아름"
+              }
+            ]
+          },
+          {
+            "id": 4008,
+            "time": "16:00",
+            "name": "아사쿠사 센소지",
+            "description": "도쿄에서 가장 오래된 절. 규모, 볼거리, 먹거리 풍성",
+            "category": "관광",
+            "tip": "지하철 이동 30분",
+            "comments": [],
+            "duration": 50,
+            "address": "2 Chome-3-1 Asakusa, Taito City, Tokyo 111-0032 일본",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "payer": "이현수",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784777631162-977362651-1000009254.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=qsbUlBCn9KKpqiggXtrqfLGBuKgiWf%2FjmhAwbAiiQIfp719oSekYP1QVHt9uHGJXho7Ms51hApHUhuw2oWzAIBqDCtk7wPJs4s%2BWsF7XHkkz6uE6QeUaBfxGuTIB2wXGsaLjvVSw3BbtGMNCkwkW3lWYs4jPfExwiwG6zLUMZZ9hVh0GMbRnxu7ipsuUXJjjyhBg8%2FcJZp8Lv6gWxkadwYd6xfZEhShAQSmlKCOP%2F2wZyF3c9JPhRYRtS%2BELi5lBClpVCUWxTQDbs%2Blg3OdN5CSL55mfpY4jF%2B1twp0TafLmFzzt0KyvezJz3E6XKABWH0%2FuY35K6Pl2LGUxu%2BWlog%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784777631556-883887005-1000009257.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=sNZDQyOie2vTHoEQiIWzyAlqeUHhycTbOczrHMzZTSxP2LGMPjTi4sY9hHT3LOfim71M6Nm%2BgksK1tD0%2F7DY1jUzjJ6vUyeXc5ubgq2Dcq2xh4z9flU%2BvdmmPQzojKMez4P0NlhpUcr0A9vr4Eoga2A3VUK7Z0PNqg5jJRun%2BFpyYJw1v8ppxVb2%2F99IoHXHWMtGl31Mea89QRPOdJ%2FfBqJbPOSPwbINEtOp4fElf5t%2BMJuXiO4pEBccCe%2FqcoCkoSUPQAO8QKAzb2Mq7IdtOUUccf%2FaN30lHnTS86%2BlL0Z93LcTx0ItUjQgDSlKXFtP17xyoLd60fgQJIUNROqgKA%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786673338510-414496467-image.png?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350905200&Signature=RMAx%2BIPylGq2ChWzMGxweVV%2FsEFPwQVmGh8nny4DLsppBrTEH64T2NLq%2FjTUlyPIJBlIH4EMUEf6z923FFzVUge9zTxDv0iv9O7ssLy5po%2BCF26rKo5XwQ8KR1cbD%2F1X0xlR4vTPkhB9R3kq%2B6munb%2BTje7nWD9qH4s8mcWAGMh1AhQOHvDA8Bo5lwVxT%2BtuR3USti3yft%2BO3dGpbWhEuMQHl8di5ewgvLQWrhpP11rhNIedEeCIMbFPE%2Fyey%2FsXuGcBfBWwbY0lfnbcoeVXVn8nyH%2BF%2F2ZRKr9oZHsMV%2BBfASOfNeCpvmC1gj7Cs1lXcQW%2BN%2BQl4cGBvyux0yrB%2Fg%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": "",
+            "costs": []
+          },
+          {
+            "id": 4009,
+            "time": "16:50",
+            "name": "나카미세도리 거리",
+            "description": "가장 오래된 상점가. 아사히 스카이룸 옥상에 황금 거품",
+            "category": "관광",
+            "comments": [],
+            "duration": 60,
+            "address": "1 Chome-36-3 Asakusa, Taito City, Tokyo 111-0032 일본",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "payer": "이현수",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784777562899-227945710-1000009245.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=csCSnGAoF8LN792AcLS9EzzzuadOvYcJACnh29pKCHrl8QiW5nbnI4qAsLbcJ9KWqWaqv8IN03njn0HTYivObaBh4a2zVMDfwFGBJ6gY8eErUKMpEuKajYFyYKg3tbwipfWgTJw67%2FGFohB8p07jHtHSB7YVgO1PwR1YeNI7tCeJ9sEUuYSXrONgRi9vcGzUqTzaqUa2tG2E4c3CZN2HcbhjKHm5X%2B%2BWjl4niwg4J3ycTAQ09vzqLN2CBcrgAn4Y9RsFhukwLDTQljyekZSYURXgPNCVZs0ZRyalVIcQID8q%2FcpiO2qTEqlinMPCc%2BrMVGUhn1IvdLCxCm%2FXGEJ9Bg%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784777563698-742676216-1000009248.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=sPKnqEWCoERcQ8mD2lqLJpT1vPGE%2Fy7Va0HQ1smnIaj8h7UY2xIn1kJl5zw3W7uk%2BBPqHkDGrLIPhzLg2%2FqFvcIai4jMe6nboXJB869GKRR6eFZtmfjeLXFHrmU1LnC6nyuT1wRMqXbtlo54i03TlwUK40ACp2W62gyL7tJHNAO4wFHRm1T5F7pHJ3V55pt75KeX5F9NUIq1iKJreDKnjKqjNt23Al%2BivWcooPQeXvI3PZy2FX%2FjC9Hthc65DCqU4bAUp%2BQet%2FACifxe%2FiQZnTpRCtyl3dpj46dieCZNz5JRgVanbstBuz0IQXUQlaSDoFvZFPBGwRbHzi29yxq7mQ%3D%3D"
+            ],
+            "transportType": "",
+            "transportDuration": "",
+            "mapImages": []
+          },
+          {
+            "id": 4010,
+            "time": "17:50",
+            "name": "도쿄 스카이트리 전망대",
+            "description": "전망대 예약은 온라인 구매가 저렴. 해질 무렵 올라가면 낮과 야경 동시 감상",
+            "category": "관광",
+            "needsReservation": true,
+            "comments": [
+              {
+                "id": 1784813287716,
+                "author": "이정우",
+                "text": "여기는 안감",
+                "time": "PM 01:28"
+              }
+            ],
+            "duration": 120,
+            "address": "1 Chome-1-2 Oshiage, Sumida City, Tokyo 131-0045 일본",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "tip": "예약 입장료 차이 있음",
+            "payer": "이현수",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784777795019-592999920-1000009260.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=SqUtzbPW%2Fp1MqKR62zCtkaBRCTdGG8JiP0wX7dpRWIQnzKi2QN3dnKQSve%2B1PReDtFn9i%2FJytBVe%2BWegCjIOAHn%2B%2Br4UGvFrcOeprgtR2x0Y9vtmP6LiQO64z7M8Z0YVv3G3QiBBPlLNqYJO0COGymEmXfigBpNgV4jrm6J3NTOFzslJZGi3LQ8mHxMJPCnrDxVnYTGAmvRYLbPS8QY42ld0%2BgwI0lHSDfo%2Fuz528Jx%2BY1cIDCixFhlX0wWvIFv6wkasbCI1qt%2B1qTMSacDftytzg91e4Y5SXx5YMRPm26R0eLlQzVv9MsPUDZtkwwEJ66VnbmfoBUVyeR9RyKjRHw%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784777795650-297171495-1000009263.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=Ee58w7qq%2FZ%2BWKvD5IZxwVwlAugBwAbrMdAYwQuqX3M6LaDzgFkDQeOAcSsXEU8WtVJeI1SGehQXZW00ip6hatsrMXdYtflLmXrReyuCoZ7TBchwQgzLV2GO6ULFeyELph7GLpPmHfR764puAmomVQBYSFLvZIM26%2FP9KxINlnD7FbJkjZRcEmZOZEIGJhsHpyOLiQEeXNIxg0X%2FEpsQYPeW%2B5ewLGuyJ0ce%2B4ql%2BOXRsz%2BzIPpL6HCOc%2BVrWf0o24l5VsBzEWRmT15IvnWOZWRRsFISzzrv4%2FP0uW2hQzyXSvmFmo4rkp3yXeBDJ9sBd75l06ItatKqQKr6%2FG5E1VA%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784777796254-73842844-1000009266.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=KgxTimPbmRj%2F1WZ1w0IgLuts1WNMjvY5cqjw1LpLNPoToXmU3R1UFvyXwMPr%2BQ1PNg5eoOt%2B%2BV6jCdn8UR4cuBczXlyos50flsm%2FQNttoImMHHzSzQ3XWTlxB8Rxi7AzthxUylUpxHTF6oGdyoELtCKedE%2FUgS%2FN%2BN%2B%2BhF5qaG5JMuhaoEdaluFsBJk6kanFKOJb3p7VscTRai%2Fh3GcKCo44dt15VP0dUpRizvZCI7p%2FYXjBX9HWhQ7bbi%2Feunt2t4ZYbu4KVZY4XJDbRZd%2F9hg3IotIViKJ9JcRno4VjkjFIeZMmcrtUNmTwyVhu8%2FGooB8CnXT7NJxeLw79TGKhw%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784777796818-119568568-1000009269.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=UZIdM73FVuzuGzmsXkdpNj7LwMPV2T2Bs2QP91EfgZtu%2FEzPusVONEg6%2BD7LbURfeoiteM1e7MpDatEIv7emJd0vB26kPZmOwc5phdkXvgaZTUu4pKhHWCuZ4z9uqjlliF9YMcw5eJhakbcoThqKECZufk9LbhFa86BCHIG8TreFCAS0r0DMqbRJ7pcsFwwWw9g4QDPfg2ITSi1A3Ah%2BBTjUNq8Kko8ZxR3IBN9QDHjE4Z4yo8ScHjhjqQ1mmQY7498KKVleOX6B7fNI2bwtaGCc5%2Balilo9Ii9rLTAoKk%2Fx8wi082fy9wh6LfGQKYD8bctOKgzhEsx6qIGIG1y9kQ%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784777797303-182342678-1000009275.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=gGgetoR8DVE%2FZnsLI46F6uFfHEftkJ6REQNU5900hOUY7D0%2B60H8WvUYayAMfdNZyJCHe7J8ZBXsgCpY5Htc38AHkN0ssysEu12z355w%2BYWWw1pPyEi6XSbeIYm1SPcR6LlSYcCwry7AFTACaNF%2FrzuqUv9hW34VESSePJ2MmT87IxHcycHR5cQkxamSfcyjur%2BtvEfphwLwKQ5G4x9JwboSH92SD06FmVQW9uVsblJ0PVi1z3AP6DDw0WseColjutC1ck2V%2B1T8rn5LjtqbPR4XVvu39bNGwKuY2i7X5r397JSZUMR6fNJkya9OdBB4%2F5TPHrrLIbTwePxcvd%2BShg%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4011,
+            "time": "19:50",
+            "name": "저녁 - 츠키시마 몬자 타마토야",
+            "description": "명란+떡+치즈 몬자(멘타이모치치즈) 추천, 2명 5000엔 정도",
+            "category": "식사",
+            "estimatedCost": 5000,
+            "currency": "JPY",
+            "tip": "몬자거리 산책도 함께 추천",
+            "comments": [],
+            "duration": 60
+          },
+          {
+            "id": 4012,
+            "time": "20:50",
+            "name": "긴자 쇼핑",
+            "description": "마츠야 백화점(디올,화장품), HOKA매장, OK긴자(다이소,GU,유니클로), MUJI, LOFT, ABC마트, 세리아, 긴자식스",
+            "category": "쇼핑",
+            "tip": "게스트카드 발급 가능. 라이프베케이션에서 일본 사케·위스키 구입",
+            "comments": [],
+            "duration": 120
+          },
+          {
+            "id": 4013,
+            "time": "22:50",
+            "name": "야식 - 아부라소바 긴자구미",
+            "description": "마제소바·아부라소바. 면사리 추가 약 340엔",
+            "category": "식사",
+            "estimatedCost": 1000,
+            "currency": "JPY",
+            "tip": "새벽 4시까지 영업",
+            "comments": [],
+            "duration": 60
+          }
+        ]
+      },
+      {
+        "day": 2,
+        "date": "2026-10-16",
+        "title": "도쿄 감성",
+        "places": [
+          {
+            "id": 4014,
+            "time": "08:00",
+            "name": "아침 - 숙소 간편식",
+            "description": "숙소에서 간단히 식사",
+            "category": "식사",
+            "comments": [],
+            "duration": 90,
+            "address": "",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [],
+            "mapImages": [],
+            "transportType": "대중교통",
+            "transportDuration": "40"
+          },
+          {
+            "id": 4015,
+            "time": "09:30",
+            "name": "메이지 진구",
+            "description": "",
+            "category": "관광",
+            "tip": "메이지 신궁→하라주쿠→오모테산도→캣스트리트→시부야→시부야 스카이",
+            "comments": [],
+            "duration": 60,
+            "address": "1-1 Yoyogikamizonocho, Shibuya, Tokyo 151-8557 일본",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784778211734-977536938-1000009278.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=b%2FZZRh9FKfQwAL1ZDomKaECm%2FcGwk0%2FnQ%2FZf58w%2F6xWxOPTXgUpbjS8lbC6oYBNNZxJI9ZPpHTF3Iqp70MwkhPGd1hG1wEECJ3LdrDaX9z9dwaC7fybhK3wpcPoexnBhMIZ7aeRTynaoQwyX8ctwdXB7PTmuiObQ8%2F%2B6GZAh5rk38o8G81LWXQcQ6u97AguKqkOrT6ao13zn%2BQfluOoaSj38sLUPGH3jXZbQsNj9dUt%2F%2BzSTMBjAMn1q1FAqxRrlvFqjszeEEsMMzNB6Q1nmPalAhB%2F1YZ1JKaKTIsqUfi9p7sCFJPuRNuyYmXcfbuf9r6X2B0g%2Bfu1jmat2AiXA%2BQ%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784778212309-86916238-1000009281.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=bwZSe8T0tYLvAa8aErAui5fImu4iVuyaq4IQS51BsXL6HN4KM8GDviIh%2FPjadjJ88cQSZxPWi21QzpKhYewZOl6ZSR%2BL948z7w36flw8hT36CBAriNRVXnKHCBnYKUuCXpbr2yAaY2MNAeWQ0pCOkCn5FnYgiUQziIdKRL5F8QxwNhakAgA7JYYWJ6X5D13M5%2Blo%2B2NJy7u%2B23GFb1RhfXiJlld1WjyYDQPFX87gLdQKGVeJs%2Bs%2BTYy7rSzapttgeT5PhYdDLleAhWIM1qCjSxmyUWWO3X88vhPogv3ukmQr2gCPNsRCGuRBnEca1wg%2BmmzbO5Z1IkRLJ97s7TKzXQ%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784778694617-207269326-1000009299.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=czRdyAftLu7NKxhoSXgkGgEtFz6uKWJvQMh4e5wE5BCKzW38iCuCYr%2BRYDq9Dtfybd9PgcHLndwZyKVDFTxvGUKMdDAX97JofO5DQtAkIywYH9zxRQ0GBEihYEOnfZYBb1%2B7q9kkGVEdWoHj72yuJ1V43bbt%2FK2aNSbX8Ka5glX1wJrlJkuNlE1YsTgB%2F45c43eM%2FgF7YBvJn2J%2BfRlrs8y%2FRNtKx9qL62Nk0CslLsSKxlcq4GXA1cdV%2FCSQO1GRkPQ27R0XMioZJds2Aj3RdM3n7m%2BCsd99k1zmnyl86Rm6injcdetJgWzxEvMevmIdRSjnXuyakFIcMr%2FcuP5ORg%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "도보",
+            "transportDuration": "15"
+          },
+          {
+            "id": 4016,
+            "time": "10:30",
+            "name": "하라주쿠 다케시타도리",
+            "description": "400미터 길거리, 도쿄 10대 소녀들로 붐비는 곳. ",
+            "category": "관광",
+            "comments": [],
+            "duration": 90,
+            "address": "일본 〒150-0001 도쿄도 시부야구 진구마에 1 조메",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "tip": "마리온 크레페 유명(호객행위 조심)",
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784778321694-300569004-1000009284.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=jeUmeo5XDXjTd4g1b2jJsAx3oQwQtJ3MgaCY%2BoSCkhzQYUrW%2B5dEWcBj8qk3uf4M3TXxkxBPqegcsSJwEMccObMW40C6oDOythdJFPCVEUl330D8jajp3QamTNCfnz3ME60krbqHXQAltLYr5Q7scR4VTq2YXYdkDMnE6i0iGD%2FtVVxbPQfT4d3TrbDnOdSUFB4j6zC%2FPK7ynSVC8HXfe2NWOPBiRgjuUqWjQFfeloxmFpoeRx5ivQYZDEsLleoRyfjaxzekpDmuMqWK0oeHN2sq%2FBeu36diQ%2Fc9Gol6R6nuyPfdaAQKTZfODxUZ8Z2l9YRmFAd70sA%2BVC%2BAb2veew%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784778322378-717711014-1000009287.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=uJ2m2J8rxOtkh331xVHRJZItCZRMR0LWPKBNa13Pb%2Fh9012kPPKOFCcVSSS83Oei9PjSFSbgmU9tf6xxFtBvnzlfzlYlPTe1Nt0Wcg691Xv%2FzTcEa8ta5JCZ60h8UrKj%2FBjjymJKGpoJKo297JB9uQbeaDqN5vAx74Bn67rLkpPrBN0nvY%2Bsrl%2BQ5GE4zntbP98S%2FM5BBydXXA4T%2BkFcIShC0KYOM%2BqmGSAUpoUWszjI6HKQqlZzdLsim7RK2lb2xniAzFoXOMM27bdjKFEDvJUaTC1VtIF%2BUfyqvV4xJUsk8oIVwcqDKXRfWKwXTpNV57i7pYraeqB6JQaSndb8KQ%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "도보",
+            "transportDuration": "5"
+          },
+          {
+            "id": 4017,
+            "time": "12:00",
+            "name": "점심 - 규카츠 모토무라",
+            "description": "위드 하라주쿠점, 길거리 맛집",
+            "category": "식사",
+            "estimatedCost": 2000,
+            "currency": "JPY",
+            "comments": [],
+            "duration": 90,
+            "address": "일본 〒150-0001 Tokyo, Shibuya, Jingumae, 1 Chome−14−30 ウィズ原宿 B1F B106区画",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4018,
+            "time": "13:30",
+            "name": "오모테산도 카페거리",
+            "description": "도쿄의 샹젤리제",
+            "category": "관광",
+            "comments": [],
+            "duration": 90,
+            "address": "",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784778596175-780692828-1000009290.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=Kb6ETCVwYx%2FUFWA4rKw5m9ybL4M6Zi%2BrjE3uKinki0bABpo7t714DSYgTAQc16ZB%2FBa5K7S3b0fL98YKDE%2FRwfgqRnACQZQ537866i463ZFZRX9oQtbuLWIjF4LLS1x%2BSANPLpjhwloaltXm4rWjdReiobUvNMAUxE6LfNemMPSK%2BAloXL%2B5uemloqSbm9lLjeGTryRoexN4Na0zoUQZwUTCo2MTPpE9Ws50iukY7wf4UHCNfPmnd140xyZT3Dv8ycksZogCivwQJHqbUQ2H%2BtkUwOkZlzC6stQeeyvVzO5VUS%2B6%2FvKnG5jFk34gAjsZnPbIouBscs4%2BT0isddZjVQ%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784778596777-371287608-1000009293.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=AvhIjyqTug6m68p98GTUavIHuS0myYUIR%2FSejj5m%2FgXzZj2nMMleAJ5EK13HESVpBpepqwW3qKkDWMd%2Fg%2BP1l1EMcCWSRO4dDGRKeHF5%2BvFDe06%2FDGCnYX%2FDuHUJPRw45G3v%2FZo7UiVTqvh1u2l12MjSKHMhsIH2fwLelGr5dgcGz3ssNL4fZogpLqDuWi%2BE0NAgu%2BIYV1YkybaaaYYHreUh5GEgEq8G6u97YJGjDV73TLwPi1EdIzIDfz38KNE6WrsHit2U7%2FAgoZ1xdNShjvj1XUVchOy143yhDVEVBopi%2Bdwdk4u4wzRzichEOOIUyJxaTfjJ7tab7jL1yAQWXw%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784778716980-511622885-1000009296.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=ppChhuQOG8iCdbd1%2FFIQAZgOyGyTgvNhjNRqlAiODF7Yj6rrrqW3M4U7nt1H2uBB6NekXoD4VpJMJgx5GnFPZCfIp2PCdC%2FOyHyQ3sP8aGCBquLiyG%2FLHbELPC%2Bfaab%2B8NNgkETbLYBirjWZyCtup5VVVCC6IRyBj%2FQfCZdMpe8lnFVwq41KtCGc2%2BdimSHpykirkO9sYxJvgk3CHkgxtnRq7QviASZlDXJGi4tqd2Bn8s%2FQtqNResQYASDw1Avh4%2F6gjl3z2omdXZDVsVRkdQBQligKVLjf0heeI28rfFQjNsSN0AJ4dsJZBiqS8CytYAFq1neF5qdAdLsn2dfD8w%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4019,
+            "time": "15:00",
+            "name": "시부야 스크램블 교차로",
+            "description": "",
+            "category": "관광",
+            "comments": [],
+            "duration": 30,
+            "address": "",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "tip": "에스컬레이터 사진은 내려갈 때 찍어야 배경이 잘 담김",
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784779076514-260531107-1000009302.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=e3L6tQio%2BWZxlhbXYeXAGtZByPYidFoXpyXNtAHOALPHrZc0gUXSk2jOlhJ7X%2FGannGib2ss0JJMJe5JxvaCZzwTSB7a4iIyCNwWwhIh3UDQ%2B9YjDnCZGmJaxhG4ZMSBoEiFsjciW8zD9dfKeubevpGBPP1ivbGTpg%2FFe%2BFS3HdotmUC4OgkEXnPNvZVmsdpsIDQ5Y4T%2BajDyli34bmu3d6upeamN9jX2rart0E05d8P2DHMKtoQ89FdyaycsxwihvRPZaLnW4DbKjTf9R5GEqPOgsjTc3UXzJvhbdfEbrddYpDCF%2FIOyyTJO2G7waP%2B9kqFtXgglvXfJesmxCrEqw%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784779077127-973157810-1000009305.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=mqFI3ATlAUPyC47bVGJ42l49o9Yh1vI6YpGipdcBkEkncF8lTKuXsdz15tSdk6KI4jQIDjvR%2FqfxG%2BMF4pAQoH%2BdjjXwwCyPUgf%2F6DF3Ty1vjOk6ymuRQPDKZgqH0tEWw7dTMw%2FbMzFnoQDf6mpnP0xCrfgLvkb%2Fq4WC8KrCsfDmsAkAw9%2FrvKpJ3nYZoYPqoYZALbER4%2FTUmTi%2BjhThO6gdvylsOxKGUkK9fOyO7e09EQO3CS4%2Bt%2FrYRYOcawx%2Ffp%2Bs4%2BCGFVVCR7uo%2BdfxQs%2FVimZFsX2jwvvXi%2Fv%2BkB4Cxsh3iPggXAE1wTPBUVvlGNOLaPaf6e4OVibgSgRBIQ%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784779077619-421328572-1000009308.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=lcLl8gvxMrZSv5Bwwmx6ID%2FzbV5xCELSMFdc8ZiC8wg5ihczjV4mmUya4snirKbkZHE%2B6fnS2CAiHA%2B%2FdgaVpdoP%2FD7wMLf8xlqVFyWc864nCZUthsPrf2gdVClrihDyw3teS2Y%2BjULFW6Asc11sX8DfMUY0uOyd1zwbDRtMbHyRwNGGtD9MThoZRVGS9buyx7ITLcVZu6nfbqh5CCDovNaAH9cXzbPhZXeUW50svmrMzuzTFbgdAJ75t0DRmIbvd6VnRdVFgG78tQs5KA9KZ6XxpRzzA6qKH44cX4OVBof%2FntNcoa7fxsJViNCesJ%2BMih5z3YOzzsydjfSPCTXH1w%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4020,
+            "time": "17:00",
+            "name": "저녁 - 시부야 돈카츠 아키라",
+            "description": "연어카츠 추천",
+            "category": "식사",
+            "estimatedCost": 2500,
+            "currency": "JPY",
+            "comments": [],
+            "duration": 90
+          },
+          {
+            "id": 4021,
+            "time": "18:30",
+            "name": "시부야 스카이 야경",
+            "description": "시부야스크램블스퀘어 1층 엘베→14층→루프탑. 모서리 사진 먼저(직원 있음)→가운데 사진",
+            "category": "관광",
+            "needsReservation": true,
+            "estimatedCost": 2450,
+            "currency": "JPY",
+            "tip": "줄서기 2시간 예상. 미리 예약 필수 (¥2,450~)",
+            "comments": [],
+            "duration": 60,
+            "address": "",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784779185598-567644757-1000009311.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=ktPFYu%2BOvjQmQBNZKkpX%2FP76LbhM0Nd2fEmB0woliX95BRvy%2F%2BJlhX7EvtQB9rmdez3Ve0TddrTDdYtjugXB%2FUq%2BPBKrVLY3HbymEhUFdcimGRYzg8TKAl4GqW8GuOpkxRhfuRV7pCMZAJo8jgN%2B017jmQOuMO3H5oRkoUrd5m4rZyAVbPX36kvKICfPyYRwi%2BuV8MOjIuJD4zfHESMxR0oZ9CHqHHSZqkZuqMMOXCCZHalRdYnJ9nhR9lejzU5gaM2iPHjAgXFBBLlRw0D888wKKBmBwCP2gJXP0HVnZnhVIm%2FhI8fMph%2F9qA9Uax4CPwTz8Zqop%2FqnvO65OfKcvQ%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784779186110-108337914-1000009314.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=kV%2FRf4iMOC49aC9gyu1ZaGSKZWMNUtYJV4LInsSxOOMsUcIDL4vBb%2BXI5Fp3TnWHW7Hsh3rojBGsEYHCLemzcT0BgViNVWyjfA8%2BvQX6vdgyJfC2KfyjMokccaXBgfyXdEu5rGywiIHYakAdAto7r2KMvOODDFH%2BFHQ%2Fb7aT%2FFJX8EEHk5co8mdRTnERmTt4HkQOoUr02B2YKhPXnKGdhQTMZkX%2BJFRNWstsnSDkpyXozLaKAcZ2qSVUuqrPWS2pXmUyRNKHNDfs5Uj%2BqLNeLKJw46nGCUpq7u3UCFYv0GG3hN%2B83G6LPcHvKGh1ZESxh68i8YtRMGUzQwm0dARuKA%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784779186605-468957022-1000009317.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=Y9H%2B6q9SxMN%2BwOxYc8VRUEVBq1wk%2FtQsKBCCe4tMvBWz87axZCyhqWKcU1ddzI5jF4tVZPeUFi1XHT0xspJrFQX%2BttEbA3KyugmlebhnrSCNsKcQNyXNJ2sNhgJ4h5U3NZJ1VyFOjfmIxLIc8gHzn5HWPKXmb%2F1hhGUHBdmMzgOjVyHN1nuCuM6KuGgcO8Mk7Q9T5%2BIlI83GIoHugpE7NIlF%2BMzPdk9IYzMhm11syCTBZNyYXcvnN%2FSc7CSj1dWy4uSBJcYk3nVMdM3wM7I58LG4d2duT6zKu7OyTsvVrQSFVTRyiM7aeHwWjzsKpsWvI8UCjU6qwB0sh%2BLHfIAeng%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          }
+        ]
+      },
+      {
+        "day": 3,
+        "date": "2026-10-17",
+        "title": "먹거리, 사진명소",
+        "places": [
+          {
+            "id": 4022,
+            "time": "07:30",
+            "name": "아침 - 츠키지 시장",
+            "description": "야마초 계란말이(웨이팅 많음)",
+            "category": "식사",
+            "estimatedCost": 1000,
+            "currency": "JPY",
+            "comments": [],
+            "duration": 90,
+            "address": "",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784794696421-702441023-1000009324.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=OTM5qotshK2ZvO34Gsddi%2FjMot%2BUgSC4XPIXxvL10iqCH7oFnjdRUcW9LDsWKOLm3JdUFpTAhXYyfKapAfacgJb95V9UIieJf4gj0i44IPRsWoSSdP1KZD5V09wGzLNHv6E90TgmYbT6iOY9GzwA2CHFNYf6hVJXQ%2BajavgsyZKHDWAsY3oD17dcCK2enNsBTNs%2Fx%2FqUbx7TfIeNyq312PC8j%2Fl8PSq1wT%2FyTGgFWVdEyE30Oq9uRVNyXLF%2FUUTmegR1a4oRC8FdkfZz7RGeAi5gCAzNJ1iCS3Ayuc9KI%2BC3JOxtzl1LgH%2Fz7jqd5m%2BaYaAd14Tg82Cw2CDs2xjv4w%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784794697546-664623524-1000009327.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=XWECVZCcswlPUj2hsGN%2FUjQoXK4%2FC6BppMY3duDuR0WmJE0Rncswvl6ukxdiNtRSCBYFARDznYJLl0uIJyb8KaGTaxjfYuuZJnWKR4HVd91P8H8mwh5ZBzbus50WNQAppA0mm3LAUSU4fC52UaPRH2NAfIFOTLna9Or3uwTZGg2x10YYkJaBbT5a24TxtHOHwI7mfoEXttV%2BS1bxgnd9x9UQzykFwemowxRY9mid0%2B16zbb%2BIRboSsju31Ds65IidgbnxFlKmt67wTB4%2Bqm4EbBQz%2B49gwKJSJGraopqmV18hUK9vgY5xYNtdy3sy55sar9l5Yma80mZ%2Bj%2BT3%2FkTkQ%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4023,
+            "time": "09:00",
+            "name": "긴자 쇼핑",
+            "description": "긴자역→긴자 식스→중앙거리(주오도리) 산책→유니클로 긴자점→이토야→미츠코시 지하 식품관",
+            "category": "쇼핑",
+            "comments": [],
+            "duration": 180,
+            "address": "",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784794731230-885287735-1000009330.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=i1pXStxlAnXhsi6CGz%2BirhYzWka%2FhCd2udpYhMaWv2ljCfMV0WpWS%2BzREiE1bJFFn7dLA6WHHB4ZhJVz93JbrnXLaIzu0iEI9Z%2F8%2Bko0I6bS1EW4zjrY0diCQ14vD8m882GwmIZ7ItYVfkZ8x5Gje3rO9zuDgxhnE6k2yOoJ%2B541e7kyKU7%2FL5RqFMexHB%2Bhyf3BjXwn%2FUNR4T8AmFVxfsHB2YBg1t7HEKwVrmxSUzwqSjFjZko%2BhwnBXXQ%2BUEao8l2sKKFtQEC9W7JJ7r%2FJ5G6zXcRCJdihfdEPKBoGX4fHmmLzUZCsxYF8qj8ha%2BaNtjzL06KyABNmLm0cwp%2B5yQ%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784794731801-994083706-1000009335.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=IaKoEsczbElJbeWtPElDfamPQkHEV3IkoVBi1gkTYuEL0pdpD041PLgGdOIQsNNELCgucGmDBXZGSnlsW1KSEEa86pHZMSaBe4u6u9C2C3tF1Z7B1VZhEZSuWhbyqPI3DEauqx%2BIEHJY9j4902KrSO71IiIubaco6Odw0sVbkmsI970058fN%2BNWIL3J25GYC33F1u8iugvdc6sARqTfon3dh1SkplFIhb%2B9t40oaXFCq0JCDbDTS1iMfXpjxNLoEnmkdxN6xPsv63SsZfBD6mi9jR87BpjPw6RB%2B3YM8XpDDjd7APK9Jm6zMThYVtYmPDJrTOfkEw0%2BaiKzsgFL6yg%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784794732368-538370839-1000009338.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=bJ%2FaC4nLywzfjCz1q8tgOxrDSfIN8LRsA8UM5cFdd6vGgENpBpFKvjX231wAmfia2L7pVaIF6zbVJHVCCk9xEyXJcfkFdDbdlpkjw84SUiZ6czq12NgFvmh3qby2IEsbxqWdNgUhDUWLsPkiOdPQahKwlTivbHK7oVSOYMa1RmSxPfCJmQ1FEvDz%2F70xRkcg2fPljqYupCD6mUJJVeoOOUMRAX8jqZFh2UMIQfI1qxluvJ9AdLFRylNl6Ad9ympaLAdDJMkYsZO6psFk8VRoDbuaOoMl5dyKKEicNEM2wK%2BNi9wQ1r2RssgKPE09ZU30rbRZB5lj8zj21XrUrQ7VRQ%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4024,
+            "time": "12:00",
+            "name": "점심 - 도쿄역 라멘 스트리트",
+            "description": "마루노우치 역사와 광장 사진 촬영, 캐릭터 스트리트 구경, KITTE 6층 전망테라스(무료)",
+            "category": "식사",
+            "estimatedCost": 1500,
+            "currency": "JPY",
+            "comments": [],
+            "duration": 120,
+            "address": "",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784794767698-906174080-1000009341.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=NYMytyXWHQJZnOgm4KE%2Fhhs0gsL%2FFEbMVY%2F5hp9chxN4ToDmnhrWwxAd5g6kGovjJcVA9nWvTJzNt4dH4SP7TWcgkx1yICabIgAr0OvupvDxVAGKkW8ZfMc%2F6XmKp9hWmN%2BmIdM72gcHtg%2B7jDI5qrzpXf469cntJ%2BTJ2Jo87UVx5gbJYlY9jMSNq7PImO%2B2bYJEuvbfM76jVfFz0DEkextFwGGLkYt9iE01gq6NWqzNDmDSyUbCxdFrjtgY7zwlURxWNme4eHzMa47vsbrGmGJlSdYrajKDoTpPbUn4r4S20rW%2FkHdVwVksgqTaPs0PjTLDq4iOz%2B0EV6vaakNWyA%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784794768292-960027940-1000009344.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=CYWsi45mgHZFhpchD62LQaEiXdxfwT2QCV%2BmYSxWPnajLzgIQlihZHOL5JKQWE0BfFSUSiLu8LWpfx6RQ2vbBVuIVFvu0sm11uVgv35FPl%2BCUXXsQLcijvGfPfRuL%2Fr54EDSVx%2Fmro4XmF1pIoZnvx3lpdDQCIsymgqyN%2FLBcOpijdTeh7WPPiSuY3bLNtC8i56SrO%2BgmTTPaCE0Tr6XNVv9a2O773SMeqXr6kyqlWhwh%2Fkmu%2F4b7SOSFqtGojiZ28tPQxCVYweLAdsOi4sQGTOUCSnNwNupnYFLKqIJuz9WbxYp%2FDOwADoLKx%2Fwbfh2nbgpdj8HyrlZXzgz304sxA%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4025,
+            "time": "14:00",
+            "name": "팀립 보더리스",
+            "description": "디지털 아트 미술관. 빛, 음악, 거울, 프로젝션이 결합된 공간",
+            "category": "관광",
+            "needsReservation": true,
+            "estimatedCost": 1850,
+            "currency": "JPY",
+            "tip": "예약 필수 (¥1,850~)",
+            "comments": [],
+            "duration": 180,
+            "address": "",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795033512-509199041-1000009347.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=wD9DEbOCV%2FeMDUqVcpEo4i2%2FgSv5NrW3BtB1Vg9PFDfjFbfVcmahJuVPrLVOOj8bJPDiikaBXuyNduaqukErcKL1rcmM19xMHztBjrkuJ4wo1DyhUHwGzW9gF30UTkJAg0gWYfrACGm%2B4pgqc2%2FEb6c0uGQgnEU0I0%2BqQI0zidiDKHe4CYwXmpdF2xiNN7jfw0EokKDrub%2Bp5QUtrhSsO6e7inVPe6zOT3GO5RagcZs8nG8kH3o1H%2Bq4aZf%2Bsrr2u4qFJBstkXd2PExhankevKkepMPzVmTT0DtA3dGFMiK6ZC05ZP1WPBQR1rilr9w%2BIjudrDfw2C6sPKHvucvfWA%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795034022-824207922-1000009350.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=HtjzxMIlvRHk3xlVYP%2FoM%2FoxfbTPbmh2qV9tD7ILqaKr6QwO%2BdT8C2qghvEDmUY8d6uLOR5IZ6HaJxw6E1JxsRtYO1gA9XrVm8aZgNia%2FQh4B2YPeVmtzECIRiU8%2FCMd%2Flm4jWm3EoNm9zigxS0JIGWgCQnjUlSeakKY220vqsZPpamI0iz270DFmFHiZ64O5hgCKFR06T6fS0J%2B88JhBgBmvFnkEpZIMIl4rB5cQRDwk6CSNIlpn%2FFirNh%2FIfbWFJ2ZZ4fuLqr0ojV55nxME4e5D6tBHYfApoJC0tSCf%2Fl09Te6bI1l1GHRJMPq4fZhATlYvwPlTtILhMXTj2kO%2Bw%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4026,
+            "time": "17:00",
+            "name": "도쿄 야경",
+            "description": "아자부다이 힐즈나 롯폰기 힐즈에서 바라보는 도쿄타워",
+            "category": "관광",
+            "estimatedCost": 1230,
+            "currency": "JPY",
+            "tip": "롯폰기 힐스 전망대 360도 도심 풍경과 후지산 감상 (¥1,230~)",
+            "comments": [],
+            "duration": 60,
+            "address": "",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795078054-469369892-1000009353.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=Hh4p1okJx4OQlaZ8C4xlJG%2BKMKEvGe7OLjOtYw%2BkHazG3JP1jv3doi69sp5ZkoO4KIy1b3vjdrV4riq5hMNKR1hypep8UoLqN%2BA9EHg683H4eN058xP%2BfzfTkPEy0RQK1Zy1EKsT%2BaxAUZ4A1xO%2F13K0ziDWa7EkEp78%2BZn75Cpr75dG8QsIHqLQYxPXweoqRKBwjs97NqeOz5OOXihod9U0CDqrLYo0KQhKHCoOi%2B0B8sckPfl53UbsB%2BGgR6I9I7N6qpT8sNAmezRVIk8GLZBq9FrAr3gx0Kw1BR9Vxyxj4p%2FdMTDCr43jsebAjKRqAP9E3HSTa%2FKPWYxDBubtTA%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795078585-915878487-1000009356.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=nqharaLJIfTSTIPG3EbR6dwNoKJzthSTWWsFebXoNFQUzkfPe0drTu4z5FSqtCYTiRYe%2FIX4rgNkr2UyyjbkOkUQgDyM0v%2BoDROa%2FCFiIChhEN%2FtUfZkkv2LLOlIk4fAtjBPd%2F6accXk3wOx6cKWkvxqSYVhnk%2BuOkFWONWwWXnDdWIRaMWja8TNbrZqcA2ooCWBpJU5Y60bOBHek9pZRTNSqD9NG%2FADuj3CUcpNxvjQStho33X6kZPh0uObCnoBLFITH%2Bf1cddgt%2B3ILwJU4BGOtI3gLBucqeC9l564DOm2YIK9iO6SDZnjyb3vRYZzOTHoXpConcLCBZBtjbtH0Q%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795079082-60849503-1000009359.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=lGmVpn0NlcSyQe2RC5RC6BE2%2BvBjOsJq5zP7HgxS64wvBxJlmNH83xGAxqxubfFXud8i6gzqn7qq8WFpYQWr6eK03Dc2ZOFt79ARyIpIed1uwop%2BLTPJvJ8UflEUhxYkyyXWMcICv9gjw5QZFQT7W7GODlAdhHOlm74V37nIQV%2B0eb2hlDOh%2B5txTlqFGXvu1NDdiOUJ%2B9pSS6Ewb67Gklos2Bu19A2OVcXq8zScCbcm39sMDHasK800%2Fwl8lxIWFDvSBjvkX2cl4cnhj0gSItz%2F%2FioK51yx7XmGC3Fl1Z0a9%2F2rP3BzT9vlQSFr9ib63ppBV5keOFt7qDWMLBMXmA%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          }
+        ]
+      },
+      {
+        "day": 4,
+        "date": "2026-10-18",
+        "title": "편안함, 마무리, 입국",
+        "places": [
+          {
+            "id": 4027,
+            "time": "08:00",
+            "name": "아침 - 숙소 간편식",
+            "description": "숙소에서 간단히 식사",
+            "category": "식사",
+            "comments": [],
+            "duration": 60,
+            "address": "1 Chome-2-2 Kinshi, Sumida City, Tokyo 130-0013 일본",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "payer": "이현수",
+            "images": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4028,
+            "time": "09:00",
+            "name": "호텔 체크아웃",
+            "description": "지하철 이동 40분",
+            "category": "숙소",
+            "comments": [
+              {
+                "id": 1784795216161,
+                "author": "이현수",
+                "text": "여기서 짐맡기나요? 아니면 가지고 다니나요?",
+                "time": "오후 05:26"
+              }
+            ],
+            "duration": 60,
+            "address": "1 Chome-2-2 Kinshi, Sumida City, Tokyo 130-0013 일본",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "payer": "이현수",
+            "images": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4029,
+            "time": "10:00",
+            "name": "도요스 시장",
+            "description": "도요스 시장에서 초밥, 현지분위기",
+            "category": "식사",
+            "estimatedCost": 3000,
+            "currency": "JPY",
+            "comments": [],
+            "duration": 60,
+            "address": "6 Chome-6-1 Toyosu, Koto City, Tokyo 135-0061 일본",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795442168-408575055-1000009365.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=XQ6m2bCvbaeM3LT0Ef6o05yWd7pxRLtBhuC1%2Fyi2Q1A4ksjMWudOcMPljPmLnp8JntxbYgYW1v2E%2BAOcQRev2FwN1a%2BbHy5kT5q%2F%2B%2Fvk90%2BQTV8Q1WCYcu8fnKLSnwBuMiTqa6o0YJcyMxC0W86TKv4EprJnmiSsTIv6CICG%2FA%2BIsd4hw7ct4wpGzoi2LdLikaMfi5pXnzr6%2FoHVgSKW4cnH%2FRLKrjUGyIb0SNqbgF8xutWSU3rPzLP9gJ3gpmKO7g4VhCyFq3o9FdEeAep5PReSCQQ5NrYS8HWowcLtl7yjmFftjd5YNM2I%2B%2B1EPQBg1djAWpukA%2FF73wz9UjOvXg%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795442854-676003878-1000009368.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=TQ4EiK%2BvY1c%2FC2zjS3B6ClWLNsmKcL4lfNzr73ZTmo6%2F2CNMMsLQ%2Bbpz7MgfJQtpLc1Yc5I1obJbVs1oBb%2FsLEchvTTxZ1zmNVCL%2BlhqlN30RYG0HjkLmzdjXTvlOjw0FGshaV1K44ft%2FST3EHT%2BIvGKUypyxKdHR0foEc5wNV0etPWH8FyU6HYuqJTAoCmvRRyVDubUlAVDaQLy%2BtPAuNviIQiydDakZun8qH3LZWDqQ2A%2FM6d1fe9NxwRECHh2QoZtm7rbwfEAwe8TYUWrb1n%2Bb1Ik3czCKdzLN%2FW6U8H4XfhY5OyQpKHaY0d%2BANo3WsIWaerlJ9i3VDUsVkjVHw%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4030,
+            "time": "11:00",
+            "name": "센카쿠반라이",
+            "description": "센캬쿠반라이 산책 및 족욕",
+            "category": "관광",
+            "comments": [],
+            "duration": 60,
+            "address": "6 Chome-5-1 Toyosu, Koto City, Tokyo 135-0061 일본",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "tip": "개인수건 챙기기",
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795542606-148397408-1000009373.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=SXIiKZCxbQQhZ3kKfg%2FaYQd2JxZEEEvntJI2Xbk1TIIEoiquMt96IAZPe8VWqf%2BHXKSdBkY28gCC3FcOQDZIzzUreM9B8hUK9GWo9UrlJ9KQrR%2FWWezZ%2FAFmY7HsY3RtFajQRueRb90Hp22AjxhLWgCYSzYhoJtLPFyU6%2BKcx38%2B48eNKOTkoYrs60cqI37HLEWvM%2Fw4PK87%2FLqlWuKKMLLw9XfTA9TbJB3acMiB8iq5wLTUO0vzyO37c4px0ozOEdfWqI4Da05%2BtuIfDk1AT4QHraK6P%2BPZwSyrEq5lV8ERqTln3eZErMo98Mqgnn8BAhM2R7l1Ia2zL8ILlWdVKg%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795543165-877128482-1000009376.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=ZVStKieQhvhqHRtgPZRQ48F%2FdGjvcjbgaBm0Tj1QNf39NoOUs8PAQ3vzkCZLkpx3e09rxWbiPQtZF%2BpjrM3w%2Bl3jVw%2BADciCoJ1%2BiHfJxqeNUMoPM7X0CQWFY7vsBy6AbgznJoIGT5dDt4qKc27bA%2FOCjv0NHo0FAy6dWejqXayaBn28b4v93gyEsle6g8l4c%2F2aa6NoNSk1OQ4qGYrSZ9x6ounmB0o%2FtCqrnSaM5cZ7SUwK3PR%2Bd%2B7YnQQ4smYYQyNXg62ZPVA%2BFQpmPObD7jZonP75hjSDlgLimzHecQFNkkQROnD3IMagi43Cn4fIe5iNJz33VdnRuLxqrCiRew%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "대중교통",
+            "transportDuration": ""
+          },
+          {
+            "id": 1784799417561,
+            "time": "12:00",
+            "name": "오다이바/다이바역",
+            "address": "2-chōme-6 Daiba, Minato City, Tokyo 135-0091 일본",
+            "description": "",
+            "category": "이동",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 60,
+            "comments": [],
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784799453824-292928163-1000009421.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=RANLfQA6sh9rRW6xGY38jtyTd8CDr1ochVxJ2G289hVzNN4hI8JjqHrrlUJQjZPNwxpHgfYa3pY%2FIP8tyXgSo4lk2RSngYdJK7qGLWz1RIQTa6IgrkkM0vt2cUji2YX9thtiv0%2FASZABe4d1uwKfDUAfUaX6F3eeo%2FBLrlLS8NRTRQdbbOHwT9wFlE6gYff2sysk1hAMxFM4ivcpYcImVB1mnqQkybvpo5B%2BY5an36CplKi6r9WDCwtCi0jd8SIznfiAPlUzw8VXdpE0cEBmSY8wCaafviPnSwLD3agG%2FILmzyChUMPrTZzDvnIlvwxhTI5awHygV7noUgSyldTDDA%3D%3D"
+            ],
+            "transportType": "",
+            "transportDuration": "",
+            "mapImages": []
+          },
+          {
+            "id": 4031,
+            "time": "13:05",
+            "name": "오다이바/해변공원",
+            "description": "모래사장을 걸으며 도쿄만과 레인보우브리지 감상",
+            "category": "관광",
+            "tip": "유리카모메 탑승",
+            "comments": [],
+            "duration": 60,
+            "address": "",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795659287-647932246-1000009385.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=VwL7TVMPcTW2yk4GC78%2BXWcY19qGeHsbrWUH%2F7r2m1b6sZbwuAiuAa2km9A%2Fmm7m8BaweBheTjh4FOP%2F%2BCHWn51HHDlgPMoGVM0jT%2B0InWw%2F8TROzdkSAZw%2FleCXiiD42WSKumrPesXZKl7vi2cwWVwRO0O4abSt8gATjsMCQA17p46bWduKN3pG6eTNm91%2BS6ONZLpMALDDd61hV2EuUVGVhcBV9pi%2F%2FUB2wNTtxfYesGr7gnPUr6TOlEBMF2Fp4JAPqC2it6La2mPX0bdT6V8TvVudcYbtDTlWP6tFyzmE6Uezb1eWaTm0A5CxX2LSih3A6yj%2BfLbBii821gMZGw%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795660331-735498124-1000009388.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=SouYLVM8zPGrpPr%2Fv4LFkykazYSsj%2BwZ9J95BQ3ySxQab8%2B%2B6rkYgY6Z4DduFob8NqUIOYddtZ3AsBizkd5NavAthKAcNQT1ldycAUyDGoUPU6tdFtz64nv0HlX8DXc%2FAnT4uh1428URFYErQtCRwVreTwDmAmqP0%2FyxpHiv3JtAZ2FNLmmqjVivFlb7fV9Kielp1mNgYa9jm5aKCbbmSSlF4AjUTLEpmSbG9wf8%2FR4DGku40rMfXN2LtCCRLc9pp6Tq%2Fdyv8X7FRqD8bNg%2BUQI%2FqvRT0C43VXLad8NHNBmPh5dvK7zGzHfuGkiXfsF16D7QxrwktD8tPbc2IJNSTg%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 1784797186376,
+            "time": "14:05",
+            "name": "오다이바/실물 건담",
+            "address": "일본 〒135-0064 Tokyo, Koto City, Aomi, 1 Chome−1−10 ダイバーシティ東京プラザ内 2Fフェスティバル広場",
+            "description": "",
+            "category": "관광",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 60,
+            "comments": [],
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784799044293-321336945-1000009419.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=tiE0Yyaj94kT82G3pGUzAJDZCrm5werc0a3MS659IHSp77drpSHtdRFCawgq1lBsMA0tyJLcJ8ibuZ4C5uDVeenYDfdxOYcIqu1s20Q0sSk330s4T74%2FTSXPTjXlCM54ftGAw7uGqGr9PcKKQw6Bs2TtSM8Xj4rbL0GvqLVQaIeG1mf6Gg76wkwd4T%2Fw63h6hr4d4jMUbIJ65fqHxYDm55drDeW3eW1dghr4vVcswlEj5C8%2B3hZXU3x3IhIUm2flMC%2BKRH%2BpRi9OgXYTSGua6jJzAQMJbAOM6NqgF8UrW6HNSvRcSoyJcNU2A4VZtTYbJJYlsIa0Z04Scb6tCpArAg%3D%3D"
+            ],
+            "transportType": "",
+            "transportDuration": "",
+            "mapImages": []
+          },
+          {
+            "id": 4032,
+            "time": "15:05",
+            "name": "자유여신상 & 레인보우브리지",
+            "description": "뉴욕의 자유의 여신상을 본떠 만든 축소 복제품. 바다와 도시가 어우러진 개방감",
+            "category": "관광",
+            "comments": [],
+            "duration": 150,
+            "address": "",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795829917-522994883-1000009391.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=VN%2B6FOj2uVMwexVITHQLK7yXnY1T5ZjpsmTJowZntpExtl%2BCRGpHSDwXZEhPlZI0RaqPU009PCLVnEWz4kbVwar4gjZSLzvCvJcVfn6HA9CBCSwqEG0dFOUphTR0B4JBqjwdRztng%2BUxjbt0%2FAucR4p1oeGp%2B8VVClBtXVWL2NiQmv%2FQqXfvM2%2BmlbKgTm2JV0nzfD5hk%2F2CBkvV9N23Mo2X1wBW9%2F9LqZtaDzK8%2FAe%2F7vswR6x8yZjC%2FhNTrRf7dMAWbLiiGMZClfCIjQyVFTYdaPaf9PRLB2LMmFi1nRAgOBf%2B8hQuifJbLJPspdWGUAK3FIGgvq1HJwJCWC223w%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795830454-563180569-1000009394.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=ctSgZVeYmdueuvaUURGOm2ikRyADb7%2F%2FZZELW1zWOBd22HxWPMYdFlBg3sWfFaY4FE22Jr%2FcGGrq3YtHjlsaSmWJjVD%2F4%2F7B8ggDLE%2FE4EtcmNhwJhxrwj9pHMcpY8KZU51jhDB0E6WMCpJ%2BbH2GSpCRxmzY2p8K9VjzzeYg7NSzn9Xr%2BqQ1XAhF%2FZYzOIfkJ0ZPlezDauqFCXE%2F0As9EhJWZib78AMt67mTbDdslKKZHDrrXcmM8aEtP%2BVU%2FJh2XL5O8%2BkG4SvoTgciEhRuj1jrCZ6vjjXWhmyl7u8ufu493yJQqqzjk2k6nRpHYm3DUxhuRtmF%2FrFuTQOUf%2Ftdfg%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795830994-790144000-1000009397.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=D7%2F8Bfvso46WV5hmqloQpcMxPaZy7b%2BLmfXtOcRc1nRBh0TFZskFW5OkbZ0DXlLvYVOor393QMxBwZHXg4Bv0VobY07QSfOzZ%2FMpsCmOkNyHt%2BNbp%2BpHvDWxA1P9qJBk%2BBYcsgewBHN5TK69SNVw1CJvOQoGSfaftQoaTZxPgf8cbN16PN8Mk%2BCBK6DkCza9%2Fapm%2BIKWJY2jDcXMa9veYbx4k3JyRBPYWfNuFTxV%2B1V9Ds4tM8q2LH%2BIh1IgM7BChwyaY0SGH8MAu7p%2FM1OouPwYve9adbE3oCeP%2FzQBJys%2FjBlTI3%2F2BGrWl3pTUieV15Ow75XkI7SMALEAFdEjNg%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795831600-247273721-1000009402.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=v4k093%2B1Bcl5hLqa9LrhHYlXd19IYNUKgctRA20t8Tqk%2BuQAVBO8k6oO4%2Bp54A6%2BhLY2k6bhKDiJBCQZ2peeoMPSgVSV5wDf%2FnOg%2FkEMwk2Vwzw%2FtckQDmxLEfbDsDfMwSGNs%2Fs1QhIInncqaWB7cRNd6%2FwUPVeZzHxWPuCB%2FKfBILnXxAh0JQIhD5P%2BBr2emKIvDpfZxxK2hjKy1KqtHFQGKcrWWYWytIxOMYYA4OuScjtnY8cf%2F66m74cW4JBzUNQLRXUPro%2BO%2F0%2BFtMTVMJ%2FhRJVlLBCdJxfMXSe9x1tcHR%2BJh%2B%2FDeH3KOqbWpDZ33xlAZb1EpFfd0t7yBIxrPQ%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795832083-867396397-1000009405.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=fi5Ig5x62EmHNyYjXgQJe0ZzpsZY%2FHAA4b7CKVXaHHPGCXlZE1Jsy9szu4tTVV4qHW9WUrVKJgeGBPzsACY0KwMbQa2CVWQRFeclOW6iEaX3gupeSuGflVrrkEl4BJYPKI4uQTZ7qjqybUqcdJ4l%2Fzs1v21G2hmUJGAwZMU%2Bk5P5Sudr341kMMu1yXUPpMYETNRYP0DjSeB852MTCjJRRmXx1JOaavycjVIH8HBGbTbplkgac96YzQUvIk5LyGd7tNsi7b1YcsOEXKmtfiUf7GdpG8ikzM%2FyUH4tSuxLr6%2F6HstXJ%2FHjrL7VcG1x%2BWOxZnPPy04Kv91bFhDqmptKeQ%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4033,
+            "time": "17:35",
+            "name": "리무진 버스 탑승",
+            "description": "나리타공항으로 이동",
+            "category": "이동",
+            "estimatedCost": 1500,
+            "currency": "JPY",
+            "comments": [],
+            "duration": 90,
+            "address": "",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784795803732-584258116-1000009408.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=JyCbtwYGAjyL1qRhPV79BaDJBKuhscUu4xg8rgUbYg7ricg4FUTtBusLynZ2b2Toz68szh8NtG3lk8B8crOa0cq8Mm39hMoCqId8ArDsxnhigXkAqasxXz%2BybuThs5MG9%2Bv1O1MLrPTo%2BK7fjHTmKA%2FOIv6baD4AjZ%2BzskOQdpyCB9KYLQOSLSZMAgPeRfwlOxnm9n8%2FqAN0fugfSxsEOi%2B%2Bzo9pgud6l1RlqLXWneAfKHukxvOL61H%2F7I8f09AfReR5BG5%2FItdWM0eVIrXrjYXS96LraKkLSOVgmXAgpDENiLtNT%2FRrOsTjnTgM%2B78M732fXgIAMjQzemE75334ew%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          },
+          {
+            "id": 4034,
+            "time": "19:05",
+            "name": "저녁 - 나리타 카와토요",
+            "description": "장어덮밥. 더라운지 바우처 공짜 + 생맥주추가",
+            "category": "식사",
+            "estimatedCost": 2000,
+            "currency": "JPY",
+            "comments": [],
+            "duration": 60,
+            "address": "일본 〒286-0111 Chiba, Narita, Sanrizuka, 御料牧場1-1 第1ターミナル 新中央棟4階",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": "",
+            "costs": [
+              {
+                "id": "4034_c0",
+                "title": "저녁 - 나리타 카와토요",
+                "amount": 2000,
+                "category": "식사",
+                "payer": "미지정"
+              }
+            ]
+          },
+          {
+            "id": 4035,
+            "time": "20:55",
+            "name": "나리타공항 이륙",
+            "description": "출국심사 후 탑승",
+            "category": "이동",
+            "comments": [],
+            "duration": 10,
+            "address": "1-1 Furugome, Narita, Chiba 282-0004 일본",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "payer": "미지정",
+            "images": [
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1784811319345-851705397-1000009414.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=ZhTzog3I8SDj0735EwZtYq7dNWZiWuGQGcclhiCFy1qzDIZMYAXp8dklPNg8dkDBipB9JKzdJ0lCQsExtqJC62C9MvGMdHgCErvJ%2BitHEOn%2BoCnar8gkzmzBLy7nGsP91daqzod0boXIYMZTMW%2BYOwYy7HTUs4VP%2Bajnh5IZb%2F%2BKzB%2B25WheKbddqsCRCp5u8Gy%2B78W60SB7ULXY4h7W7CkGgJkURc6cdy9FI2Jz%2FavTY9%2BIQfX%2FVzSTH1lFhLGFT1q%2F6famzB%2FuLTDV6IeRe7koR12RdsAkB%2BnGrHME%2FMPu5N5U9t4Wbz5jbKf15xKy2cDqI%2Bz2TqiRKK3BtW9DXQ%3D%3D",
+              "https://storage.googleapis.com/travel-squad-73fe2.firebasestorage.app/uploads/1786408452998-269788779-1000010128.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40travel-squad-73fe2.iam.gserviceaccount.com&Expires=3350937600&Signature=PTL93ttmsnPt8XHznzTJVkzYuJJ5KWkRyGYV%2FAXgbaMy0VGX8DF%2BhPu%2F9T2W7ieauvVOv%2B%2FUlRqD1JtmXAavSlPmmyiG48ZdFIPWrxkhPcQCh8d9B6WMkykmNLGCA3Jjau8Zr9Er77dpfQPzYOU6HUMYGV0GAQt6rgyQcwb5P%2Fhzeuxn5bNzyD9W8xADzlQ%2BAoV26K7603KAd9RY1iuTIG0E4m9cDYoI62mODUHs17umAnxbARD34WPuDzT13aa5vKEDSYj8RFwI4LTnxNsR9%2F7YWopMo%2FTqJqcKvXKm2d9BAAxZ5GA6dJDnkIk6pqANSymdPVbBlZqKmyKYdKoWQg%3D%3D"
+            ],
+            "mapImages": [],
+            "transportType": "비행기",
+            "transportDuration": "150",
+            "costs": []
+          },
+          {
+            "id": 4036,
+            "time": "23:25",
+            "name": "인천공항 착륙",
+            "description": "입국심사 후 귀가",
+            "category": "이동",
+            "comments": [],
+            "duration": 10,
+            "address": "",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "images": [],
+            "mapImages": [],
+            "transportType": "자차",
+            "transportDuration": "60",
+            "costs": []
+          },
+          {
+            "id": 1786409021645,
+            "time": "23:55",
+            "name": "인천공항 제2터미널 주차장/집으로",
+            "address": "",
+            "description": "",
+            "category": "이동",
+            "estimatedCost": 0,
+            "currency": "JPY",
+            "needsReservation": false,
+            "isReservationCompleted": false,
+            "tip": "",
+            "payer": "미지정",
+            "duration": 5,
+            "costs": [],
+            "comments": [],
+            "images": [],
+            "mapImages": [],
+            "transportType": "",
+            "transportDuration": ""
+          }
+        ]
       }
     ]
   },
