@@ -2376,15 +2376,6 @@ function App() {
 
         // Process costs breakdown
         let costsList = editingPlace.costs ? editingPlace.costs.filter(c => Number(c.amount) > 0) : [];
-        if (costsList.length === 0 && Number(editingPlace.estimatedCost) > 0) {
-          costsList = [{
-            id: `${editingPlace.id}_c0`,
-            title: editingPlace.name,
-            amount: Number(editingPlace.estimatedCost),
-            category: editingPlace.category || '관광',
-            payer: editingPlace.payer || '미지정'
-          }];
-        }
         const totalCostValue = costsList.reduce((sum, c) => sum + Number(c.amount || 0), 0);
         const primaryPayer = costsList.length === 1 ? costsList[0].payer : (editingPlace.payer || '미지정');
 
