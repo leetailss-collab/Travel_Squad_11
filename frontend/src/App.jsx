@@ -4320,19 +4320,38 @@ function App() {
 
                     return filteredItinerary.map((dayItem) => (
                       <div key={dayItem.day} className="card" style={{ padding: '20px 16px' }}>
-                      <h3 className="card-title day-heading" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                        <div>
-                          <span>{dayItem.title || `${dayItem.day}일차`}</span>
-                          {dayItem.date && <span className="day-date" style={{ marginLeft: '6px' }}>({dayItem.date})</span>}
+                      <div className="card-title day-heading-container" style={{ marginBottom: '16px' }}>
+                        {/* 1라인: 타이틀 */}
+                        <div style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text)' }}>
+                          {dayItem.title || `${dayItem.day}일차`}
                         </div>
-                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        {/* 2라인 (줄바꿈): 일자 + ✏️ 수정 원형 버튼 + 🗑️ 삭제 원형 버튼 (오른쪽 정렬) */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                          {dayItem.date && (
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '500' }}>
+                              📅 {dayItem.date}
+                            </span>
+                          )}
                           <button
                             type="button"
-                            className="btn-secondary-sm"
-                            style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '6px', cursor: 'pointer' }}
+                            style={{
+                              width: '28px',
+                              height: '28px',
+                              borderRadius: '50%',
+                              border: '1px solid var(--primary)',
+                              background: 'var(--primary-light, #eef2ff)',
+                              color: 'var(--primary)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              fontSize: '0.8rem',
+                              padding: 0
+                            }}
+                            title="탭 이름/날짜 수정"
                             onClick={() => setEditingDayTab({ ...dayItem })}
                           >
-                            ✏️ 탭 이름 수정
+                            ✏️
                           </button>
                           {plan.itinerary.length > 1 && (
                             <button
@@ -4358,7 +4377,7 @@ function App() {
                             </button>
                           )}
                         </div>
-                      </h3>
+                      </div>
                       <div className="timeline">
                         {dayItem.places.length === 0 ? (
                           <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>아직 등록된 일정이 없습니다.</div>
