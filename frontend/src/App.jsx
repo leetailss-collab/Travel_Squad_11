@@ -5271,28 +5271,22 @@ function App() {
                         <label>📸 이미지 첨부</label>
                         <div 
                           className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
+                          onClick={() => addImgInputRef.current?.click()}
                           onDragOver={(e) => e.preventDefault()}
                           onDrop={(e) => handleDropImages(e, false, false)}
                           style={{
                             border: '2px dashed var(--border)',
                             borderRadius: '8px',
-                            padding: '14px',
+                            padding: '16px',
                             textAlign: 'center',
+                            cursor: 'pointer',
                             backgroundColor: 'var(--bg-muted, #f9f9f9)',
                             transition: 'all 0.2s',
                             fontSize: '0.85rem',
                             color: 'var(--text-muted)'
                           }}
                         >
-                          <div>{uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 캡처한 이미지를 모달 어디서든 Ctrl+V 로 붙여넣거나, 드래그&드롭 하세요.'}</div>
-                          <button 
-                            type="button" 
-                            className="btn btn-sm btn-outline-secondary" 
-                            onClick={() => addImgInputRef.current?.click()}
-                            style={{ marginTop: '8px', fontSize: '0.8rem', padding: '4px 12px' }}
-                          >
-                            📁 PC 파일 찾기
-                          </button>
+                          {uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 복사한 이미지를 모달 어디서든 Ctrl+V 로 붙여넣거나 클릭해서 업로드'}
                         </div>
                         <input 
                           type="file" 
@@ -5667,28 +5661,22 @@ function App() {
                       <label>📸 이미지 첨부</label>
                       <div 
                         className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
+                        onClick={() => editImgInputRef.current?.click()}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => handleDropImages(e, true, false)}
                         style={{
                           border: '2px dashed var(--border)',
                           borderRadius: '8px',
-                          padding: '14px',
+                          padding: '16px',
                           textAlign: 'center',
+                          cursor: 'pointer',
                           backgroundColor: 'var(--bg-muted, #f9f9f9)',
                           transition: 'all 0.2s',
                           fontSize: '0.85rem',
                           color: 'var(--text-muted)'
                         }}
                       >
-                        <div>{uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 캡처한 이미지를 모달 어디서든 Ctrl+V 로 붙여넣거나, 드래그&드롭 하세요.'}</div>
-                        <button 
-                          type="button" 
-                          className="btn btn-sm btn-outline-secondary" 
-                          onClick={() => editImgInputRef.current?.click()}
-                          style={{ marginTop: '8px', fontSize: '0.8rem', padding: '4px 12px' }}
-                        >
-                          📁 PC 파일 찾기
-                        </button>
+                        {uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 복사한 이미지를 모달 어디서든 Ctrl+V 로 붙여넣거나 클릭해서 업로드'}
                       </div>
                       <input 
                         type="file" 
