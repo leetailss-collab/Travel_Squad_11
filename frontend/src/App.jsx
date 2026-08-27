@@ -2021,6 +2021,47 @@ function App() {
     setEditingDayTab(null);
   };
 
+  // Move / Reorder Day Tab (Left or Right)
+  const handleMoveDayTab = (dayNumber, direction) => {
+    if (!plan || !plan.itinerary || plan.itinerary.length <= 1) return;
+
+    const itinerary = [...plan.itinerary];
+    const index = itinerary.findIndex(d => d.day === dayNumber);
+    if (index === -1) return;
+
+    const targetIndex = direction === 'left' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= itinerary.length) return;
+
+    // Swap items
+    const temp = itinerary[index];
+    itinerary[index] = itinerary[targetIndex];
+    itinerary[targetIndex] = temp;
+
+    // Re-assign sequential day numbers (1, 2, 3...)
+    const updatedItinerary = itinerary.map((item, idx) => ({
+      ...item,
+      day: idx + 1
+    }));
+
+    const updatedPlan = {
+      ...plan,
+      itinerary: updatedItinerary
+    };
+
+    saveUpdatedPlan(updatedPlan);
+
+    // Update active editingDayTab state to follow the new day number
+    if (editingDayTab) {
+      setEditingDayTab({
+        ...editingDayTab,
+        day: targetIndex + 1
+      });
+    }
+
+    // Keep selected filter in sync with moved tab
+    setSelectedDayFilter(String(targetIndex + 1));
+  };
+
   // Delete Day / Schedule Tab
   const handleDeleteDayTab = (dayNumber) => {
     if (!plan || !plan.itinerary) return;
@@ -7404,6 +7445,50 @@ function App() {
                   onChange={e => setEditingDayTab({ ...editingDayTab, date: e.target.value })}
                 />
               </div>
+
+              {/* 탭 순서 이동 기능 (2번 방식) */}
+              {plan && plan.itinerary && plan.itinerary.length > 1 && (
+                <div className="form-group" style={{ background: 'var(--bg-app)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', marginTop: '8px' }}>
+                  <label style={{ fontSize: '0.82rem', fontWeight: 'bold', marginBottom: '8px', display: 'block', color: 'var(--text)' }}>
+                    ↔️ 탭 순서 배치 변경
+                  </label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      className="btn-secondary-sm"
+                      disabled={plan.itinerary.findIndex(d => d.day === editingDayTab.day) <= 0}
+                      style={{
+                        flex: 1,
+                        padding: '8px 10px',
+                        fontSize: '0.82rem',
+                        fontWeight: '600',
+                        opacity: plan.itinerary.findIndex(d => d.day === editingDayTab.day) <= 0 ? 0.4 : 1,
+                        cursor: plan.itinerary.findIndex(d => d.day === editingDayTab.day) <= 0 ? 'not-allowed' : 'pointer'
+                      }}
+                      onClick={() => handleMoveDayTab(editingDayTab.day, 'left')}
+                    >
+                      ◀ 앞으로 이동
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-secondary-sm"
+                      disabled={plan.itinerary.findIndex(d => d.day === editingDayTab.day) >= plan.itinerary.length - 1}
+                      style={{
+                        flex: 1,
+                        padding: '8px 10px',
+                        fontSize: '0.82rem',
+                        fontWeight: '600',
+                        opacity: plan.itinerary.findIndex(d => d.day === editingDayTab.day) >= plan.itinerary.length - 1 ? 0.4 : 1,
+                        cursor: plan.itinerary.findIndex(d => d.day === editingDayTab.day) >= plan.itinerary.length - 1 ? 'not-allowed' : 'pointer'
+                      }}
+                      onClick={() => handleMoveDayTab(editingDayTab.day, 'right')}
+                    >
+                      ▶ 뒤로 이동
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="modal-footer" style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
                 <button type="button" className="delete-btn-danger" onClick={() => { const day = editingDayTab.day; setEditingDayTab(null); handleDeleteDayTab(day); }} style={{ width: 'auto', marginTop: 0, padding: '10px 16px' }}>삭제</button>
                 <button type="submit" className="submit-btn" style={{ flex: 1, margin: 0 }}>수정 완료</button>
