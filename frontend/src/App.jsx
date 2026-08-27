@@ -595,6 +595,11 @@ function App() {
   const [showEditMembersModal, setShowEditMembersModal] = useState(false);
   const [tempMembers, setTempMembers] = useState([]);
 
+  // Custom Day / Schedule Tab States
+  const [showAddDayTabModal, setShowAddDayTabModal] = useState(false);
+  const [newDayTab, setNewDayTab] = useState({ title: '', date: '' });
+  const [editingDayTab, setEditingDayTab] = useState(null);
+
   const [holidays, setHolidays] = useState([]);
   const [exchangeRate, setExchangeRate] = useState({ rate: 1, source: '기본값', updatedAt: null, loading: false });
 
@@ -976,6 +981,8 @@ function App() {
       (lightboxImagesList && lightboxImagesList.length > 0) ||
       showAddSavedPlaceModal ||
       editingSavedPlace ||
+      showAddDayTabModal ||
+      editingDayTab ||
       showNotifModal
     );
     if (isModalOpen) {
@@ -990,7 +997,7 @@ function App() {
     showModal, showAddTripModal, showAddEventModal, editingEvent, showEditMembersModal, showAddAnniversaryModal, 
     editingPlace, editingAnniversary, confirmModal.isOpen, showTrashModal, showEditMetaModal, 
     selectedDetailPlace, showProfileModal, lightboxImagesList, showAddSavedPlaceModal, editingSavedPlace,
-    showNotifModal
+    showAddDayTabModal, editingDayTab, showNotifModal
   ]);
 
   // Modal Back Button Handling (For Mobile Browser Back Gesture/Button)
@@ -1012,6 +1019,8 @@ function App() {
       (lightboxImagesList && lightboxImagesList.length > 0) ||
       showAddSavedPlaceModal ||
       editingSavedPlace ||
+      showAddDayTabModal ||
+      editingDayTab ||
       showNotifModal
     );
 
@@ -1033,6 +1042,8 @@ function App() {
         setLightboxImagesList([]);
         setShowAddSavedPlaceModal(false);
         setEditingSavedPlace(null);
+        setShowAddDayTabModal(false);
+        setEditingDayTab(null);
         setShowNotifModal(false);
       }
     };
@@ -1958,6 +1969,75 @@ function App() {
     }
 
     setEditingEvent(null);
+  };
+
+  // Add Custom Day / Schedule Tab
+  const handleAddDayTab = (e) => {
+    e.preventDefault();
+    if (!plan) return;
+
+    const updatedPlan = { ...plan };
+    const currentItinerary = updatedPlan.itinerary ? [...updatedPlan.itinerary] : [];
+    
+    // Find next day number
+    const maxDay = currentItinerary.length > 0 ? Math.max(...currentItinerary.map(d => Number(d.day) || 0)) : 0;
+    const nextDay = maxDay + 1;
+    const dateValue = newDayTab.date || (currentItinerary.length > 0 ? currentItinerary[currentItinerary.length - 1].date : plan.startDate);
+
+    const newDayItem = {
+      day: nextDay,
+      date: dateValue,
+      title: newDayTab.title || `${nextDay}일차`,
+      places: []
+    };
+
+    currentItinerary.push(newDayItem);
+    updatedPlan.itinerary = currentItinerary;
+
+    saveUpdatedPlan(updatedPlan);
+    setShowAddDayTabModal(false);
+    setNewDayTab({ title: '', date: '' });
+    setSelectedDayFilter(String(nextDay));
+  };
+
+  // Update Custom Day / Schedule Tab Name/Date
+  const handleUpdateDayTab = (e) => {
+    e.preventDefault();
+    if (!plan || !editingDayTab) return;
+
+    const updatedPlan = { ...plan };
+    updatedPlan.itinerary = updatedPlan.itinerary.map(item => {
+      if (item.day === editingDayTab.day) {
+        return {
+          ...item,
+          title: editingDayTab.title,
+          date: editingDayTab.date || item.date
+        };
+      }
+      return item;
+    });
+
+    saveUpdatedPlan(updatedPlan);
+    setEditingDayTab(null);
+  };
+
+  // Delete Day / Schedule Tab
+  const handleDeleteDayTab = (dayNumber) => {
+    if (!plan || !plan.itinerary) return;
+    const dayItem = plan.itinerary.find(d => d.day === dayNumber);
+    const placesCount = dayItem?.places?.length || 0;
+    const tabName = dayItem?.title ? `${dayNumber}일차 (${dayItem.title})` : `${dayNumber}일차`;
+
+    openConfirm(
+      "🗑️ 일정 탭 삭제",
+      `'${tabName}' 탭을 삭제하시겠습니까?${placesCount > 0 ? `\n\n⚠️ 포함된 ${placesCount}개의 세부 장소도 함께 영구 삭제됩니다.` : ''}`,
+      () => {
+        const updatedPlan = { ...plan };
+        updatedPlan.itinerary = updatedPlan.itinerary.filter(d => d.day !== dayNumber);
+        saveUpdatedPlan(updatedPlan);
+        setSelectedDayFilter('all');
+      }
+    );
   };
 
   // Delete Travel Plan or Family Event
@@ -4139,7 +4219,7 @@ function App() {
                 </div>
 
                 {/* 2차 Day 필터 바 */}
-                {plan.itinerary.length > 0 && (
+                {plan.itinerary && plan.itinerary.length > 0 && (
                   <div className="sub-filter-bar" style={{ 
                     display: 'flex', 
                     gap: '8px', 
@@ -4149,7 +4229,8 @@ function App() {
                     position: 'sticky',
                     top: '58px',
                     zIndex: 90,
-                    backgroundColor: 'var(--bg-app)'
+                    backgroundColor: 'var(--bg-app)',
+                    alignItems: 'center'
                   }}>
                     <button 
                       className={`filter-chip ${selectedDayFilter === 'all' ? 'active' : ''}`}
@@ -4169,9 +4250,10 @@ function App() {
                     >
                       전체 일정
                     </button>
-                    {Array.from({ length: Math.max(1, Math.ceil((new Date(plan.endDate) - new Date(plan.startDate)) / (1000 * 60 * 60 * 24)) + 1) }).map((_, i) => {
-                      const dVal = i + 1;
+                    {plan.itinerary.map((dayItem) => {
+                      const dVal = dayItem.day;
                       const isActive = selectedDayFilter === String(dVal);
+                      const tabLabel = dayItem.title || `${dVal}일차`;
                       return (
                         <button 
                           key={dVal}
@@ -4190,10 +4272,35 @@ function App() {
                             flexShrink: 0
                           }}
                         >
-                          {dVal}일차
+                          {tabLabel}
                         </button>
                       );
                     })}
+                    <button
+                      type="button"
+                      className="filter-chip"
+                      onClick={() => {
+                        setNewDayTab({
+                          title: '',
+                          date: plan.startDate || getLocalDateStr(new Date())
+                        });
+                        setShowAddDayTabModal(true);
+                      }}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: '20px',
+                        border: '1px dashed var(--primary)',
+                        background: 'var(--primary-light, #eef2ff)',
+                        color: 'var(--primary)',
+                        fontSize: '0.82rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
+                      }}
+                    >
+                      ➕ 탭/일차 추가
+                    </button>
                   </div>
                 )}
 
@@ -4213,10 +4320,44 @@ function App() {
 
                     return filteredItinerary.map((dayItem) => (
                       <div key={dayItem.day} className="card" style={{ padding: '20px 16px' }}>
-                      <h3 className="card-title day-heading">
-                        {dayItem.day}일차
-                        {dayItem.title && <span className="day-theme">{dayItem.title}</span>}
-                        <span className="day-date">({dayItem.date})</span>
+                      <h3 className="card-title day-heading" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                        <div>
+                          <span>{dayItem.title || `${dayItem.day}일차`}</span>
+                          {dayItem.date && <span className="day-date" style={{ marginLeft: '6px' }}>({dayItem.date})</span>}
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          <button
+                            type="button"
+                            className="btn-secondary-sm"
+                            style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '6px', cursor: 'pointer' }}
+                            onClick={() => setEditingDayTab({ ...dayItem })}
+                          >
+                            ✏️ 탭 이름 수정
+                          </button>
+                          {plan.itinerary.length > 1 && (
+                            <button
+                              type="button"
+                              style={{
+                                width: '28px',
+                                height: '28px',
+                                borderRadius: '50%',
+                                border: '1px solid #fee2e2',
+                                background: '#fff5f5',
+                                color: 'var(--danger)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                fontSize: '0.8rem',
+                                padding: 0
+                              }}
+                              title="탭 삭제"
+                              onClick={() => handleDeleteDayTab(dayItem.day)}
+                            >
+                              🗑️
+                            </button>
+                          )}
+                        </div>
                       </h3>
                       <div className="timeline">
                         {dayItem.places.length === 0 ? (
@@ -5308,8 +5449,10 @@ function App() {
                       <div className="form-group">
                         <label>여행 일자 선택</label>
                         <select className="form-control" value={newPlace.day} onChange={e => setNewPlace({ ...newPlace, day: e.target.value })}>
-                          {Array.from({ length: Math.max(1, Math.ceil((new Date(plan.endDate) - new Date(plan.startDate)) / (1000 * 60 * 60 * 24)) + 1) }).map((_, i) => (
-                            <option key={i} value={i + 1}>{i + 1}일차</option>
+                          {plan.itinerary && plan.itinerary.map((dayItem) => (
+                            <option key={dayItem.day} value={dayItem.day}>
+                              {dayItem.title || `${dayItem.day}일차`} {dayItem.date ? `(${dayItem.date})` : ''}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -7194,6 +7337,82 @@ function App() {
             >
               변경사항 저장하기
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* 5. ADD CUSTOM DAY TAB MODAL */}
+      {showAddDayTabModal && (
+        <div className="modal-overlay" onClick={() => setShowAddDayTabModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>➕ 새 일정 탭/일차 추가</h3>
+              <button className="close-btn" onClick={() => setShowAddDayTabModal(false)}>×</button>
+            </div>
+            <form onSubmit={handleAddDayTab}>
+              <div className="form-group">
+                <label>탭 이름 / 일차 타이틀</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="예: 1일차 저녁 추가일정, 야경 투어, 자유시간"
+                  className="form-control"
+                  value={newDayTab.title}
+                  onChange={e => setNewDayTab({ ...newDayTab, title: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>해당 날짜 (선택사항)</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={newDayTab.date}
+                  onChange={e => setNewDayTab({ ...newDayTab, date: e.target.value })}
+                />
+              </div>
+              <div className="modal-footer" style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                <button type="button" className="btn-secondary-sm" onClick={() => setShowAddDayTabModal(false)} style={{ margin: 0 }}>취소</button>
+                <button type="submit" className="submit-btn" style={{ flex: 1, margin: 0 }}>일정 탭 추가하기</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 6. EDIT DAY TAB MODAL */}
+      {editingDayTab && (
+        <div className="modal-overlay" onClick={() => setEditingDayTab(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>✏️ 일정 탭 이름/날짜 수정</h3>
+              <button className="close-btn" onClick={() => setEditingDayTab(null)}>×</button>
+            </div>
+            <form onSubmit={handleUpdateDayTab}>
+              <div className="form-group">
+                <label>탭 이름 / 일차 타이틀</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="예: 1일차 저녁 추가일정, 1일차 - 입국 및 숙소"
+                  className="form-control"
+                  value={editingDayTab.title || ''}
+                  onChange={e => setEditingDayTab({ ...editingDayTab, title: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>날짜</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={editingDayTab.date || ''}
+                  onChange={e => setEditingDayTab({ ...editingDayTab, date: e.target.value })}
+                />
+              </div>
+              <div className="modal-footer" style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                <button type="button" className="delete-btn-danger" onClick={() => { const day = editingDayTab.day; setEditingDayTab(null); handleDeleteDayTab(day); }} style={{ width: 'auto', marginTop: 0, padding: '10px 16px' }}>삭제</button>
+                <button type="submit" className="submit-btn" style={{ flex: 1, margin: 0 }}>수정 완료</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
