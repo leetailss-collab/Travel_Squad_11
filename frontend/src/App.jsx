@@ -4320,16 +4320,16 @@ function App() {
 
                     return filteredItinerary.map((dayItem) => (
                       <div key={dayItem.day} className="card" style={{ padding: '20px 16px' }}>
-                      <div className="card-title day-heading-container" style={{ marginBottom: '16px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', marginBottom: '16px' }}>
                         {/* 1라인: 타이틀 */}
-                        <div style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text)' }}>
+                        <div style={{ fontSize: '1.15rem', fontWeight: '700', color: 'var(--text)', marginBottom: '4px' }}>
                           {dayItem.title || `${dayItem.day}일차`}
                         </div>
-                        {/* 2라인 (줄바꿈): 일자 + ✏️ 수정 원형 버튼 + 🗑️ 삭제 원형 버튼 (오른쪽 정렬) */}
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                        {/* 2라인 (줄바꿈): (YYYY-MM-DD) + ✏️ 수정 원형 버튼 (오른쪽 정렬) */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '6px', width: '100%' }}>
                           {dayItem.date && (
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '500' }}>
-                              📅 {dayItem.date}
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '400' }}>
+                              ({dayItem.date})
                             </span>
                           )}
                           <button
@@ -4353,29 +4353,6 @@ function App() {
                           >
                             ✏️
                           </button>
-                          {plan.itinerary.length > 1 && (
-                            <button
-                              type="button"
-                              style={{
-                                width: '28px',
-                                height: '28px',
-                                borderRadius: '50%',
-                                border: '1px solid #fee2e2',
-                                background: '#fff5f5',
-                                color: 'var(--danger)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                fontSize: '0.8rem',
-                                padding: 0
-                              }}
-                              title="탭 삭제"
-                              onClick={() => handleDeleteDayTab(dayItem.day)}
-                            >
-                              🗑️
-                            </button>
-                          )}
                         </div>
                       </div>
                       <div className="timeline">
