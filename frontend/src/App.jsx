@@ -1067,6 +1067,43 @@ function App() {
     showNotifModal
   ]);
 
+  // Global Paste Event Listener for Modals (Ctrl+V Image Upload Anywhere in Modal)
+  useEffect(() => {
+    const handleGlobalModalPaste = (e) => {
+      const isPlaceModalOpen = showModal || !!editingPlace || !!editingSavedPlace || showAddSavedPlaceModal;
+      if (!isPlaceModalOpen) return;
+
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      const imageFiles = [];
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type && items[i].type.indexOf('image') !== -1) {
+          const file = items[i].getAsFile();
+          if (file) imageFiles.push(file);
+        }
+      }
+
+      if (imageFiles.length > 0) {
+        e.preventDefault();
+        if (editingPlace) {
+          handleImageAttach(imageFiles, true, false);
+        } else if (showModal) {
+          handleImageAttach(imageFiles, false, false);
+        } else if (editingSavedPlace) {
+          handleSavedPlaceImageAttach(imageFiles, true);
+        } else if (showAddSavedPlaceModal) {
+          handleSavedPlaceImageAttach(imageFiles, false);
+        }
+      }
+    };
+
+    window.addEventListener('paste', handleGlobalModalPaste);
+    return () => {
+      window.removeEventListener('paste', handleGlobalModalPaste);
+    };
+  }, [showModal, editingPlace, editingSavedPlace, showAddSavedPlaceModal]);
+
   // Fetch and build users profile mapping with offline fallback
   useEffect(() => {
     const fetchUsers = async () => {
@@ -5234,25 +5271,28 @@ function App() {
                         <label>📸 이미지 첨부</label>
                         <div 
                           className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
-                          onClick={() => addImgInputRef.current?.click()}
                           onDragOver={(e) => e.preventDefault()}
                           onDrop={(e) => handleDropImages(e, false, false)}
-                          onPaste={(e) => handlePasteImages(e, false, false)}
-                          tabIndex={0}
                           style={{
                             border: '2px dashed var(--border)',
                             borderRadius: '8px',
-                            padding: '16px',
+                            padding: '14px',
                             textAlign: 'center',
-                            cursor: 'pointer',
                             backgroundColor: 'var(--bg-muted, #f9f9f9)',
                             transition: 'all 0.2s',
-                            outline: 'none',
                             fontSize: '0.85rem',
                             color: 'var(--text-muted)'
                           }}
                         >
-                          {uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 복사한 이미지를 여기에 붙여넣거나 클릭해서 업로드'}
+                          <div>{uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 캡처한 이미지를 모달 어디서든 Ctrl+V 로 붙여넣거나, 드래그&드롭 하세요.'}</div>
+                          <button 
+                            type="button" 
+                            className="btn btn-sm btn-outline-secondary" 
+                            onClick={() => addImgInputRef.current?.click()}
+                            style={{ marginTop: '8px', fontSize: '0.8rem', padding: '4px 12px' }}
+                          >
+                            📁 PC 파일 찾기
+                          </button>
                         </div>
                         <input 
                           type="file" 
@@ -5459,80 +5499,7 @@ function App() {
                         </div>
                       </div>
 
-                      <div className="form-group">
-                        <label>🗺️ 경로 지도 이미지 첨부 (지도 연동 대비 캡처 이미지)</label>
-                        <div 
-                          className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
-                          onClick={() => addMapImgInputRef.current?.click()}
-                          onDragOver={(e) => e.preventDefault()}
-                          onDrop={(e) => handleDropImages(e, false, true)}
-                          onPaste={(e) => handlePasteImages(e, false, true)}
-                          tabIndex={0}
-                          style={{
-                            border: '2px dashed var(--border)',
-                            borderRadius: '8px',
-                            padding: '16px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            backgroundColor: 'var(--bg-muted, #f9f9f9)',
-                            transition: 'all 0.2s',
-                            outline: 'none',
-                            fontSize: '0.85rem',
-                            color: 'var(--text-muted)'
-                          }}
-                        >
-                          {uploading ? '⏳ 지도 업로드 중...' : '🗺️ 복사한 지도 이미지를 여기에 붙여넣거나 클릭해서 업로드'}
-                        </div>
-                        <input 
-                          type="file" 
-                          ref={addMapImgInputRef} 
-                          style={{ display: 'none' }} 
-                          multiple 
-                          accept="image/*" 
-                          onChange={(e) => {
-                            if (e.target.files && e.target.files.length > 0) {
-                              handleImageAttach(e.target.files, false, true);
-                            }
-                          }} 
-                        />
-                        {newPlace.mapImages && newPlace.mapImages.length > 0 && (
-                          <div className="image-preview-container" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
-                            {newPlace.mapImages.map((url, index) => (
-                              <div key={index} className="image-preview-wrapper" style={{ position: 'relative', width: '80px', height: '60px' }}>
-                                <img 
-                                  src={url} 
-                                  alt="map preview" 
-                                  style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border)' }} 
-                                />
-                                <button 
-                                  type="button" 
-                                  className="remove-img-btn" 
-                                  onClick={() => handleRemoveImage(index, false, true)}
-                                  style={{
-                                    position: 'absolute',
-                                    top: '-6px',
-                                    right: '-6px',
-                                    width: '18px',
-                                    height: '18px',
-                                    borderRadius: '50%',
-                                    backgroundColor: 'rgba(0,0,0,0.6)',
-                                    color: '#fff',
-                                    border: 'none',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    fontSize: '11px',
-                                    padding: 0
-                                  }}
-                                >
-                                  ×
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+
                     </div>
                     <div className="modal-footer">
                       <button type="button" className="btn-secondary-sm" onClick={() => setShowModal(false)} style={{ margin: 0, padding: '12px' }}>취소</button>
@@ -5700,25 +5667,28 @@ function App() {
                       <label>📸 이미지 첨부</label>
                       <div 
                         className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
-                        onClick={() => editImgInputRef.current?.click()}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => handleDropImages(e, true, false)}
-                        onPaste={(e) => handlePasteImages(e, true, false)}
-                        tabIndex={0}
                         style={{
                           border: '2px dashed var(--border)',
                           borderRadius: '8px',
-                          padding: '16px',
+                          padding: '14px',
                           textAlign: 'center',
-                          cursor: 'pointer',
                           backgroundColor: 'var(--bg-muted, #f9f9f9)',
                           transition: 'all 0.2s',
-                          outline: 'none',
                           fontSize: '0.85rem',
                           color: 'var(--text-muted)'
                         }}
                       >
-                        {uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 복사한 이미지를 여기에 붙여넣거나 클릭해서 업로드'}
+                        <div>{uploading ? '⏳ 이미지 업로드 중...' : '🖼️ 캡처한 이미지를 모달 어디서든 Ctrl+V 로 붙여넣거나, 드래그&드롭 하세요.'}</div>
+                        <button 
+                          type="button" 
+                          className="btn btn-sm btn-outline-secondary" 
+                          onClick={() => editImgInputRef.current?.click()}
+                          style={{ marginTop: '8px', fontSize: '0.8rem', padding: '4px 12px' }}
+                        >
+                          📁 PC 파일 찾기
+                        </button>
                       </div>
                       <input 
                         type="file" 
@@ -5933,93 +5903,7 @@ function App() {
                     </div>
                   </div>
                   
-                  {/* 지도 첨부 기능 추가 */}
-                  <div className="form-group">
-                    <label>🗺️ 경로 지도 이미지 첨부 (지도 연동 대비 캡처 이미지)</label>
-                    <div 
-                      className={`image-upload-zone ${uploading ? 'uploading' : ''}`}
-                      onClick={() => editMapImgInputRef.current?.click()}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => handleDropImages(e, true, true)}
-                      onPaste={(e) => handlePasteImages(e, true, true)}
-                      tabIndex={0}
-                      style={{
-                        border: '2px dashed var(--border)',
-                        borderRadius: '8px',
-                        padding: '16px',
-                        textAlign: 'center',
-                        cursor: 'pointer',
-                        backgroundColor: 'var(--bg-muted, #f9f9f9)',
-                        transition: 'all 0.2s',
-                        outline: 'none',
-                        fontSize: '0.85rem',
-                        color: 'var(--text-muted)'
-                      }}
-                    >
-                      {uploading ? '⏳ 지도 업로드 중...' : '🗺️ 복사한 지도 이미지를 여기에 붙여넣거나 클릭해서 업로드'}
-                    </div>
-                    <input 
-                      type="file" 
-                      ref={editMapImgInputRef} 
-                      style={{ display: 'none' }} 
-                      multiple 
-                      accept="image/*" 
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files.length > 0) {
-                          handleImageAttach(e.target.files, true, true);
-                        }
-                      }} 
-                    />
-                    {editingPlace.mapImages && editingPlace.mapImages.length > 0 && (
-                      <div className="image-preview-container" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
-                        {editingPlace.mapImages.map((url, index) => (
-                          <div 
-                            key={index} 
-                            className="image-preview-wrapper" 
-                            draggable={true}
-                            onDragStart={() => setDraggedMapImgIdx(index)}
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={() => {
-                              handleReorderImages(draggedMapImgIdx, index, true, true);
-                              setDraggedMapImgIdx(null);
-                            }}
-                            style={{ position: 'relative', width: '80px', height: '60px', cursor: 'grab' }}
-                            title="드래그하여 순서 변경"
-                          >
-                            <img 
-                              src={url} 
-                              alt="map preview" 
-                              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border)' }} 
-                            />
-                            <button 
-                              type="button" 
-                              className="remove-img-btn" 
-                              onClick={() => handleRemoveImage(index, true, true)}
-                              style={{
-                                position: 'absolute',
-                                top: '-6px',
-                                right: '-6px',
-                                width: '18px',
-                                height: '18px',
-                                borderRadius: '50%',
-                                backgroundColor: 'rgba(0,0,0,0.6)',
-                                color: '#fff',
-                                border: 'none',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                fontSize: '11px',
-                                padding: 0
-                              }}
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div> {/* Close form-group of map images */}
+ {/* Close form-group of map images */}
                 </div> {/* Close modal-body */}
                 </form>
               </div>
