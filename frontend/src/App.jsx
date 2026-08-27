@@ -590,6 +590,7 @@ function App() {
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
   const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
   const [showAddEventModal, setShowAddEventModal] = useState(false);
+  const [editingEvent, setEditingEvent] = useState(null);
   const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '', members: [] });
   const [showEditMembersModal, setShowEditMembersModal] = useState(false);
   const [tempMembers, setTempMembers] = useState([]);
@@ -962,6 +963,7 @@ function App() {
       showModal || 
       showAddTripModal || 
       showAddEventModal || 
+      editingEvent ||
       showEditMembersModal || 
       showAddAnniversaryModal || 
       editingPlace || 
@@ -976,25 +978,6 @@ function App() {
       editingSavedPlace ||
       showNotifModal
     );
-    console.log("=== Scroll Lock Debug ===", {
-      isModalOpen,
-      showModal,
-      showAddTripModal,
-      showAddEventModal,
-      showEditMembersModal,
-      showAddAnniversaryModal,
-      editingPlace: !!editingPlace,
-      editingAnniversary: !!editingAnniversary,
-      confirmModalIsOpen: confirmModal?.isOpen,
-      showTrashModal,
-      showEditMetaModal,
-      selectedDetailPlace: !!selectedDetailPlace,
-      showProfileModal,
-      lightboxOpen: lightboxImagesList && lightboxImagesList.length > 0,
-      showAddSavedPlaceModal,
-      editingSavedPlace: !!editingSavedPlace,
-      showNotifModal
-    });
     if (isModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -1004,7 +987,7 @@ function App() {
       document.body.style.overflow = '';
     };
   }, [
-    showModal, showAddTripModal, showAddEventModal, showEditMembersModal, showAddAnniversaryModal, 
+    showModal, showAddTripModal, showAddEventModal, editingEvent, showEditMembersModal, showAddAnniversaryModal, 
     editingPlace, editingAnniversary, confirmModal.isOpen, showTrashModal, showEditMetaModal, 
     selectedDetailPlace, showProfileModal, lightboxImagesList, showAddSavedPlaceModal, editingSavedPlace,
     showNotifModal
@@ -1016,6 +999,7 @@ function App() {
       showModal || 
       showAddTripModal || 
       showAddEventModal || 
+      editingEvent ||
       showEditMembersModal || 
       showAddAnniversaryModal || 
       editingPlace || 
@@ -1036,6 +1020,7 @@ function App() {
         setShowModal(false);
         setShowAddTripModal(false);
         setShowAddEventModal(false);
+        setEditingEvent(null);
         setShowEditMembersModal(false);
         setShowAddAnniversaryModal(false);
         setEditingPlace(null);
@@ -1061,7 +1046,7 @@ function App() {
       window.removeEventListener('popstate', handlePopState);
     };
   }, [
-    showModal, showAddTripModal, showAddEventModal, showEditMembersModal, showAddAnniversaryModal, 
+    showModal, showAddTripModal, showAddEventModal, editingEvent, showEditMembersModal, showAddAnniversaryModal, 
     editingPlace, editingAnniversary, confirmModal.isOpen, showTrashModal, showEditMetaModal, 
     selectedDetailPlace, showProfileModal, lightboxImagesList, showAddSavedPlaceModal, editingSavedPlace,
     showNotifModal
@@ -1936,6 +1921,43 @@ function App() {
     setNewEvent({ title: '', date: '', description: '', members: [] });
     setShowAddEventModal(false);
     setSelectedCalendarDate(null);
+  };
+
+  // Update Custom Family Event
+  const handleUpdateEvent = async (e) => {
+    e.preventDefault();
+    if (!editingEvent || !editingEvent.title || !(editingEvent.startDate || editingEvent.date)) return;
+
+    const eventDate = editingEvent.startDate || editingEvent.date;
+    const updatedEventData = {
+      ...editingEvent,
+      startDate: eventDate,
+      endDate: eventDate,
+      description: editingEvent.description || ''
+    };
+
+    try {
+      const response = await fetch(`${API_BASE}/api/plans/${editingEvent.id}/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedEventData)
+      });
+      if (response.ok) {
+        const saved = await response.json();
+        const updatedPlans = plans.map(p => p.id === editingEvent.id ? saved : p);
+        setPlans(updatedPlans);
+        localStorage.setItem('family_travel_plans', JSON.stringify(updatedPlans));
+      } else {
+        throw new Error('Server failed to update event');
+      }
+    } catch (err) {
+      console.warn("Offline: updating event locally:", err);
+      const updatedPlans = plans.map(p => p.id === editingEvent.id ? updatedEventData : p);
+      setPlans(updatedPlans);
+      localStorage.setItem('family_travel_plans', JSON.stringify(updatedPlans));
+    }
+
+    setEditingEvent(null);
   };
 
   // Delete Travel Plan or Family Event
@@ -3528,7 +3550,7 @@ function App() {
                       {selectedEvents.length === 0 ? (
                         <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '12px' }}>등록된 일정이 없습니다.</div>
                       ) : (
-                        <div className="selected-day-events-list">
+                        <div className="selected-day-events-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           {selectedEvents.map(e => (
                             <div
                               key={e.id}
@@ -3538,7 +3560,9 @@ function App() {
                                   if (currentUser?.role === 'admin') {
                                     setEditingAnniversary(e);
                                   }
-                                } else if (!e.isEvent) {
+                                } else if (e.isEvent) {
+                                  setEditingEvent(e);
+                                } else {
                                   fetchSinglePlan(e.id);
                                 }
                               }}
@@ -3546,43 +3570,111 @@ function App() {
                                 display: 'flex', 
                                 justifyContent: 'space-between', 
                                 alignItems: 'center', 
-                                cursor: e.isAnniversary 
-                                  ? (currentUser?.role === 'admin' ? 'pointer' : 'default') 
-                                  : 'pointer' 
+                                padding: '10px 12px',
+                                background: 'var(--bg-app, #fff)',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border)',
+                                cursor: (e.isAnniversary && currentUser?.role !== 'admin') ? 'default' : 'pointer'
                               }}
                             >
-                              <span>
-                                <span className={`event-type-tag ${e.isAnniversary ? 'anniversary' : (e.isEvent ? 'event' : 'trip')}`} style={{ marginRight: '6px' }}>
-                                  {e.isAnniversary ? (
-                                    e.type === 'birthday' ? (e.name.includes('생신') ? '생신' : '생일') :
-                                    e.type === 'memorial' ? '기일' :
-                                    e.type === 'ritual' ? '제사' : '기념일'
-                                  ) : (e.isEvent ? '행사' : '여행')}
-                                </span>
-                                {e.title}
-                              </span>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                {!e.isEvent && !e.isAnniversary && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>자세히 ➔</span>}
-                                {e.isAnniversary && currentUser?.role === 'admin' && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>수정 ➔</span>}
+                              <div style={{ flex: 1, minWidth: 0, paddingRight: '8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                                  <span className={`event-type-tag ${e.isAnniversary ? 'anniversary' : (e.isEvent ? 'event' : 'trip')}`}>
+                                    {e.isAnniversary ? (
+                                      e.type === 'birthday' ? (e.name.includes('생신') ? '생신' : '생일') :
+                                      e.type === 'memorial' ? '기일' :
+                                      e.type === 'ritual' ? '제사' : '기념일'
+                                    ) : (e.isEvent ? '행사' : '여행')}
+                                  </span>
+                                  <span style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem' }}>{e.title}</span>
+                                </div>
+                                {e.description && (
+                                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px', whiteSpace: 'pre-wrap', lineHeight: '1.3' }}>
+                                    📝 {e.description}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                                {!e.isEvent && !e.isAnniversary && (
+                                  <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600', marginRight: '4px' }}>자세히 ➔</span>
+                                )}
+                                {e.isEvent && (
+                                  <button
+                                    type="button"
+                                    title="행사 수정"
+                                    style={{
+                                      width: '32px',
+                                      height: '32px',
+                                      borderRadius: '50%',
+                                      border: '1px solid var(--primary)',
+                                      background: 'var(--primary-light, #eef2ff)',
+                                      color: 'var(--primary)',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      cursor: 'pointer',
+                                      fontSize: '0.85rem',
+                                      padding: 0
+                                    }}
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      setEditingEvent(e);
+                                    }}
+                                  >
+                                    ✏️
+                                  </button>
+                                )}
+                                {e.isAnniversary && currentUser?.role === 'admin' && (
+                                  <button
+                                    type="button"
+                                    title="기념일 수정"
+                                    style={{
+                                      width: '32px',
+                                      height: '32px',
+                                      borderRadius: '50%',
+                                      border: '1px solid var(--primary)',
+                                      background: 'var(--primary-light, #eef2ff)',
+                                      color: 'var(--primary)',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      cursor: 'pointer',
+                                      fontSize: '0.85rem',
+                                      padding: 0
+                                    }}
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      setEditingAnniversary(e);
+                                    }}
+                                  >
+                                    ✏️
+                                  </button>
+                                )}
                                 {!e.isAnniversary && (
                                   <button
-                                    className="logout-btn"
+                                    type="button"
+                                    title="삭제"
                                     style={{
-                                      padding: '2px 8px',
-                                      fontSize: '0.7rem',
-                                      margin: 0,
-                                      border: '1px solid var(--danger)',
-                                      borderRadius: '6px',
+                                      width: '32px',
+                                      height: '32px',
+                                      borderRadius: '50%',
+                                      border: '1px solid #fee2e2',
+                                      background: '#fff5f5',
                                       color: 'var(--danger)',
-                                      background: 'transparent',
-                                      cursor: 'pointer'
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      cursor: 'pointer',
+                                      fontSize: '0.85rem',
+                                      padding: 0
                                     }}
                                     onClick={(event) => {
                                       event.stopPropagation();
                                       handleDeletePlan(e.id);
                                     }}
                                   >
-                                    삭제
+                                    🗑️
                                   </button>
                                 )}
                               </div>
@@ -6966,6 +7058,84 @@ function App() {
                 </div>
               </div>
               <button type="submit" className="submit-btn">가족 행사 등록하기</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT FAMILY EVENT MODAL */}
+      {editingEvent && (
+        <div className="modal-overlay" onClick={() => setEditingEvent(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>✏️ 가족 행사 수정</h3>
+              <button className="close-btn" onClick={() => setEditingEvent(null)}>×</button>
+            </div>
+            <form onSubmit={handleUpdateEvent}>
+              <div className="form-group">
+                <label>행사 제목</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="예: 할머니 칠순 식사, 가족 대청소"
+                  className="form-control"
+                  value={editingEvent.title || ''}
+                  onChange={e => setEditingEvent({ ...editingEvent, title: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>날짜</label>
+                <input
+                  type="date"
+                  required
+                  className="form-control"
+                  value={editingEvent.startDate || editingEvent.date || ''}
+                  onChange={e => setEditingEvent({ ...editingEvent, startDate: e.target.value, date: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>설명/메모</label>
+                <textarea
+                  placeholder="예: 오후 6시 서라벌 한정식 예약"
+                  className="form-control"
+                  value={editingEvent.description || ''}
+                  onChange={e => setEditingEvent({ ...editingEvent, description: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>참여 가족 구성원</label>
+                <div className="members-checkbox-group">
+                  {FAM_USERS.map((user) => {
+                    const name = user.name;
+                    const age = calculateManAge(user.pin);
+                    const isChecked = (editingEvent.members || []).includes(name);
+                    return (
+                      <label key={name} className="member-checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            let updatedMembers = [...(editingEvent.members || [])];
+                            if (e.target.checked) {
+                              if (!updatedMembers.includes(name)) {
+                                updatedMembers.push(name);
+                              }
+                            } else {
+                              updatedMembers = updatedMembers.filter(m => m !== name);
+                            }
+                            setEditingEvent({ ...editingEvent, members: updatedMembers });
+                          }}
+                        />
+                        {name} {age !== null && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>(만 {age}세)</span>}
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="modal-footer" style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                <button type="button" className="delete-btn-danger" onClick={() => { const id = editingEvent.id; setEditingEvent(null); handleDeletePlan(id); }} style={{ width: 'auto', marginTop: 0, padding: '10px 16px' }}>삭제</button>
+                <button type="submit" className="submit-btn" style={{ flex: 1, margin: 0 }}>수정 완료</button>
+              </div>
             </form>
           </div>
         </div>
